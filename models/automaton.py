@@ -19,12 +19,14 @@ class Automaton:
         Automaton constructor.
 
         frame_time will probably be changed depending on the method used to controle the speed.
-        
+        grid_b is a copy of the array created to avoid the overhead of memory allocation and copying on each update.
+
         Args:
             binary_array (np.ndarray): Binary array with cell positions. Result of `load_to_binary_array()` from utils.data_reader
             frame_time (float, optional): Frame time in seconds. Defaults to 0.2s.
         """
         self.automaton = self._create_automaton_grid(binary_array)
+        self.grid_b = np.array([[copy.deepcopy(cell) for cell in row] for row in self.automaton])
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = 0
@@ -94,15 +96,14 @@ class Automaton:
         Method to update the grid based on the current state.
         """
         nrows, ncols = self.automaton.shape
-        automaton_copy = np.array([[copy.deepcopy(cell) for cell in row] for row in self.automaton])
         for y in range(nrows):
             for x in range(ncols):
                 new_state, flag = self._update_cell((y, x))
-                automaton_copy[y, x].state = new_state
+                self.grid_b[y, x].state = new_state
                 if flag:
-                    automaton_copy[y, x].last_polarized = self.frame_counter
+                    self.grid_b[y, x].last_polarized = self.frame_counter
         
-        self.automaton = automaton_copy
+        self.automaton, self.grid_b = self.grid_b, self.automaton
 
     def _to_numpy(self) -> np.ndarray:
         """
@@ -139,6 +140,10 @@ class Automaton:
         clear_output(wait=True)
 
     def run_simulation(self):
+        """
+        Simple method to update the simulation. sleep function is used more for debug than anything since
+        it doesn't include the time needed for the update and rendering of the new frame.
+        """
         self.draw(first_time=True)
 
         while True:
