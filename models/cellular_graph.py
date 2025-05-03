@@ -6,12 +6,46 @@ from scipy.sparse.csgraph import minimum_spanning_tree
 
 
 class Space: #, the final frontier
+
     def __init__(self, binary_array, root):
-        self.graph = self.create_graph_from_matrix(binary_array, root)
-    def create_graph_from_matrix(self,binary_array,root, return_mst = False):
+        self.primary_dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        self.diagonal_dirs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        self.root = root
+        self.graph = self.capped_neighbours_graph(binary_array)
+
+
+    def nearest_neighbours_graph(self,binary_array: np.ndarray):
         """
-        Creates a graph of CCS from matrix.
+        Creates the graph where cells are connected if they are in sqrt(2) radius - maximum of 8 neighbours.
+        One of the ways to create cells neighborhood.
+        binary_array (np.ndarray): Binary array with cell positions. Result of `load_to_binary_array()` from utils.data_reader
         """
+        points = np.argwhere(binary_array == 1)
+
+        # Create k-d tree to search neighbours faster
+        tree = cKDTree(points)
+
+        # Search for neighbours in radius sqrt(2)
+        indices = tree.query_ball_point(points, np.sqrt(2))
+
+        G = nx.Graph()
+        for i, neighbors in enumerate(indices):
+            for j in neighbors:
+                if i != j:
+                    p1, p2 = points[i], points[j]
+                    weight = np.linalg.norm(p1 - p2)
+                    G.add_edge(tuple(p1), tuple(p2), weight=weight)
+
+        return G
+
+    def capped_neighbours_graph(self, binary_array, cap = 4):
+        """
+        Creates the graph where maximum of cap cells are connected if they are in sqrt(2) radius - maximum of 8
+        neighbours. Prioritising cells arranged vertically or horizontally.
+        One of the ways to create cells neighborhood.
+        binary_array (np.ndarray): Binary array with cell positions. Result of `load_to_binary_array()` from utils.data_reader
+        """
+
         points = np.argwhere(binary_array == 1)
 
         # Create k-d tree for faster neighbour search
@@ -22,25 +56,32 @@ class Space: #, the final frontier
 
         # Create weighted graph
         G = nx.Graph()
-        for i, neighbors in enumerate(indices):
-            for j in neighbors:
-                if i != j:
-                    p1, p2 = points[i], points[j]
-                    weight = np.linalg.norm(p1 - p2)
-                    G.add_edge(tuple(p1), tuple(p2), weight=weight)
 
+        for point in points:
+            neighbors = []
 
-        if not return_mst:
-            return G
-        mst = nx.minimum_spanning_tree(G)
+            # Check 4-connected neighbors
+            for dx, dy in self.primary_dirs:
+                neighbor = (point[0] + dx, point[1] + dy)
+                if binary_array[neighbor[0], neighbor[1]] > 0:
+                    neighbors.append(neighbor)
+                if len(neighbors) == cap:
+                    break
+            # Add diagonal neighbors if less than 4
+            if len(neighbors) < cap:
+                for dx, dy in self.diagonal_dirs:
+                    neighbor = (point[0] + dx, point[1] + dy)
+                    if not ((point[0] + dx, point[1]) in neighbors and (point[0], point[1] + dy) in neighbors):
+                        if binary_array[neighbor[0], neighbor[1]] > 0:
+                            neighbors.append(neighbor)
+                        if len(neighbors) == 4:
+                            break
 
-        if root in mst.nodes:
-            mst = nx.bfs_tree(mst, root)
-        else:
-            print(f"Warning: Root {root} not found in MST nodes.")
+            for neighbor in neighbors:
+                weight = np.linalg.norm(np.array(point) - np.array(neighbor))
+                G.add_edge(tuple(point), neighbor, weight=weight)
 
-        return mst.to_undirected()
-
+        return G
 
     def draw(self):
         """
