@@ -1,9 +1,9 @@
-import networkx as nx
-import numpy as np
-from matplotlib import pyplot as plt
-from scipy.spatial import cKDTree
-from scipy.sparse.csgraph import minimum_spanning_tree
-
+import networkx as nx # type: ignore
+import numpy as np # type: ignore
+from matplotlib import pyplot as plt # type: ignore
+from scipy.spatial import cKDTree # type: ignore
+from scipy.sparse.csgraph import minimum_spanning_tree # type: ignore
+from models.cell import Cell
 
 class Space: #, the final frontier
 
@@ -11,7 +11,8 @@ class Space: #, the final frontier
         self.primary_dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         self.diagonal_dirs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
         self.root = root
-        self.graph = self.capped_neighbours_graph(binary_array)
+        self.graph = self.nearest_neighbours_graph(binary_array)
+        #self.capped_neighbours_graph(binary_array)
 
 
     def nearest_neighbours_graph(self,binary_array: np.ndarray):
@@ -28,6 +29,7 @@ class Space: #, the final frontier
         # Search for neighbours in radius sqrt(2)
         indices = tree.query_ball_point(points, np.sqrt(2))
 
+
         G = nx.Graph()
         for i, neighbors in enumerate(indices):
             for j in neighbors:
@@ -43,12 +45,27 @@ class Space: #, the final frontier
         Creates the graph where maximum of cap cells are connected if they are in sqrt(2) radius - maximum of 8
         neighbours. Prioritising cells arranged vertically or horizontally.
         One of the ways to create cells neighborhood.
-        binary_array (np.ndarray): Binary array with cell positions. Result of `load_to_binary_array()` from utils.data_reader
+
+        Args:
+            binary_array (np.ndarray): Binary array with cell positions. Result of `load_to_binary_array()` from utils.data_reader
+        
+        returns:
+            networkx graph
+            cells_map dict[Tuple[int, int], Cell] - dict mapping position in the grid to a given cell
         """
 
         points = np.argwhere(binary_array == 1)
-
         # Create k-d tree for faster neighbour search
+        cells = {}
+        for p in points:
+            point = (p[0], p[1])
+            cell = None
+            if point == self.root:
+                cell = Cell(position=point, self_polarization=True)
+            else:
+                cell = Cell(position=point)
+            cells[point] = cell
+
         tree = cKDTree(points)
 
         # find 8 neighbours of node
@@ -57,7 +74,7 @@ class Space: #, the final frontier
         # Create weighted graph
         G = nx.Graph()
 
-        for point in points:
+        for ind, point in enumerate(points):
             neighbors = []
 
             # Check 4-connected neighbors
@@ -77,11 +94,12 @@ class Space: #, the final frontier
                         if len(neighbors) == 4:
                             break
 
+            p = (point[0], point[1])
             for neighbor in neighbors:
+                cells[p].add_neighbour(cells[neighbor])
                 weight = np.linalg.norm(np.array(point) - np.array(neighbor))
                 G.add_edge(tuple(point), neighbor, weight=weight)
-
-        return G
+        return G, cells
 
     def draw(self):
         """

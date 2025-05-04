@@ -2,19 +2,19 @@ from models.cell import Cell
 from models.cell_state import CellState
 
 import copy
-from typing import Tuple
+from typing import Dict, List, Tuple
 import numpy as np # type: ignore
 from matplotlib import colors # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 from IPython.display import clear_output, display
-from time import sleep
+from time import sleep, time
 
 class Automaton:
     """
     Stores the cell array and controles the simulation.
     is_running (bool): Stops the update on the automaton
     """
-    def __init__(self, binary_array: np.ndarray, frame_time: float = 0.2):
+    def __init__(self,data_array: np.ndarray, cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2):
         """
         Automaton constructor.
 
@@ -22,16 +22,24 @@ class Automaton:
         grid_b is a copy of the array created to avoid the overhead of memory allocation and copying on each update.
 
         Args:
-            binary_array (np.ndarray): Binary array with cell positions. Result of `load_to_binary_array()` from utils.data_reader
+            cells Dict[Tuple[int, int], Cell]: mapping of the cell to a position
             frame_time (float, optional): Frame time in seconds. Defaults to 0.2s.
         """
-        self.automaton = self._create_automaton_grid(binary_array)
-        self.grid_b = np.array([[copy.deepcopy(cell) for cell in row] for row in self.automaton])
+        self.shape = data_array.shape
+        self.draw_array = np.zeros(self.shape)
+        self.cells = cells
+        self.grid_a = self._create_automaton()
+        #self.automaton = self._create_automaton_grid(binary_array)
+        self.grid_b = self._create_automaton()
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = 0
 
         self.fig = self.ax = self.img = None
+
+    def _create_automaton(self) -> List[Cell]:
+        return [value for value in self.cells.values()]
+
 
     def _create_automaton_grid(self, binary_array: np.ndarray) -> np.ndarray:
         """
@@ -51,7 +59,7 @@ class Automaton:
             [Cell(value_to_state[val]) for val in row] for row in binary_array
         ])    
 
-    def _update_cell(self, position: Tuple[int, int]) -> Tuple[CellState, bool]:
+    def _update_cell(self, cell: Cell) -> Tuple[CellState, bool]:
         """
         Method to update cells state using neigbours.
         For now just cycle through the states if it was polarized. If not, check if
@@ -63,8 +71,6 @@ class Automaton:
         Returns:
             Tuple[CellState, bool]: New state of the cell and information if it was polarized
         """
-        cell = self.automaton[position]
-
         if cell.state == CellState.DEAD:
             return cell.state, False
         # Losing charge
@@ -73,17 +79,10 @@ class Automaton:
         
         # Check if it can take in charge
         else:
-            y, x = position
-            nrows, ncols = self.automaton.shape
-            if y - 1 >= 0 and self.automaton[y - 1, x].state == CellState.DEPOLARIZATION:
-                return CellState.POLARIZATION, True
-            if y + 1 < nrows and self.automaton[y + 1, x].state == CellState.DEPOLARIZATION:
-                return CellState.POLARIZATION, True
-            if x - 1 >= 0 and self.automaton[y, x - 1].state == CellState.DEPOLARIZATION:
-                return CellState.POLARIZATION, True
-            if x + 1 < ncols and self.automaton[y, x + 1].state == CellState.DEPOLARIZATION:
-                return CellState.POLARIZATION, True
-
+            for nei in cell.neighbours:
+                if nei.state == CellState.DEPOLARIZATION:
+                    return CellState.POLARIZATION, True
+            
         # Check if can self polarize
         if cell.self_polarization and self.frame_counter >= (cell.last_polarized + cell.self_polar_timer): 
             return CellState.POLARIZATION, True 
@@ -95,16 +94,14 @@ class Automaton:
         """
         Method to update the grid based on the current state.
         """
-        nrows, ncols = self.automaton.shape
-        for y in range(nrows):
-            for x in range(ncols):
-                new_state, flag = self._update_cell((y, x))
-                self.grid_b[y, x].state = new_state
-                if flag:
-                    self.grid_b[y, x].last_polarized = self.frame_counter
+        for ind, cell in enumerate(self.grid_a):
+            new_state, flag = self._update_cell(cell)
+            self.grid_b[ind].state = new_state
+            if flag:
+                self.grid_b[ind].last_polarized = self.frame_counter
         
-        self.automaton, self.grid_b = self.grid_b, self.automaton
-
+        self.grid_a, self.grid_b = self.grid_b, self.grid_a
+        
     def _to_numpy(self) -> np.ndarray:
         """
         Simple method to map self.automaton array to array of numbers
@@ -112,7 +109,11 @@ class Automaton:
         Returns:
             np.ndarray: array of type int from Cell.to_int() method
         """
-        return np.array([[cell.to_int() for cell in row] for row in self.automaton])
+        #res = np.zeros(self.shape)
+        for cell in self.grid_a:
+            self.draw_array[cell.position] = cell.to_int()
+        return self.draw_array 
+        #return np.array([[cell.to_int() for cell in row] for row in self.automaton])
 
     def draw(self, first_time: bool = False) -> None:
         """
@@ -129,8 +130,8 @@ class Automaton:
             self.ax.set_xticks([])
             self.ax.set_yticks([])
 
-        cmap = colors.ListedColormap(['white', 'yellow', 'red', 'blue', 'green', 'black'])
-        bounds = np.arange(-0.5, 6.5, 1)
+        cmap = colors.ListedColormap(['white','gray', 'yellow', 'red', 'blue', 'green', 'black'])
+        bounds = np.arange(-0.5, 7.5, 1)
         norm = colors.BoundaryNorm(bounds, cmap.N)
 
         self.ax.cla()
