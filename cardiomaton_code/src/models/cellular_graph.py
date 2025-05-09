@@ -73,6 +73,7 @@ class Space: #, the final frontier
 
         # Create weighted graph
         G = nx.Graph()
+        rows, cols = binary_array.shape
 
         for ind, point in enumerate(points):
             neighbors = []
@@ -80,8 +81,9 @@ class Space: #, the final frontier
             # Check 4-connected neighbors
             for dx, dy in self.primary_dirs:
                 neighbor = (point[0] + dx, point[1] + dy)
-                if binary_array[neighbor[0], neighbor[1]] > 0:
-                    neighbors.append(neighbor)
+                if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                    if binary_array[neighbor[0], neighbor[1]] > 0:
+                        neighbors.append(neighbor)
                 if len(neighbors) == cap:
                     break
             # Add diagonal neighbors if less than 4
@@ -89,8 +91,9 @@ class Space: #, the final frontier
                 for dx, dy in self.diagonal_dirs:
                     neighbor = (point[0] + dx, point[1] + dy)
                     if not ((point[0] + dx, point[1]) in neighbors and (point[0], point[1] + dy) in neighbors):
-                        if binary_array[neighbor[0], neighbor[1]] > 0:
-                            neighbors.append(neighbor)
+                        if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                            if binary_array[neighbor[0], neighbor[1]] > 0:
+                                neighbors.append(neighbor)
                         if len(neighbors) == 4:
                             break
 
