@@ -11,7 +11,7 @@ class Space: #, the final frontier
         self.primary_dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         self.diagonal_dirs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
         self.root = root
-        self.graph = self.nearest_neighbours_graph(binary_array)
+        self.graph, _ = self.capped_neighbours_graph(binary_array)
         #self.capped_neighbours_graph(binary_array)
 
 

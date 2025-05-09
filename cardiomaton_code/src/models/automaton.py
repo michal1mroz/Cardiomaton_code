@@ -29,8 +29,7 @@ class Automaton:
         self.draw_array = np.zeros(self.shape)
         self.cells = cells
         self.grid_a = self._create_automaton()
-        #self.automaton = self._create_automaton_grid(binary_array)
-        self.grid_b = self._create_automaton()
+        self.grid_b = self._copy_grid(self.grid_a)
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = 0
@@ -38,8 +37,38 @@ class Automaton:
         self.fig = self.ax = self.img = None
 
     def _create_automaton(self) -> List[Cell]:
+        """
+        Simple method to flatten the dict of cells (Dict[Tuple[int, int], Cell]) to a list of cells.
+
+        Returns:
+            cells (List[Cell]) - flattened list
+        """
         return [value for value in self.cells.values()]
 
+    def _copy_grid(self, cell_list: List[Cell]) -> List[Cell]:
+        """
+        Internal method to copy the grid. Standard deepcopy failed with the references to other cells.
+
+        Args:
+            cell_list (List[Cell]): List of input cells.
+
+        Returns:
+            result_list (List[Cell]): Coppied list
+        """
+        arr = []
+        help_dict = {}
+        for cell in cell_list:
+            new_cell = Cell(position = cell.position, init_state = cell.state,
+                            self_polarization = cell.self_polarization,
+                            self_polarization_timer= cell.self_polar_timer)
+            help_dict[cell.position] = new_cell
+            arr.append(new_cell)
+        
+        for i, cell in enumerate(cell_list):
+            for nei in cell.neighbours:
+                pos = nei.position
+                arr[i].add_neighbour(help_dict[pos])
+        return arr
 
     def _create_automaton_grid(self, binary_array: np.ndarray) -> np.ndarray:
         """
@@ -59,47 +88,22 @@ class Automaton:
             [Cell(value_to_state[val]) for val in row] for row in binary_array
         ])    
 
-    def _update_cell(self, cell: Cell) -> Tuple[CellState, bool]:
-        """
-        Method to update cells state using neigbours.
-        For now just cycle through the states if it was polarized. If not, check if
-        any neighbour is depolarizing.
-
-        Args:
-            position (Tuple[int, int]): indices of a given cell
-        
-        Returns:
-            Tuple[CellState, bool]: New state of the cell and information if it was polarized
-        """
-        if cell.state == CellState.DEAD:
-            return cell.state, False
-        # Losing charge
-        if cell.state != CellState.WAITING:
-            return CellState((cell.state.value + 1) % (len(CellState) - 1)), False
-        
-        # Check if it can take in charge
-        else:
-            for nei in cell.neighbours:
-                if nei.state == CellState.DEPOLARIZATION:
-                    return CellState.POLARIZATION, True
-            
-        # Check if can self polarize
-        if cell.self_polarization and self.frame_counter >= (cell.last_polarized + cell.self_polar_timer): 
-            return CellState.POLARIZATION, True 
-
-        # No update
-        return cell.state, False
-
     def update_grid(self) -> None:
         """
         Method to update the grid based on the current state.
         """
         for ind, cell in enumerate(self.grid_a):
-            new_state, flag = self._update_cell(cell)
+            new_state, flag = cell.update_cell(self.frame_counter)
+            #self._dump_grid(self.grid_a)
+            #self._dump_grid(self.grid_b)
+            #new_state, flag = self._update_cell(cell)
+            #print(f"Checking: {ind} - {cell}")
+
             self.grid_b[ind].state = new_state
             if flag:
                 self.grid_b[ind].last_polarized = self.frame_counter
-        
+
+
         self.grid_a, self.grid_b = self.grid_b, self.grid_a
         
     def _to_numpy(self) -> np.ndarray:
