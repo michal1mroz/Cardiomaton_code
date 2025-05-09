@@ -22,6 +22,37 @@ class Cell:
         self.position = position 
         self.neighbours = []
 
+    def update_cell(self, current_frame: int) -> Tuple[CellState, bool]:
+        """
+        Public method to update the state of the cell. Does not modify the state of the cell - that would break down the automaton.
+
+        Args:
+            current_frame (int): Frame from the automaton, used to measure time (to be changed to some kind of delta time value in the future)
+
+        Returns:
+            Tuple[CellState, bool]: New state of the cell to be set on the temporary grid of the automaton and bool flag showing if the cell was
+                polarized in this update.
+        """
+        if self.state == CellState.DEAD:
+            return self.state, False
+        # Losing charge
+        if self.state != CellState.WAITING:
+            return CellState((self.state.value + 1) % (len(CellState) - 1)), False
+        
+        # Check if it can take in charge
+        else:
+            for nei in self.neighbours:
+                if nei.state == CellState.DEPOLARIZATION:
+                    return CellState.POLARIZATION, True
+            
+        # Check if can self polarize
+        if self.self_polarization and current_frame >= (self.last_polarized + self.self_polar_timer): 
+            return CellState.POLARIZATION, True 
+
+        # No update
+        return self.state, False
+
+
     def __repr__(self):
         """
         Debug print method
