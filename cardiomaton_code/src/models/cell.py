@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List, Tuple
-from models.cell_state import CellState
+from src.models.cell_state import CellState
 
 class Cell:
     """
