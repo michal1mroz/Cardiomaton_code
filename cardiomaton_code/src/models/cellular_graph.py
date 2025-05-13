@@ -3,7 +3,7 @@ import numpy as np # type: ignore
 from matplotlib import pyplot as plt # type: ignore
 from scipy.spatial import cKDTree # type: ignore
 from scipy.sparse.csgraph import minimum_spanning_tree # type: ignore
-from models.cell import Cell
+from src.models.cell import Cell
 
 class Space: #, the final frontier
 

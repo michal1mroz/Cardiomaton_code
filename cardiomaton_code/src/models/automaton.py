@@ -1,5 +1,5 @@
-from models.cell import Cell
-from models.cell_state import CellState
+from src.models.cell import Cell
+from src.models.cell_state import CellState
 
 import copy
 from typing import Dict, List, Tuple
