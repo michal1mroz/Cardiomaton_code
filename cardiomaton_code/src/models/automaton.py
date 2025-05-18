@@ -1,5 +1,8 @@
-from models.cell import Cell
-from models.cell_state import CellState
+from src.models.cell import Cell
+from src.models.cell_state import CellState
+from src.update_strategies.basic_update import BasicUpdate
+from src.update_strategies.update_with_timing import UpdateWithTiming
+from src.update_strategies.test_update import TestUpdate
 
 import copy
 from typing import Dict, List, Tuple
@@ -14,7 +17,7 @@ class Automaton:
     Stores the cell array and controles the simulation.
     is_running (bool): Stops the update on the automaton
     """
-    def __init__(self,data_array: np.ndarray, cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2):
+    def __init__(self, data_array: np.ndarray, cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2):
         """
         Automaton constructor.
 
@@ -33,6 +36,8 @@ class Automaton:
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = 0
+        # self.update_method = BasicUpdate()
+        self.update_method = UpdateWithTiming()
 
         self.fig = self.ax = self.img = None
 
@@ -82,7 +87,7 @@ class Automaton:
         """
         value_to_state = {
             0: CellState.DEAD,
-            1: CellState.WAITING,
+            1: CellState.POLARIZATION,
         }
         return np.array([
             [Cell(value_to_state[val]) for val in row] for row in binary_array
@@ -92,17 +97,16 @@ class Automaton:
         """
         Method to update the grid based on the current state.
         """
+        reset_frame_counter = False
         for ind, cell in enumerate(self.grid_a):
-            new_state, flag = cell.update_cell(self.frame_counter)
-            #self._dump_grid(self.grid_a)
-            #self._dump_grid(self.grid_b)
-            #new_state, flag = self._update_cell(cell)
-            #print(f"Checking: {ind} - {cell}")
+            new_state, flag = self.update_method.update(cell, self.frame_counter)
+            if flag:
+                reset_frame_counter = True
 
             self.grid_b[ind].state = new_state
-            if flag:
-                self.grid_b[ind].last_polarized = self.frame_counter
-
+            
+        if reset_frame_counter:
+            self.frame_counter = 0
 
         self.grid_a, self.grid_b = self.grid_b, self.grid_a
         
@@ -113,11 +117,9 @@ class Automaton:
         Returns:
             np.ndarray: array of type int from Cell.to_int() method
         """
-        #res = np.zeros(self.shape)
         for cell in self.grid_a:
             self.draw_array[cell.position] = cell.to_int()
         return self.draw_array 
-        #return np.array([[cell.to_int() for cell in row] for row in self.automaton])
 
     def draw(self, first_time: bool = False) -> None:
         """
@@ -156,4 +158,60 @@ class Automaton:
             sleep(self.frame_time)
             self.update_grid()
             self.draw()
- 
+
+    def run_test_signal(self, trigger_position: Tuple[int, int]):
+        """
+        Runs a single depolarization wave through the grid to measure signal propagation.
+
+        The simulation stops when no further state changes occur. This allows assessment of how far 
+        (depth) and how long (duration in frames) the signal travels through the graph.
+
+        Returns:
+            Tuple[int, int]: Maximum depth reached and total number of frames until signal propagation ends.
+        """
+         
+        tmp_grid = self._copy_grid(self.grid_a)
+        test_grid = self.grid_a
+        
+        for cell in test_grid:
+            cell.state = CellState.POLARIZATION
+            cell.activated_at = None
+
+        for cell in test_grid:
+            if cell.position == trigger_position:
+                cell.state = CellState.DEPOLARIZATION
+                cell.activated_at = 0
+                break
+
+        frame_counter = 0
+
+        self.draw(first_time=True)
+        while True:
+            sleep(self.frame_time)
+            updated = False
+            next_states = []
+
+            for cell in test_grid:
+                new_state, depolarized = TestUpdate().update(cell, frame_counter)
+                next_states.append((cell, new_state, depolarized))
+                if depolarized and cell.activated_at is None:
+                    cell.activated_at = frame_counter
+                if cell.state != new_state:
+                    updated = True
+            
+            for cell, new_state, _ in next_states:
+                cell.state = new_state
+
+            self.draw()
+
+            if not updated:
+                break
+            frame_counter += 1
+
+        max_depth = max(
+            (cell.activated_at for cell in test_grid if cell.activated_at is not None),
+            default=-1
+        )
+
+        self.grid_a = tmp_grid
+        return max_depth, frame_counter

@@ -4,9 +4,8 @@ class CellState(Enum):
     """
     Enum class to store the state of the cell.
     """
-    WAITING = 0
-    POLARIZATION = 1
-    DEPOLARIZATION = 2
-    ABS_REFRACTION = 3
-    REFRACTION = 4
-    DEAD = 5
+    POLARIZATION = 0
+    DEPOLARIZATION = 1
+    ABS_REFRACTION = 2
+    REFRACTION = 3
+    DEAD = 4
