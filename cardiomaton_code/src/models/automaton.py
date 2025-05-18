@@ -104,6 +104,7 @@ class Automaton:
                 reset_frame_counter = True
 
             self.grid_b[ind].state = new_state
+            self.grid_b[ind].state_timer = cell.state_timer
             
         if reset_frame_counter:
             self.frame_counter = 0
@@ -136,7 +137,7 @@ class Automaton:
             self.ax.set_xticks([])
             self.ax.set_yticks([])
 
-        cmap = colors.ListedColormap(['white','gray', 'yellow', 'red', 'blue', 'green', 'black'])
+        cmap = colors.ListedColormap(['white','gray', 'yellow', 'red', 'pink', 'green', 'black'])
         bounds = np.arange(-0.5, 7.5, 1)
         norm = colors.BoundaryNorm(bounds, cmap.N)
 

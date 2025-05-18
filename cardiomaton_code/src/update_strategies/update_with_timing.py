@@ -23,8 +23,8 @@ class UpdateWithTiming(UpdateStrategy):
             if cell.state_timer >= cell.state_durations[cell.state]:
                 next_state = {
                     CellState.DEPOLARIZATION: CellState.ABS_REFRACTION,
-                    CellState.ABS_REFRACTION: CellState.POLARIZATION,
-                    # CellState.REFRACTION: CellState.POLARIZATION # the refraction does not work now
+                    CellState.ABS_REFRACTION: CellState.REFRACTION,
+                    CellState.REFRACTION: CellState.POLARIZATION # the refraction does not work now
                 }[cell.state]
                 cell.reset_timer()
                 return next_state, False

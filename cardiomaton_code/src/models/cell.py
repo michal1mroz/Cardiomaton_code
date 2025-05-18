@@ -70,8 +70,8 @@ class Cell:
             # CellState.WAITING: 'gray',
             CellState.POLARIZATION: 'gray',
             CellState.DEPOLARIZATION: 'yellow',
-            CellState.ABS_REFRACTION: 'blue',
-            CellState.REFRACTION: 'green',
+            CellState.ABS_REFRACTION: 'red',
+            CellState.REFRACTION: 'pink',
             CellState.DEAD: 'black',
             }[self.state]
 
