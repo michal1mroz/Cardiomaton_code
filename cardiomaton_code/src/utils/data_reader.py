@@ -5,7 +5,7 @@ from typing import Tuple
 from src.models.cellular_graph import Space
 #from .models.cellular_graph import Space
 
-def load_to_binary_array(path : str = "resources/img_ccs/", nr_of_nodes: int = 1500) -> Tuple[np.ndarray, Tuple[float, float]]:
+def load_to_binary_array(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> Tuple[np.ndarray, Tuple[float, float]]:
     """
     Loads a binary array representing the cardiac conduction system from an image.
 
@@ -35,7 +35,7 @@ def load_to_binary_array(path : str = "resources/img_ccs/", nr_of_nodes: int = 1
 
     return (ccs > 0).astype(np.int_), tuple(AV_node_position)
 
-def img_graph(path : str = "resources/img_ccs/", nr_of_nodes: int = 1500) -> Space:
+def img_graph(path : str = "../resources/img_ccs/", nr_of_nodes: int = 1500) -> Space:
     """
     Loads a binary array representing the cardiac conduction system from an image.
 

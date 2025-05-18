@@ -93,3 +93,15 @@ class Cell:
         """
         return self.state.value + 1
 
+    def to_tuple(self) -> Tuple[int, bool, str]:
+        """
+        Simple method to map the current state to tuple with the most important information
+        The tuple contains:
+         - self_polarization (bool): Whether the cell can self-polarize.
+         - state (str): Human-readable name of the cell's current state (e.g., 'Waiting', 'Polarization').
+
+        Returns:
+            Tuple[int, bool, str]: A tuple with the cell's Numerical value, self-polarization flag, and state name.
+        """
+        return (self.state.value + 1, self.self_polarization, self.state.name.capitalize())
+

@@ -5,6 +5,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer
 from src.frontend.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
+from src.frontend.main_label import MainLabel
+
 
 class MainWindow(QMainWindow):
     """
@@ -23,6 +25,9 @@ class MainWindow(QMainWindow):
 
         self.sim = SimulationController(frame_time=0.05)
         self.renderer = FrameRenderer(self.sim)
+        self.label = MainLabel(self.renderer)
+
+        self.running = False
 
         self._init_ui()
         self._init_timer()
@@ -37,10 +42,11 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(central)
 
         # Simulation display
-        self.simulation_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        # self.simulation_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        self.simulation_label = self.label
         layout.addWidget(self.simulation_label)
 
-        # Play button
+        # Start/stop button
         self.play_button = QPushButton("Play")
         self.play_button.clicked.connect(self._start)
         layout.addWidget(self.play_button)
@@ -62,10 +68,18 @@ class MainWindow(QMainWindow):
 
     def _start(self):
         """
-        Starts the simulation loop.
+        Toggles the simulation loop between start and stop.
         """
-        self.play_button.setEnabled(False)
-        self.timer.start(int(self.sim.frame_time * 1000))
+        if self.running:
+            self.timer.stop()
+            self.play_button.setText("Start")
+            self.running = False
+        else:
+            self.timer.start(int(self.sim.frame_time * 1000))
+            self.play_button.setText("Stop")
+            self.running = True
+
+        self.label.set_running(self.running)
 
     def _change_speed(self, ms: int):
         """

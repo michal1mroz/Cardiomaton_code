@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 from src.utils.data_reader import load_to_binary_array
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
@@ -38,13 +40,25 @@ class SimulationController:
         """
         self.automaton.frame_time = t
 
-    def step(self) -> "np.ndarray[int]":
-        """
-        Advances the simulation by one frame.
+    # def step(self) -> "np.ndarray[int]":
+    #     """
+    #     Advances the simulation by one frame.
+    #
+    #     Returns:
+    #         np.ndarray[int]: Grid state as a 2D NumPy integer array.
+    #     """
+    #     self.automaton.frame_counter += 1
+    #     self.automaton.update_grid()
+    #     return self.automaton._to_numpy().astype(int)
 
+    def step(self) -> List[List[Tuple[int, bool, str]]]:
+        """
+        Alternative step method. Advances the simulation by one frame.
         Returns:
-            np.ndarray[int]: Grid state as a 2D NumPy integer array.
+            List[List[Tuple[int, bool, str]]]: A 2D list representing the grid,
+            where each element is a tuple with cell information. Positions without a cell
+            are filled with None.
         """
         self.automaton.frame_counter += 1
         self.automaton.update_grid()
-        return self.automaton._to_numpy().astype(int)
+        return self.automaton.to_cell_data()
