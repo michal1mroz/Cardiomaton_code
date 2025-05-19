@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 from typing import Tuple
 from src.models.cellular_graph import Space
-#from .models.cellular_graph import Space
 
 def load_to_binary_array(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> Tuple[np.ndarray, Tuple[float, float]]:
     """
