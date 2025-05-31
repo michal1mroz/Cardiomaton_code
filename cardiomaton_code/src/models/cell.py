@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import List, Tuple
 from src.models.cell_state import CellState
 
+
+
 class Cell:
     """
     Class to store information about specific cell.
@@ -11,6 +13,26 @@ class Cell:
         CellState.DEPOLARIZATION: 1,
         CellState.ABS_REFRACTION: 50,
         CellState.REFRACTION: 10
+    }
+
+    # To be moved to better location
+    cell_data = {
+        "default": {
+            "resting_charge": -90,
+            "peak_charge": 30,
+            "threshold": -5,
+            "duration": 60,
+            "step": 2,
+        },
+        "auto": {
+            "resting_charge": -60,
+            "peak_charge": 20,
+            "threshold": -35,
+            "duration": 40,
+            "step": 2,
+            "step_1": 0.13,
+            "step_2": 27.5,
+        },
     }
 
     self_polar_threshold = 200
@@ -31,7 +53,13 @@ class Cell:
 
         self.position = position 
         self.neighbours = []
-    
+        self.charge = 0
+
+        # To be changed according to some type of dict
+        self.type = "default"
+        if self.self_polarization:
+            self.type = "auto"
+
     def reset_timer(self):
         self.state_timer = 0
 
@@ -48,7 +76,7 @@ class Cell:
         """
         Debug print method
         """
-        return f"[Cell]: State: {self.state}, auto polar: {self.self_polarization}, last polarized: {self.last_polarized}, position: {self.position}, neighbour count: {len(self.neighbours)}"
+        return f"[Cell]: State: {self.state}, auto polar: {self.self_polarization}, charge: {self.charge}, position: {self.position}, neighbour count: {len(self.neighbours)}"
 
     def add_neighbour(self, neighbour: Cell) -> None:
         """

@@ -2,6 +2,7 @@ from src.models.cell import Cell
 from src.models.cell_state import CellState
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
+from src.update_strategies.update_charge import UpdateCharge
 
 import copy
 from typing import Dict, List, Tuple
@@ -36,8 +37,8 @@ class Automaton:
         self.is_running = False
         self.frame_counter = 0
         # self.update_method = BasicUpdate()
-        self.update_method = UpdateWithTiming()
-
+        #self.update_method = UpdateWithTiming()
+        self.update_method = UpdateCharge()
         self.fig = self.ax = self.img = None
 
     def _create_automaton(self) -> List[Cell]:
@@ -98,13 +99,15 @@ class Automaton:
         """
         reset_frame_counter = False
         for ind, cell in enumerate(self.grid_a):
-            new_state, flag = self.update_method.update(cell, self.frame_counter)
-            if flag:
-                reset_frame_counter = True
-
+            #new_state, flag = self.update_method.update(cell, self.frame_counter)
+            new_charge, new_state = self.update_method.update(cell)
+            
+            #if flag:
+            #    reset_frame_counter = True
+            
             self.grid_b[ind].state = new_state
             self.grid_b[ind].state_timer = cell.state_timer
-            
+            self.grid_b[ind].charge = new_charge
         if reset_frame_counter:
             self.frame_counter = 0
 
