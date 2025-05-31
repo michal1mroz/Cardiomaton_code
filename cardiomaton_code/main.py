@@ -1,4 +1,4 @@
-from utils.data_reader import *
+from src.utils.data_reader import *
 
 
 # Press the green button in the gutter to run the script.
