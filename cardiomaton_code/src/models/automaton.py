@@ -3,6 +3,7 @@ from src.models.cell_state import CellState
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
 from src.update_strategies.update_charge import UpdateCharge
+from src.update_strategies.update_charge_ms import UpdateChargeMS
 
 import copy
 from typing import Dict, List, Tuple
@@ -38,8 +39,10 @@ class Automaton:
         self.frame_counter = 0
         # self.update_method = BasicUpdate()
         #self.update_method = UpdateWithTiming()
-        self.update_method = UpdateCharge()
+        # self.update_method = UpdateCharge()
+        self.update_method = UpdateChargeMS()
         self.fig = self.ax = self.img = None
+
 
     def _create_automaton(self) -> List[Cell]:
         """
@@ -195,7 +198,7 @@ class Automaton:
 
         for cell in test_grid:
             if cell.position == trigger_position:
-                cell.state = CellState.DEPOLARIZATION
+                cell.state = CellState.RAPID_DEPOLARIZATION
                 cell.activated_at = 0
                 break
 

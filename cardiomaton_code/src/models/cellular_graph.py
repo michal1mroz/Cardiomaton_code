@@ -62,7 +62,7 @@ class Space: #, the final frontier
             point = (p[0], p[1])
             cell = None
             if point == self.root:
-                cell = Cell(position=point, init_state=CellState.DEPOLARIZATION, self_polarization=True)
+                cell = Cell(position=point, init_state=CellState.SLOW_DEPOLARIZATION, self_polarization=True)
             else:
                 cell = Cell(position=point)
             cells[point] = cell
