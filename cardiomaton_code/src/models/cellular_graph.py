@@ -64,10 +64,7 @@ class Space: #, the final frontier
             point = (p[0], p[1])
             cell = None
             if point == self.root:
-                # cell = Cell(position=point,cell_type=CellType.SA_NODE,durations = CellType.SA_NODE.value["durations"],init_state=CellState.DEPOLARIZATION, self_polarization=True)
-                #
-                cell = CellType.create(position=point, cell_type=CellType.AV_NODE,state=CellState.DEPOLARIZATION)
-                # print(cell.to_tuple())
+                cell = CellType.create(position=point, cell_type=CellType.AV_NODE,state=CellState.SLOW_DEPOLARIZATION)
             else:
                 # cell = Cell(position=point,cell_type=CellType.SA_NODE,durations = CellType.SA_NODE.value["durations"], self_polarization=True)
 

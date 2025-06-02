@@ -10,10 +10,34 @@ class Cell:
     Class to store information about specific cell.
     """
 
-    state_durations = {
-        CellState.DEPOLARIZATION: 1,
-        CellState.ABS_REFRACTION: 50,
-        CellState.REFRACTION: 10
+    # state_durations = {
+    #     CellState.DEPOLARIZATION: 1,
+    #     CellState.ABS_REFRACTION: 50,
+    #     CellState.REFRACTION: 10
+    # }
+
+    # To be moved to better location
+    # For now, we have one(?) self-depolarizing cell and the rest of the cells is treated like regular cardiomycytes
+    # which is not tru biologically, but works well in the first version of simulation
+    cell_data = {
+        "default": {
+            "resting_membrane_potential": -90,
+            "peak_potential": 30,
+            "threshold_potential": -5,
+            "duration": 60,
+            "repolarization_potential_drop": 2, # more values to be established because repolarization pace changes
+            "relative_refractory_period_threshold": -60,
+        },
+        "auto": {
+            "resting_membrane_potential": -60,
+            "peak_potential": 20,
+            "threshold_potential": -35,
+            "duration": 40,
+            "spontaneous_depolarization_step_slow": 0.13,
+            "spontaneous_depolarization_step_fast": 27.5,
+            "repolarization_potential_drop": 2,
+            "relative_refractory_period_threshold": -40,
+        },
     }
 
     self_polar_threshold = 200
@@ -37,7 +61,13 @@ class Cell:
 
         self.position = position 
         self.neighbours = []
-    
+        self.charge = 0
+
+        # To be changed according to some type of dict
+        self.type = "default"
+        if self.self_polarization:
+            self.type = "auto"
+
     def reset_timer(self):
         self.state_timer = 0
 
@@ -54,7 +84,7 @@ class Cell:
         """
         Debug print method
         """
-        return f"[Cell]: State: {self.state}, auto polar: {self.self_polarization}, position: {self.position}, neighbour count: {len(self.neighbours)}"
+        return f"[Cell]: State: {self.state}, auto polar: {self.self_polarization}, charge: {self.charge}, position: {self.position}, neighbour count: {len(self.neighbours)}"
 
     def add_neighbour(self, neighbour: Cell) -> None:
         """
@@ -75,9 +105,9 @@ class Cell:
         return {
             # CellState.WAITING: 'gray',
             CellState.POLARIZATION: 'gray',
-            CellState.DEPOLARIZATION: 'yellow',
-            CellState.ABS_REFRACTION: 'red',
-            CellState.REFRACTION: 'pink',
+            CellState.RAPID_DEPOLARIZATION: 'yellow',
+            CellState.SLOW_DEPOLARIZATION: 'pink',
+            CellState.REPOLARIZATION: 'red',
             CellState.DEAD: 'black',
             }[self.state]
 

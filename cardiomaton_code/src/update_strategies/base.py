@@ -5,3 +5,7 @@ from src.models.cell_state import CellState
 class UpdateStrategy:
     def update(self, cell: Cell, current_frame: int) -> Tuple[CellState, bool]:
         raise NotImplementedError
+    
+class UpdateBaseCharge:
+    def update(self, cell: Cell) -> Tuple[int, CellState]:
+        raise NotImplementedError
