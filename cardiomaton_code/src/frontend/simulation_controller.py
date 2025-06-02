@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from src.utils.data_reader import load_to_binary_array
+from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
 
@@ -15,9 +15,12 @@ class SimulationController:
         Args:
             frame_time (float): Time between frames in seconds.
         """
-        graph, av_pos = load_to_binary_array()
-        space = Space(graph, av_pos)
-        _, cell_map = space.capped_neighbours_graph(graph, cap=8)
+        # graph, av_pos = load_to_binary_array()
+        graph, A, B = extract_conduction_pixels()
+        space = Space(graph)
+        # _, cell_map = space.capped_neighbours_graph(graph, cap=8)
+        _, cell_map = space.capped_neighbours_graph_from_regions(A,B,cap = 8)
+
         self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
 
     @property
@@ -51,7 +54,7 @@ class SimulationController:
     #     self.automaton.update_grid()
     #     return self.automaton._to_numpy().astype(int)
 
-    def step(self) -> List[List[Tuple[int, bool, str]]]:
+    def step(self) -> List[List[Tuple[int, bool, str, str]]]:
         """
         Alternative step method. Advances the simulation by one frame.
         Returns:

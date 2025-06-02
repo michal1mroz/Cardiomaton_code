@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout,
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy,
     QPushButton, QLabel, QSlider
 )
 from PyQt6.QtCore import Qt, QTimer
@@ -23,9 +23,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Cardiomaton")
         self.setGeometry(0, 0, 1000, 600)
 
-        self.sim = SimulationController(frame_time=0.05)
+        self.base_frame_time = 0.05
+
+        self.sim = SimulationController(frame_time=self.base_frame_time)
         self.renderer = FrameRenderer(self.sim)
         self.label = MainLabel(self.renderer)
+
 
         self.running = False
 
@@ -41,6 +44,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
         layout = QVBoxLayout(central)
 
+        self.label.setMinimumSize(800, 600)
+
         # Simulation display
         # self.simulation_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.simulation_label = self.label
@@ -49,14 +54,23 @@ class MainWindow(QMainWindow):
         # Start/stop button
         self.play_button = QPushButton("Play")
         self.play_button.clicked.connect(self._start)
-        layout.addWidget(self.play_button)
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.play_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addLayout(button_layout)
+        # layout.addWidget(self.play_button)
 
         # Speed slider
         self.speed_slider = QSlider(Qt.Orientation.Horizontal)
-        self.speed_slider.setRange(1, 200)
-        self.speed_slider.setValue(int(self.sim.frame_time * 1000))
+        self.speed_slider.setRange(1, 500)
+        self.speed_slider.setValue(100)
         self.speed_slider.valueChanged.connect(self._change_speed)
-        layout.addWidget(self.speed_slider)
+
+        slider_layout = QHBoxLayout()
+        self.speed_slider.setFixedWidth(300)
+        slider_layout.addWidget(self.speed_slider, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addLayout(slider_layout)
+        # layout.addWidget(self.speed_slider)
 
     def _init_timer(self):
         """
@@ -81,16 +95,19 @@ class MainWindow(QMainWindow):
 
         self.label.set_running(self.running)
 
-    def _change_speed(self, ms: int):
+    def _change_speed(self, percent: int):
         """
         Updates the simulation speed based on slider value.
 
         Args:
-            ms (int): Milliseconds per frame.
+            prercent (int): % of change speed
         """
-        self.sim.frame_time = ms / 1000
+        multiplier = percent / 100
+        new_frame_time = self.base_frame_time / multiplier
+        self.sim.frame_time = new_frame_time
+
         if self.timer.isActive():
-            self.timer.start(ms)
+            self.timer.start(int(new_frame_time * 1000))
 
     def _update_frame(self):
         """

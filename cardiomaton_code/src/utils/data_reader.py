@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from typing import Tuple
 from src.models.cellular_graph import Space
+from itertools import chain
+from matplotlib import pyplot as plt
 
 def load_to_binary_array(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> Tuple[np.ndarray, Tuple[float, float]]:
     """
@@ -34,7 +36,7 @@ def load_to_binary_array(path : str = "./resources/img_ccs/", nr_of_nodes: int =
 
     return (ccs > 0).astype(np.int_), tuple(AV_node_position)
 
-def img_graph(path : str = "../resources/img_ccs/", nr_of_nodes: int = 1500) -> Space:
+def img_graph(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> Space:
     """
     Loads a binary array representing the cardiac conduction system from an image.
 
@@ -48,3 +50,58 @@ def img_graph(path : str = "../resources/img_ccs/", nr_of_nodes: int = 1500) -> 
     binary_array, av_pos = load_to_binary_array(path = path,nr_of_nodes = nr_of_nodes)
     return Space(binary_array, av_pos)
 
+def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,threshold= 110, min_component_size = 30):
+    def binarize_image(image_path, threshold):
+        img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        with open(path + "CCS_info.json") as img_info:
+            data = json.load(img_info)
+            base_nr_of_nodes = data["base_nodes_number"]
+        # scale = np.sqrt(nr_of_nodes / base_nr_of_nodes) * img.shape[0] / img.shape[1]
+        _, bin_img = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY)
+        # bin_img = cv2.resize(bin_img, (0, 0), fx=scale, fy=scale)
+        return bin_img
+
+    def get_connected_components(binary_img):
+        # Find connected components using 8-connectivity
+        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(binary_img, connectivity=8)
+        components = []
+        x = 0
+        for label in range(1, num_labels+1):  # skip background
+            component_mask = labels == label
+            if np.sum(component_mask) < min_component_size: continue
+            points = list(zip(*np.where(component_mask)))
+            print(points[0])
+            components.append(points)
+        return components
+
+    # 1. Binarize images
+    bin_main = binarize_image(path + "CCS.png", threshold)
+    bin_parts = binarize_image(path + "CCS_parts.png", threshold)
+
+    # 2. Get main graph components (full system) and parts (regions)
+    region_components = get_connected_components(bin_parts)
+
+    # 3. Przyjmujemy stałą kolejność etykiet jak wcześniej
+    # labels = [
+    #     "his_left", "his_right", "bachmann", "internodal_post",
+    #     "his_bundle", "sa_node", "av_node", "internodal_ant", "internodal_mid"
+    # ]
+    labels = [
+        "bachmann", "his_right", "sa_node", "internodal_ant",
+        "internodal_post", "internodal_mid", "his_bundle", "av_node", "his_left"
+    ]
+    region_dict = dict(zip(labels, region_components))
+
+    for label in labels:
+        print(len(region_dict[label]))
+
+    # 4. Znajdź wszystkie piksele należące do regionów
+    region_pixels = set(chain.from_iterable(region_components))
+
+    # 5. Znajdź piksele w całym układzie, które NIE należą do żadnego regionu — to będą połączenia (junctions)
+    all_pixels = set(zip(*np.where(bin_main == 255)))
+    junction_pixels = list(all_pixels - region_pixels)
+
+
+
+    return bin_main, region_dict, junction_pixels

@@ -44,6 +44,7 @@ class UpdateWithTiming(UpdateStrategy):
         # Depolarization induced by neighbor
         if cell.state == CellState.POLARIZATION:
             for nei in cell.neighbours:
+                if not cell.neighbours : print("kurcze puste")
                 if nei.state == CellState.DEPOLARIZATION:
                     cell.reset_timer()
                     return CellState.DEPOLARIZATION, False
