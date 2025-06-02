@@ -50,7 +50,7 @@ def img_graph(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> S
     binary_array, av_pos = load_to_binary_array(path = path,nr_of_nodes = nr_of_nodes)
     return Space(binary_array, av_pos)
 
-def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,threshold= 105, min_component_size = 30):
+def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,threshold= 127, min_component_size = 30):
     """
 
     Args:
@@ -87,8 +87,8 @@ def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,t
         return components
 
     # Binarize images
-    bin_main = binarize_image(path + "CCS.png", threshold)
-    bin_parts = binarize_image(path + "CCS_parts.png", threshold)
+    bin_main = binarize_image(path + "CCS.png", 127)
+    bin_parts = binarize_image(path + "CCS_parts.png", 110)
 
     # Get main graph components (full system) and parts (regions)
     region_components = get_connected_components(bin_parts)
