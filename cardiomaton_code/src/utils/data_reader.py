@@ -50,7 +50,20 @@ def img_graph(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> S
     binary_array, av_pos = load_to_binary_array(path = path,nr_of_nodes = nr_of_nodes)
     return Space(binary_array, av_pos)
 
-def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,threshold= 110, min_component_size = 30):
+def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,threshold= 105, min_component_size = 30):
+    """
+
+    Args:
+        path:
+        nr_of_nodes:
+        threshold:
+        min_component_size:
+
+    Returns:
+        bin_main - A binary NumPy array (1: part of CCS, 0: background).
+        region_dict - dictionary in which keys are CCS parts names and points ( x,y coordinates) as values
+        junction_pixels - list of junction cells
+    """
     def binarize_image(image_path, threshold):
         img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         with open(path + "CCS_info.json") as img_info:
@@ -70,38 +83,27 @@ def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,t
             component_mask = labels == label
             if np.sum(component_mask) < min_component_size: continue
             points = list(zip(*np.where(component_mask)))
-            print(points[0])
             components.append(points)
         return components
 
-    # 1. Binarize images
+    # Binarize images
     bin_main = binarize_image(path + "CCS.png", threshold)
     bin_parts = binarize_image(path + "CCS_parts.png", threshold)
 
-    # 2. Get main graph components (full system) and parts (regions)
+    # Get main graph components (full system) and parts (regions)
     region_components = get_connected_components(bin_parts)
 
-    # 3. Przyjmujemy stałą kolejność etykiet jak wcześniej
-    # labels = [
-    #     "his_left", "his_right", "bachmann", "internodal_post",
-    #     "his_bundle", "sa_node", "av_node", "internodal_ant", "internodal_mid"
-    # ]
+    # Order in which they are read
     labels = [
         "bachmann", "his_right", "sa_node", "internodal_ant",
         "internodal_post", "internodal_mid", "his_bundle", "av_node", "his_left"
     ]
     region_dict = dict(zip(labels, region_components))
 
-    for label in labels:
-        print(len(region_dict[label]))
-
-    # 4. Znajdź wszystkie piksele należące do regionów
     region_pixels = set(chain.from_iterable(region_components))
 
-    # 5. Znajdź piksele w całym układzie, które NIE należą do żadnego regionu — to będą połączenia (junctions)
+    # find pixels which belongs to whole mesh, but does not to specific part : junctions
     all_pixels = set(zip(*np.where(bin_main == 255)))
     junction_pixels = list(all_pixels - region_pixels)
-
-
 
     return bin_main, region_dict, junction_pixels

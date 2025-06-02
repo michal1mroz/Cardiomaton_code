@@ -10,39 +10,35 @@ class Cell:
     Class to store information about specific cell.
     """
 
-    # state_durations = {
-    #     CellState.DEPOLARIZATION: 1,
-    #     CellState.ABS_REFRACTION: 50,
-    #     CellState.REFRACTION: 10
-    # }
-
     # To be moved to better location
     # For now, we have one(?) self-depolarizing cell and the rest of the cells is treated like regular cardiomycytes
     # which is not tru biologically, but works well in the first version of simulation
-    cell_data = {
-        "default": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2, # more values to be established because repolarization pace changes
-            "relative_refractory_period_threshold": -60,
-        },
-        "auto": {
-            "resting_membrane_potential": -60,
-            "peak_potential": 20,
-            "threshold_potential": -35,
-            "duration": 40,
-            "spontaneous_depolarization_step_slow": 0.13,
-            "spontaneous_depolarization_step_fast": 27.5,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -40,
-        },
-    }
+
+    # CELL DATA MOVED TO CellType enum values (for now?)
+    # cell_data = {
+    #     "default": {
+    #         "resting_membrane_potential": -90,
+    #         "peak_potential": 30,
+    #         "threshold_potential": -5,
+    #         "duration": 60,
+    #         "repolarization_potential_drop": 2, # more values to be established because repolarization pace changes
+    #         "relative_refractory_period_threshold": -60,
+    #     },
+    #     "auto": {
+    #         "resting_membrane_potential": -60,
+    #         "peak_potential": 20,
+    #         "threshold_potential": -35,
+    #         "duration": 40,
+    #         "spontaneous_depolarization_step_slow": 0.13,
+    #         "spontaneous_depolarization_step_fast": 27.5,
+    #         "repolarization_potential_drop": 2,
+    #         "relative_refractory_period_threshold": -40,
+    #     },
+    # }
 
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: CellType, durations : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
+    def __init__(self, position: Tuple[int, int],cell_type: CellType, cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
         """
         Cell constructor.
         
@@ -52,9 +48,9 @@ class Cell:
         """
         self.state = init_state
         self.self_polarization = self_polarization
-        self.type = cell_type
+        self.cell_type = cell_type
 
-        self.state_durations = durations
+        # self.state_durations = durations
 
         self.self_polar_timer = 0
         self.state_timer = 0
@@ -63,10 +59,12 @@ class Cell:
         self.neighbours = []
         self.charge = 0
 
-        # To be changed according to some type of dict
-        self.type = "default"
-        if self.self_polarization:
-            self.type = "auto"
+        self.cell_data = cell_data
+
+        # # To be changed according to some type of dict
+        # self.type = "default"
+        # if self.self_polarization:
+        #     self.type = "auto"
 
     def reset_timer(self):
         self.state_timer = 0
@@ -130,7 +128,7 @@ class Cell:
         Returns:
             Tuple[int, bool, str]: A tuple with the cell's Numerical value, self-polarization flag, and state name.
         """
-        return (self.state.value + 1, self.self_polarization, self.state.name.capitalize(), self.type.name.capitalize())
+        return (self.state.value + 1, self.self_polarization, self.state.name.capitalize(), self.cell_type.value["name"])
 
     def copy(self) -> Cell:
         """
@@ -142,7 +140,7 @@ class Cell:
         """
         copied_cell = Cell(
             position=self.position,
-            cell_type=self.type,
+            cell_type=self.cell_type,
             durations=self.state_durations,
             init_state=self.state,
             self_polarization=self.self_polarization,
@@ -152,4 +150,3 @@ class Cell:
         # Neighbours are intentionally not copied
 
         return copied_cell
-

@@ -22,7 +22,8 @@ class UpdateChargeMS(UpdateBaseCharge):
         """
         REFRACTION_POLAR = 1000
         
-        cell_data_dict = cell.cell_data[cell.type]
+        # cell_data_dict = cell.cell_data[cell.type]
+        cell_data_dict = cell.cell_data
         
         match cell.state:
             case CellState.DEAD:

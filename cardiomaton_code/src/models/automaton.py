@@ -70,7 +70,7 @@ class Automaton:
         arr = []
         help_dict = {}
         for cell in cell_list:
-            new_cell = Cell(position=cell.position,durations = cell.state_durations, init_state=cell.state,cell_type = cell.type,
+            new_cell = Cell(position=cell.position,cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type,
                             self_polarization=cell.self_polarization,
                             self_polarization_timer=cell.self_polar_timer)
             if len(new_cell.neighbours) != 0: print("cost tu jest nie tak")

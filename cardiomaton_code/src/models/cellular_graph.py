@@ -128,7 +128,7 @@ class Space: #, the final frontier
         all_points = []
         cell_types = {}
 
-        # Mapowanie nazw sekcji na CellType
+        # Maping cell
         label_to_type = {
             "sa_node": CellType.SA_NODE,
             "av_node": CellType.AV_NODE,
@@ -141,38 +141,33 @@ class Space: #, the final frontier
             "internodal_mid": CellType.INTERNODAL_MID
         }
 
-        # Dodaj punkty z regionów
+        # Adding points from known regions
         for label, points in region_dict.items():
-            ctype = label_to_type.get(label)  # default fallback
+            ctype = label_to_type.get(label)
             for pt in points:
                 cell_types[pt] = ctype
                 all_points.append(pt)
 
-        # Dodaj punkty junctionów jako osobny typ
+        # Adding Junction type cells
+        # TODO: assign junction cells to specific(closest) part of CCS
         for pt in junction_pixels:
             cell_types[pt] = CellType.JUNCTION
             all_points.append(pt)
 
-        # Stwórz obiekty Cell
+        # Creating Cell obejcts
         cells = {}
         for pt in all_points:
-            # if cell_types[pt] == None:
-            #     # print(pt)
-            #     cells[pt] = CellType.create(position=pt, cell_type=CellType.INTERNODAL_MID)
-            # else:
             cells[pt] = CellType.create(position=pt, cell_type=cell_types[pt])
 
-        # Ustawienie do przeszukiwania sąsiedztwa
+        # array for searching neighbours
         array_points = np.array(all_points)
-        tree = cKDTree(array_points)
 
-        # Tworzenie grafu
         G = nx.Graph()
         for idx, point in enumerate(array_points):
             pt = tuple(point)
             neighbors = []
 
-            # Szukaj najpierw w pion/poziom
+            # Horizontal/vertical first
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 neighbor = (pt[0] + dx, pt[1] + dy)
                 if neighbor in cell_types:
@@ -180,12 +175,11 @@ class Space: #, the final frontier
                 if len(neighbors) == cap:
                     break
 
-            # Jeśli za mało sąsiadów, szukaj po przekątnej
+            # Diagonally second
             if len(neighbors) < cap:
                 for dx, dy in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
                     neighbor = (pt[0] + dx, pt[1] + dy)
                     if neighbor in cell_types:
-                        # pomiń przekątne między już podłączonymi
                         if not ((pt[0] + dx, pt[1]) in neighbors and (pt[0], pt[1] + dy) in neighbors):
                             neighbors.append(neighbor)
                     if len(neighbors) == cap:
@@ -195,9 +189,6 @@ class Space: #, the final frontier
                 cells[pt].add_neighbour(cells[n])
                 dist = np.linalg.norm(np.array(pt) - np.array(n))
                 G.add_edge(pt, n, weight=dist)
-        # self.graph = G
-
-        # self.draw()
         return G, cells
 
     def draw(self):

@@ -76,8 +76,8 @@ class MainLabel(QLabel):
         polarization_state = info[2]
 
         voltage = "200 Volt (placeholder)"
-        cell_type = info[3]
-        ccs_part = "pęczek Hisa (placeholder)"
+        cell_type = "komórka rozruchowa (placeholder)"
+        ccs_part = info[3]
 
         text = (
             f"<b>Pozycja:<b> {pos}<br><br>"
