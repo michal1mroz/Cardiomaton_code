@@ -141,7 +141,7 @@ class CellType(Enum):
     }
 
     @staticmethod
-    def create(position: Tuple[int, int], cell_type, state : CellState = CellState.POLARIZATION ) -> Cell:
+    def create(position: Tuple[int, int], cell_type : "CellType", state : CellState = CellState.POLARIZATION ) -> Cell:
         config = cell_type.value
         return Cell(
             position=position,
