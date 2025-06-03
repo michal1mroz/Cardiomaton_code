@@ -27,9 +27,8 @@ class MainLabel(QLabel):
 
     def mouseMoveEvent(self, event):
         """
-        Handles mouse move events to show tooltips with cell information
-        when hovering over the pixmap.
-
+        Show tooltip only if the mouse moves to a new cell.
+        Tooltip remains visible as long as the mouse stays over the same cell.
         """
         if not self.pixmap() or self.running:
             return
@@ -44,6 +43,9 @@ class MainLabel(QLabel):
         y = event.position().y() - offset_y
 
         if x < 0 or y < 0 or x >= pixmap_size.width() or y >= pixmap_size.height():
+            if self.last_tooltip is not None:
+                QToolTip.hideText()
+                self.last_tooltip = None
             return
 
         data = self.renderer.last_data
@@ -57,15 +59,16 @@ class MainLabel(QLabel):
         row = int(y / pixmap_size.height() * rows)
 
         if 0 <= row < rows and 0 <= col < cols:
-            cell_info = data[row][col]
-            if cell_info is not None:
-                if self.last_tooltip != (row, col):
-                    QToolTip.hideText()
-                    self.show_cell_info(cell_info, event.globalPosition().toPoint())
+            if self.last_tooltip != (row, col):
+                cell_info = data[row][col]
+                if cell_info is not None:
+                    self.show_cell_info(cell_info, event.globalPosition().toPoint(), (row, col))
                     self.last_tooltip = (row, col)
         else:
-            QToolTip.hideText()
-    def show_cell_info(self, info, global_pos):
+            if self.last_tooltip is not None:
+                QToolTip.hideText()
+                self.last_tooltip = None
+    def show_cell_info(self, info, global_pos, pos):
         """
         Shows information about cell at the given global position.
         """
@@ -73,10 +76,11 @@ class MainLabel(QLabel):
         polarization_state = info[2]
 
         voltage = "200 Volt (placeholder)"
-        cell_type = "Komórka rozrusznikowa (placeholder)"
-        ccs_part = "pęczek Hisa (placeholder)"
+        cell_type = "komórka rozruchowa (placeholder)"
+        ccs_part = info[3]
 
         text = (
+            f"<b>Pozycja:<b> {pos}<br><br>"
             f"<b>Samopolaryzacja:</b> {is_self_polarizing}<br>"
             f"<b>Stan polaryzacji:</b> {polarization_state}<br><br>"
             f"<b>Napięcie:</b> {voltage}<br>"
@@ -86,5 +90,12 @@ class MainLabel(QLabel):
 
         QToolTip.showText(global_pos, text, self)
 
+    def leaveEvent(self, event):
+        """
+        Hide tooltip when mouse leaves the label.
+        """
+        QToolTip.hideText()
+        self.last_tooltip = None
+        super().leaveEvent(event)
     def set_running(self, state):
         self.running = state

@@ -2,6 +2,9 @@ from src.models.cell import Cell
 from src.models.cell_state import CellState
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
+from src.models.cell_type import CellType
+from src.update_strategies.update_charge import UpdateCharge
+from src.update_strategies.update_charge_ms import UpdateChargeMS
 
 import copy
 from typing import Dict, List, Tuple
@@ -10,6 +13,9 @@ from matplotlib import colors # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 from IPython.display import clear_output, display
 from time import sleep, time
+
+
+
 
 class Automaton:
     """
@@ -36,9 +42,11 @@ class Automaton:
         self.is_running = False
         self.frame_counter = 0
         # self.update_method = BasicUpdate()
-        self.update_method = UpdateWithTiming()
-
+        #self.update_method = UpdateWithTiming()
+        # self.update_method = UpdateCharge()
+        self.update_method = UpdateChargeMS()
         self.fig = self.ax = self.img = None
+
 
     def _create_automaton(self) -> List[Cell]:
         """
@@ -62,12 +70,13 @@ class Automaton:
         arr = []
         help_dict = {}
         for cell in cell_list:
-            new_cell = Cell(position = cell.position, init_state = cell.state,
-                            self_polarization = cell.self_polarization,
-                            self_polarization_timer= cell.self_polar_timer)
+            new_cell = Cell(position=cell.position,cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type,
+                            self_polarization=cell.self_polarization,
+                            self_polarization_timer=cell.self_polar_timer)
+            if len(new_cell.neighbours) != 0: print("cost tu jest nie tak")
             help_dict[cell.position] = new_cell
             arr.append(new_cell)
-        
+
         for i, cell in enumerate(cell_list):
             for nei in cell.neighbours:
                 pos = nei.position
@@ -98,13 +107,15 @@ class Automaton:
         """
         reset_frame_counter = False
         for ind, cell in enumerate(self.grid_a):
-            new_state, flag = self.update_method.update(cell, self.frame_counter)
-            if flag:
-                reset_frame_counter = True
-
+            #new_state, flag = self.update_method.update(cell, self.frame_counter)
+            new_charge, new_state = self.update_method.update(cell)
+            
+            #if flag:
+            #    reset_frame_counter = True
+            
             self.grid_b[ind].state = new_state
             self.grid_b[ind].state_timer = cell.state_timer
-            
+            self.grid_b[ind].charge = new_charge
         if reset_frame_counter:
             self.frame_counter = 0
 
@@ -121,7 +132,7 @@ class Automaton:
             self.draw_array[cell.position] = cell.to_int()
         return self.draw_array
         #return np.array([[cell.to_int() for cell in row] for row in self.automaton])
-    def to_cell_data(self) -> List[List[Tuple[int, bool, str]]]:
+    def to_cell_data(self) -> List[List[Tuple[int, bool, str, str]]]:
         """
         Simple method to map self.automaton array to array of tuples storing cell informations
         Returns:
@@ -192,7 +203,7 @@ class Automaton:
 
         for cell in test_grid:
             if cell.position == trigger_position:
-                cell.state = CellState.DEPOLARIZATION
+                cell.state = CellState.RAPID_DEPOLARIZATION
                 cell.activated_at = 0
                 break
 
