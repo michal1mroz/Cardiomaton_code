@@ -131,8 +131,8 @@ class Automaton:
         for cell in self.grid_a:
             self.draw_array[cell.position] = cell.to_int()
         return self.draw_array
-        #return np.array([[cell.to_int() for cell in row] for row in self.automaton])
-    def to_cell_data(self) -> List[List[Tuple[int, bool, str, str]]]:
+    
+    def to_cell_data(self) -> List[Dict]:#List[List[Tuple[int, bool, str, str]]]:
         """
         Simple method to map self.automaton array to array of tuples storing cell informations
         Returns:
@@ -140,11 +140,13 @@ class Automaton:
             where each element is a tuple with cell information. Positions without a cell
             are filled with None.
         """
-        mesh = [[None for x in range(self.shape[1])] for y in range(self.shape[0])]
-        for cell in self.grid_a:
-            mesh[cell.position[0]][cell.position[1]] = cell.to_dict()
+        return {cell.position: cell.to_dict() for cell in self.grid_a}
+        #mesh = [[None for x in range(self.shape[1])] for y in range(self.shape[0])]
+        #for cell in self.grid_a:
+        #    mesh[cell.position[0]][cell.position[1]] = cell.to_dict()
 
-        return mesh
+        #return mesh
+
     def draw(self, first_time: bool = False) -> None:
         """
         Method to draw the current state of the automaton using matplotlib.

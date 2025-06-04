@@ -52,15 +52,16 @@ class MainLabel(QLabel):
         if data is None:
             return
 
-        rows = len(data)
-        cols = len(data[0])
+        data_shape = self.renderer.ctrl.automaton.shape
+        rows = data_shape[0]
+        cols = data_shape[1]
 
         col = int(x / pixmap_size.width() * cols)
         row = int(y / pixmap_size.height() * rows)
 
         if 0 <= row < rows and 0 <= col < cols:
             if self.last_tooltip != (row, col):
-                cell_info = data[row][col]
+                cell_info = data.get((row, col))
                 if cell_info is not None:
                     self.show_cell_info(cell_info, event.globalPosition().toPoint(), (row, col))
                     self.last_tooltip = (row, col)

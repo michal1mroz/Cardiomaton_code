@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Dict, Tuple
 import numpy as np
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from PyQt6.QtGui import QImage, QPixmap
@@ -37,7 +37,12 @@ class FrameRenderer:
         data = self.ctrl.step()
         self.last_data = data
 
-        val = np.array([[cell["state_value"] if cell is not None else 0 for cell in row] for row in data])
+        #val = np.array([[cell["state_value"] if cell is not None else 0 for cell in row] for row in data])
+        size = self.ctrl.automaton.shape
+        val = np.zeros((size[0], size[1]), dtype=np.uint8)
+        for position, cell in data.items():
+            x, y = position
+            val[x,y] = cell["state_value"]
         rgba = self.cmap(self.norm(val))
         rgb  = (rgba[:, :, :3] * 255).astype(np.uint8)
 
@@ -47,7 +52,7 @@ class FrameRenderer:
         pix = QPixmap.fromImage(img)
         return pix.scaled(target_size, Qt.AspectRatioMode.KeepAspectRatio)
     
-    def _cell_to_hsv(self, cell) -> Tuple[int, int, int]:
+    def _cell_to_hsv(self, cell: Dict) -> Tuple[int, int, int]:
         # Got to think of a better way to get the gray color
         if not cell["auto_polarization"] and cell["state_name"] == "Polarization":
             return (0,0,124)
@@ -68,10 +73,16 @@ class FrameRenderer:
         data = self.ctrl.step()
         self.last_data = data
 
-        im_array = cv2.cvtColor(np.array([[self._cell_to_hsv(cell) if cell is not None else (0,0,255) for cell in row] for row in data], dtype=np.uint8), cv2.COLOR_HSV2RGB)
-        h, w, _ = im_array.shape
+        size = self.ctrl.automaton.shape
+        hsv_img = np.zeros((size[0], size[1], 3), dtype=np.uint8)
+        for position, cell in data.items():
+            x, y = position
+            hsv_img[x, y] = self._cell_to_hsv(cell)
+        im_rgb = cv2.cvtColor(hsv_img, cv2.COLOR_HSV2RGB)
+        
+        h, w, _ = im_rgb.shape
         bytes_per_line = 3 * w
-        qimage = QImage(im_array.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+        qimage = QImage(im_rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
         return QPixmap.fromImage(qimage).scaled(
             target_size,
             aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
