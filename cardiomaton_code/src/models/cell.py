@@ -130,6 +130,22 @@ class Cell:
         """
         return (self.state.value + 1, self.self_polarization, self.state.name.capitalize(), self.cell_type.value["name"])
 
+    def to_dict(self):
+        """
+        Method to serialize the cell data for rendering on the front end. Can be changed to dto if the need arises.
+
+        Returns:
+            Dict: dictionary that stores all the relevant fields of the cell
+        """
+        return {
+            "position": self.position,
+            "state_value": self.state.value + 1,
+            "state_name": self.state.name.capitalize(),
+            "charge": self.charge,
+            "ccs_part": self.cell_type.value["name"],
+            "auto_polarization": self.self_polarization,
+        }
+
     def copy(self) -> Cell:
         """
         Creates a copy of the cell with the same state, timers, and configuration.

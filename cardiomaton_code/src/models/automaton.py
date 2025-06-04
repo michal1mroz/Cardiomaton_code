@@ -142,7 +142,7 @@ class Automaton:
         """
         mesh = [[None for x in range(self.shape[1])] for y in range(self.shape[0])]
         for cell in self.grid_a:
-            mesh[cell.position[0]][cell.position[1]] = cell.to_tuple()
+            mesh[cell.position[0]][cell.position[1]] = cell.to_dict()
 
         return mesh
     def draw(self, first_time: bool = False) -> None:

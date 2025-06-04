@@ -35,7 +35,7 @@ class FrameRenderer:
         data = self.ctrl.step()
         self.last_data = data
 
-        val = np.array([[cell[0] if cell is not None else 0 for cell in row] for row in data])
+        val = np.array([[cell["state_value"] if cell is not None else 0 for cell in row] for row in data])
         rgba = self.cmap(self.norm(val))
         rgb  = (rgba[:, :, :3] * 255).astype(np.uint8)
 
