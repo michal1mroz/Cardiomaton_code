@@ -118,7 +118,7 @@ class Cell:
         """
         return self.state.value + 1
 
-    def to_tuple(self) -> Tuple[int, bool, str, str]:
+    def to_tuple(self) -> Tuple[int, bool, str, str, float]:
         """
         Simple method to map the current state to tuple with the most important information
         The tuple contains:
@@ -128,7 +128,11 @@ class Cell:
         Returns:
             Tuple[int, bool, str]: A tuple with the cell's Numerical value, self-polarization flag, and state name.
         """
-        return (self.state.value + 1, self.self_polarization, self.state.name.capitalize(), self.cell_type.value["name"])
+        return (self.state.value + 1,
+                self.self_polarization,
+                self.state.name.capitalize(),
+                self.cell_type.value["name"],
+                self.charge)
 
     def copy(self) -> Cell:
         """
