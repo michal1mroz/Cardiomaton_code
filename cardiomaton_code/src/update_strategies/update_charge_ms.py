@@ -3,6 +3,7 @@ from src.models.cell import Cell
 from src.models.cell_state import CellState
 
 from typing import Tuple
+from random import uniform
 
 class UpdateChargeMS(UpdateBaseCharge):
     def update(self, cell: Cell) -> Tuple[int, CellState]:
@@ -72,7 +73,10 @@ class UpdateChargeMS(UpdateBaseCharge):
                 if cell.charge >= cell_data_dict["threshold_potential"]:
                     return cell.charge + cell_data_dict["spontaneous_depolarization_step_fast"], CellState.RAPID_DEPOLARIZATION
                 else:
-                    return cell.charge + cell_data_dict["spontaneous_depolarization_step_slow"], CellState.SLOW_DEPOLARIZATION
+                    return cell.charge + uniform(
+                        cell_data_dict["spontaneous_depolarization_step_slow_min"],
+                        cell_data_dict["spontaneous_depolarization_step_slow_max"]
+                    ), CellState.SLOW_DEPOLARIZATION
 
 
             case CellState.RAPID_DEPOLARIZATION:
