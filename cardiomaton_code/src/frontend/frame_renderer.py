@@ -21,11 +21,12 @@ class FrameRenderer:
         self.cmap = ListedColormap(['white', 'gray', 'yellow', 'red', 'blue', 'green', 'black'])
         self.norm = BoundaryNorm(np.arange(-0.5, 7.5, 1), self.cmap.N)
         self.last_data = None
+        self.current_data = None
 
     def render_next_frame(self, target_size) -> QPixmap:
         """
-        Renders the next simulation frame and converts it to a QPixmap,
-        then sends the resulting pixmap to the recorder for playback.
+        Renders the next simulation frame and converts it to a QPixmap.
+        Sends the data to the recorder for playback.
 
 
         Args:
@@ -36,16 +37,24 @@ class FrameRenderer:
         """
         data = self.ctrl.step()
         self.last_data = data
+        self.ctrl.recorder.record(self.last_data)
+        """
+        Not working version - frame counter display
+        self.ctrl.recorder.record(self.ctrl.automaton.frame_counter, self.last_data)
+        """
 
+        return self.render_frame(target_size, self.last_data)
+
+    def render_frame(self, target_size, data) -> QImage:
+        self.current_data = data
         val = np.array([[cell[0] if cell is not None else 0 for cell in row] for row in data])
         rgba = self.cmap(self.norm(val))
-        rgb  = (rgba[:, :, :3] * 255).astype(np.uint8)
+        rgb = (rgba[:, :, :3] * 255).astype(np.uint8)
 
         h, w, _ = rgb.shape
         bytes_per_line = 3 * w
         img = QImage(rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
         pix = QPixmap.fromImage(img)
         scaled = pix.scaled(target_size, Qt.AspectRatioMode.KeepAspectRatio)
-        self.ctrl.recorder.record(scaled)
 
         return scaled

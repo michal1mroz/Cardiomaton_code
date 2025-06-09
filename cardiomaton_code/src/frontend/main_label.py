@@ -48,7 +48,7 @@ class MainLabel(QLabel):
                 self.last_tooltip = None
             return
 
-        data = self.renderer.last_data
+        data = self.renderer.current_data
         if data is None:
             return
 
