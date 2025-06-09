@@ -24,7 +24,9 @@ class FrameRenderer:
 
     def render_next_frame(self, target_size) -> QPixmap:
         """
-        Renders the next simulation frame and converts it to a QPixmap.
+        Renders the next simulation frame and converts it to a QPixmap,
+        then sends the resulting pixmap to the recorder for playback.
+
 
         Args:
             target_size : QSize
@@ -43,4 +45,7 @@ class FrameRenderer:
         bytes_per_line = 3 * w
         img = QImage(rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
         pix = QPixmap.fromImage(img)
-        return pix.scaled(target_size, Qt.AspectRatioMode.KeepAspectRatio)
+        scaled = pix.scaled(target_size, Qt.AspectRatioMode.KeepAspectRatio)
+        self.ctrl.recorder.record(scaled)
+
+        return scaled

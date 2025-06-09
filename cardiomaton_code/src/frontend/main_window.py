@@ -65,12 +65,19 @@ class MainWindow(QMainWindow):
         self.speed_slider.setRange(1, 500)
         self.speed_slider.setValue(100)
         self.speed_slider.valueChanged.connect(self._change_speed)
-
         slider_layout = QHBoxLayout()
-        self.speed_slider.setFixedWidth(300)
-        slider_layout.addWidget(self.speed_slider, alignment=Qt.AlignmentFlag.AlignCenter)
+        slider_layout.addWidget(self.speed_slider, alignment = Qt.AlignmentFlag.AlignCenter)
         layout.addLayout(slider_layout)
-        # layout.addWidget(self.speed_slider)
+
+        # Playback slider
+        self.playback_slider = QSlider(Qt.Orientation.Horizontal)
+        self.playback_slider.setRange(0, 0)
+        self.playback_slider.setValue(0)
+        self.playback_slider.valueChanged.connect(self._on_slider_change)
+        slider2_layout = QHBoxLayout()
+        slider2_layout.addWidget(QLabel("Playback:"), alignment = Qt.AlignmentFlag.AlignCenter)
+        slider2_layout.addWidget(self.playback_slider, alignment = Qt.AlignmentFlag.AlignCenter)
+        layout.addLayout(slider2_layout)
 
     def _init_timer(self):
         """
@@ -115,3 +122,22 @@ class MainWindow(QMainWindow):
         """
         pixmap = self.renderer.render_next_frame(self.simulation_label.size())
         self.simulation_label.setPixmap(pixmap)
+
+        buf_len = len(self.sim.recorder)
+        if buf_len > 0:
+            self.playback_slider.blockSignals(True)
+            self.playback_slider.setRange(0, buf_len - 1)
+            self.playback_slider.setValue(buf_len - 1)
+            self.playback_slider.blockSignals(False)
+
+    def _on_slider_change(self, value: int):
+        if self.running:
+            self.timer.stop()
+            self.play_button.setText("Start")
+            self.running = False
+            self.label.set_running(False)
+        try:
+            pixmap = self.sim.recorder.get_frame(value)
+            self.label.setPixmap(pixmap)
+        except Exception:
+            pass

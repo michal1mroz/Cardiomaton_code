@@ -3,6 +3,8 @@ from typing import List, Tuple
 from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
+from src.frontend.frame_recorder import FrameRecorder
+
 
 class SimulationController:
     """
@@ -22,6 +24,7 @@ class SimulationController:
         _, cell_map = space.capped_neighbours_graph_from_regions(A,B,cap = 8)
 
         self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
+        self.recorder = FrameRecorder(capacity = 200)
 
     @property
     def frame_time(self) -> float:
