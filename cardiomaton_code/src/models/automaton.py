@@ -151,19 +151,23 @@ class Automaton:
             data (List[Dict]): result of to_cell_data method
         """
         cells_a, cells_b = {}, {}
-        for cell_dict in data:
-            cells_a.update({cell_dict["position"]: CellType.create(position = cell_dict["position"], cell_type = cell_dict["ccs_part"], state = cell_dict["state_value"])})
-            cells_b.update({cell_dict["position"]: CellType.create(position = cell_dict["position"], cell_type = cell_dict["ccs_part"], state = cell_dict["state_value"])})
+        for pos, cell_dict in data.items():
+            cell_a = CellType.create(position = cell_dict["position"], cell_type = CellType[cell_dict["cell_type"]], state = CellState[cell_dict["state_name"].upper()])
+            cell_b = CellType.create(position = cell_dict["position"], cell_type = CellType[cell_dict["cell_type"]], state = CellState[cell_dict["state_name"].upper()])
+            cell_a.charge, cell_a.self_polarization = cell_dict["charge"], cell_dict["auto_polarization"]
+            cell_b.charge, cell_b.self_polarization = cell_dict["charge"], cell_dict["auto_polarization"]
+            cells_a.update({pos: cell_a})
+            cells_b.update({pos: cell_b})
         
-        for cell_dict in data:
-            cell_a, cell_b = cells_a[cell_dict["position"]], cells_b[cell_dict["position"]]
+        for pos, cell_dict in data.items():
+            cell_a, cell_b = cells_a[pos], cells_b[pos]
             for nei in cell_dict["neighbours"]:
                 cell_a.add_neighbour(cells_a[nei])
                 cell_b.add_neighbour(cells_b[nei])
         
         self.cells = cells_a
-        self.grid_a = cells_a.values()
-        self.grid_b = cells_b.values()
+        self.grid_a = [val for val in cells_a.values()]
+        self.grid_b = [val for val in cells_b.values()]
 
     def draw(self, first_time: bool = False) -> None:
         """

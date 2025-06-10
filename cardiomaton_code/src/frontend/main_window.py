@@ -104,12 +104,14 @@ class MainWindow(QMainWindow):
         """
         Toggles the simulation loop between start and stop.
         """
-        print(self.playback_slider.value())
         if self.running:
             self.timer.stop()
             self.play_button.setText("Start")
             self.running = False
         else:
+            # Checks if playback was changed and updates the automaton accordingly
+            if self.playback_slider.value() < self.sim.recorder.__len__() - 1:
+                self.sim.update_automaton(self.playback_slider.value())
             self.timer.start(int(self.sim.frame_time * 1000))
             self.play_button.setText("Stop")
             self.running = True

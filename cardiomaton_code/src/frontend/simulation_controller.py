@@ -57,6 +57,18 @@ class SimulationController:
     #     self.automaton.update_grid()
     #     return self.automaton._to_numpy().astype(int)
 
+    def update_automaton(self, ix) -> None:
+        """
+        Updates the automaton by setting the state to that from the index ix in the recorders buffer.
+        Also modifies the recorder to remove newer entries.
+
+        Args:
+            ix (int): index of the selected frame.
+        """
+        frame = self.recorder.get_frame(ix)
+        self.automaton.recreate_from_dict(frame)
+        self.recorder.drop_newer(ix)
+
     def step(self) -> List[List[Tuple[int, bool, str, str]]]:
         """
         Alternative step method. Advances the simulation by one frame.

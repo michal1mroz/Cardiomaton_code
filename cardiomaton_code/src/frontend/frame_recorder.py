@@ -1,5 +1,5 @@
 from collections import deque
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from PyQt6.QtGui import QPixmap
 
@@ -12,13 +12,13 @@ class FrameRecorder:
         self.capacity = capacity
         self.buffer = deque(maxlen=capacity)
 
-    def record(self, data: List[List[Tuple[int, bool, str, str]]]) -> None:
+    def record(self, data: Dict) -> None:
         """
         Store the automaton data in the buffer.
         """
         self.buffer.append(data)
 
-    def get_frame(self, index: int) -> List[Tuple[int, bool, str, str]]:
+    def get_frame(self, index: int) -> Dict:
         """
         Get a frame by buffer index (0 = oldest, -1 = newest).
         """
@@ -27,11 +27,20 @@ class FrameRecorder:
     def __len__(self) -> int:
         return len(self.buffer)
 
-    def get_all(self) -> List[List[Tuple[int, bool, str, str]]]:
+    def get_all(self) -> List[Dict]:
         """
         Return a list of all stored frames in order.
         """
         return list(self.buffer)
+    
+    def drop_newer(self, ix: int) -> None:
+        """
+        Slices and removes all the entries newer then the specified index. Changes buffer in place.
+
+        Args:
+            ix (int): selected index.
+        """
+        self.buffer = deque(list(self.buffer)[:ix+1], maxlen=self.buffer.maxlen)
 
     """
         Not working version - frame counter display

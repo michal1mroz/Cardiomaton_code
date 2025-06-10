@@ -143,6 +143,7 @@ class Cell:
             "state_name": self.state.name.capitalize(),
             "charge": self.charge,
             "ccs_part": self.cell_type.value["name"],
+            "cell_type": self.cell_type.name,
             "auto_polarization": self.self_polarization,
             "neighbours": [nei.position for nei in self.neighbours]
         }
