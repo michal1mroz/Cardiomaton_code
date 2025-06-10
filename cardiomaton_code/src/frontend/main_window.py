@@ -104,6 +104,7 @@ class MainWindow(QMainWindow):
         """
         Toggles the simulation loop between start and stop.
         """
+        print(self.playback_slider.value())
         if self.running:
             self.timer.stop()
             self.play_button.setText("Start")
@@ -134,7 +135,7 @@ class MainWindow(QMainWindow):
         Renders and displays the next frame of the simulation.
         """
         #pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-        pixmap = self.renderer.render_next_frame_charge(self.simulation_label.size())
+        pixmap = self.renderer.render_next_frame(self.simulation_label.size())
         self.simulation_label.setPixmap(pixmap)
 
         """

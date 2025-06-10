@@ -144,6 +144,7 @@ class Cell:
             "charge": self.charge,
             "ccs_part": self.cell_type.value["name"],
             "auto_polarization": self.self_polarization,
+            "neighbours": [nei.position for nei in self.neighbours]
         }
 
     def copy(self) -> Cell:

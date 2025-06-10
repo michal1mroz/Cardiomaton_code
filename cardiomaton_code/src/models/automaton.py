@@ -141,11 +141,29 @@ class Automaton:
             are filled with None.
         """
         return {cell.position: cell.to_dict() for cell in self.grid_a}
-        #mesh = [[None for x in range(self.shape[1])] for y in range(self.shape[0])]
-        #for cell in self.grid_a:
-        #    mesh[cell.position[0]][cell.position[1]] = cell.to_dict()
 
-        #return mesh
+    def recreate_from_dict(self, data: List[Dict]) -> None:
+        """
+        Method to recreate grid_a, grid_b and cells data from the dict.
+        Updates the automaton in place.
+        
+        Args:
+            data (List[Dict]): result of to_cell_data method
+        """
+        cells_a, cells_b = {}, {}
+        for cell_dict in data:
+            cells_a.update({cell_dict["position"]: CellType.create(position = cell_dict["position"], cell_type = cell_dict["ccs_part"], state = cell_dict["state_value"])})
+            cells_b.update({cell_dict["position"]: CellType.create(position = cell_dict["position"], cell_type = cell_dict["ccs_part"], state = cell_dict["state_value"])})
+        
+        for cell_dict in data:
+            cell_a, cell_b = cells_a[cell_dict["position"]], cells_b[cell_dict["position"]]
+            for nei in cell_dict["neighbours"]:
+                cell_a.add_neighbour(cells_a[nei])
+                cell_b.add_neighbour(cells_b[nei])
+        
+        self.cells = cells_a
+        self.grid_a = cells_a.values()
+        self.grid_b = cells_b.values()
 
     def draw(self, first_time: bool = False) -> None:
         """
