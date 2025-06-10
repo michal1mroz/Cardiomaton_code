@@ -39,7 +39,7 @@ class FrameRenderer:
 
         #val = np.array([[cell["state_value"] if cell is not None else 0 for cell in row] for row in data])
         size = self.ctrl.automaton.shape
-        val = np.zeros((size[0], size[1]), dtype=np.uint8)
+        val = np.ones((size[0], size[1]), dtype=np.uint8) * 255
         for position, cell in data.items():
             x, y = position
             val[x,y] = cell["state_value"]

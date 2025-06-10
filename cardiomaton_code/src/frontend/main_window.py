@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy,
-    QPushButton, QLabel, QSlider
+    QPushButton, QLabel, QSlider, QCheckBox
 )
 from PyQt6.QtCore import Qt, QTimer
 from src.frontend.simulation_controller import SimulationController
@@ -72,6 +72,23 @@ class MainWindow(QMainWindow):
         layout.addLayout(slider_layout)
         # layout.addWidget(self.speed_slider)
 
+        # Color by charge / state option
+        self.render_next_frame_method = self.renderer.render_next_frame_charge
+        self.render_next_frame_method = self.renderer.render_next_frame_charge
+        self.state_checkbox = QCheckBox("Color by state")
+        self.state_checkbox.setChecked(False)
+        self.state_checkbox.stateChanged.connect(self.state_checkbox_changed)
+        layout.addWidget(self.state_checkbox)
+
+    def state_checkbox_changed(self, state):
+        """
+        Handle state change of the 'Color by state' checkbox.
+        """
+        if state == Qt.CheckState.Checked.value:
+            self.render_next_frame_method = self.renderer.render_next_frame
+        else:
+            self.render_next_frame_method = self.renderer.render_next_frame_charge
+
     def _init_timer(self):
         """
         Initializes the QTimer for frame updates.
@@ -114,5 +131,6 @@ class MainWindow(QMainWindow):
         Renders and displays the next frame of the simulation.
         """
         #pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-        pixmap = self.renderer.render_next_frame_charge(self.simulation_label.size())
+        # pixmap = self.renderer.render_next_frame_charge(self.simulation_label.size())
+        pixmap = self.render_next_frame_method(self.simulation_label.size())
         self.simulation_label.setPixmap(pixmap)
