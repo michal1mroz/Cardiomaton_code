@@ -1,4 +1,4 @@
-from src.models.cell import Cell
+from src.models.cell import Cell, CellDict
 from src.models.cell_state import CellState
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
@@ -13,8 +13,6 @@ from matplotlib import colors # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 from IPython.display import clear_output, display
 from time import sleep, time
-
-
 
 
 class Automaton:
@@ -105,19 +103,16 @@ class Automaton:
         """
         Method to update the grid based on the current state.
         """
-        reset_frame_counter = False
+        self.frame_counter += 1
         for ind, cell in enumerate(self.grid_a):
             #new_state, flag = self.update_method.update(cell, self.frame_counter)
             new_charge, new_state = self.update_method.update(cell)
-            
             #if flag:
             #    reset_frame_counter = True
             
             self.grid_b[ind].state = new_state
             self.grid_b[ind].state_timer = cell.state_timer
             self.grid_b[ind].charge = new_charge
-        if reset_frame_counter:
-            self.frame_counter = 0
 
         self.grid_a, self.grid_b = self.grid_b, self.grid_a
         
@@ -132,20 +127,45 @@ class Automaton:
             self.draw_array[cell.position] = cell.to_int()
         return self.draw_array
     
-    def to_cell_data(self) -> List[Dict]:#List[List[Tuple[int, bool, str, str]]]:
+    def to_cell_data(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
-        Simple method to map self.automaton array to array of tuples storing cell informations
-        Returns:
-            List[List[Tuple[int, bool, str]]]: A 2D list representing the grid,
-            where each element is a tuple with cell information. Positions without a cell
-            are filled with None.
-        """
-        return {cell.position: cell.to_dict() for cell in self.grid_a}
-        #mesh = [[None for x in range(self.shape[1])] for y in range(self.shape[0])]
-        #for cell in self.grid_a:
-        #    mesh[cell.position[0]][cell.position[1]] = cell.to_dict()
+        Method to map the automaton state to a tuple with the current frame.
 
-        #return mesh
+        Returns
+            Tuple[int, Dict[Tuple[int, int], CellDict]] - mapped automaton state.
+                first int represents the current frame, dict is a mapping of position to
+                a cell state serialized with CellDict.
+        """
+        return self.frame_counter ,{cell.position: cell.to_dict() for cell in self.grid_a}
+
+    def recreate_from_dict(self, data_tuple: Tuple[int, Dict[Tuple[int, int], CellDict]]) -> None:
+        """
+        Method to recreate grid_a, grid_b and cells data from the dict.
+        Updates the automaton in place.
+        
+        Args:
+            data (List[Dict]): result of to_cell_data method
+        """
+        frame, data = data_tuple
+        cells_a, cells_b = {}, {}
+        for pos, cell_dict in data.items():
+            cell_a = CellType.create(position = cell_dict["position"], cell_type = CellType[cell_dict["cell_type"]], state = CellState[cell_dict["state_name"].upper()])
+            cell_b = CellType.create(position = cell_dict["position"], cell_type = CellType[cell_dict["cell_type"]], state = CellState[cell_dict["state_name"].upper()])
+            cell_a.charge, cell_a.self_polarization = cell_dict["charge"], cell_dict["auto_polarization"]
+            cell_b.charge, cell_b.self_polarization = cell_dict["charge"], cell_dict["auto_polarization"]
+            cells_a.update({pos: cell_a})
+            cells_b.update({pos: cell_b})
+        
+        for pos, cell_dict in data.items():
+            cell_a, cell_b = cells_a[pos], cells_b[pos]
+            for nei in cell_dict["neighbours"]:
+                cell_a.add_neighbour(cells_a[nei])
+                cell_b.add_neighbour(cells_b[nei])
+        
+        self.cells = cells_a
+        self.grid_a = [val for val in cells_a.values()]
+        self.grid_b = [val for val in cells_b.values()]
+        self.frame_counter = frame
 
     def draw(self, first_time: bool = False) -> None:
         """

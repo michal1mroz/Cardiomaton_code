@@ -1,8 +1,11 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
+from src.models.cell import CellDict
 from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
+from src.frontend.frame_recorder import FrameRecorder
+
 
 class SimulationController:
     """
@@ -22,6 +25,7 @@ class SimulationController:
         _, cell_map = space.capped_neighbours_graph_from_regions(A,B,cap = 8)
 
         self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
+        self.recorder = FrameRecorder(capacity = 200)
 
     @property
     def frame_time(self) -> float:
@@ -54,14 +58,24 @@ class SimulationController:
     #     self.automaton.update_grid()
     #     return self.automaton._to_numpy().astype(int)
 
-    def step(self) -> List[List[Tuple[int, bool, str, str]]]:
+    def update_automaton(self, ix) -> None:
+        """
+        Updates the automaton by setting the state to that from the index ix in the recorders buffer.
+        Also modifies the recorder to remove newer entries.
+
+        Args:
+            ix (int): index of the selected frame.
+        """
+        frame = self.recorder.get_frame(ix)
+        self.automaton.recreate_from_dict(frame)
+        self.recorder.drop_newer(ix)
+
+    def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Alternative step method. Advances the simulation by one frame.
         Returns:
-            List[List[Tuple[int, bool, str]]]: A 2D list representing the grid,
-            where each element is a tuple with cell information. Positions without a cell
-            are filled with None.
+            Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
+            mapping of the cell position to the cell state
         """
-        self.automaton.frame_counter += 1
         self.automaton.update_grid()
         return self.automaton.to_cell_data()

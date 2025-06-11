@@ -1,0 +1,38 @@
+/* Główne tło aplikacji */
+QMainWindow {
+    background-color: #f5f5f5;
+}
+
+/* Etykiety (np. QLabel) */
+QLabel {
+    font-size: 16px;
+    color: #333;
+    padding: 4px;
+}
+
+/* Przycisk "Play"/"Stop" */
+QPushButton {
+    background-color: #0078d4;
+    color: white;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 16px;
+}
+QPushButton:hover {
+    background-color: #005ea6;
+}
+QPushButton:pressed {
+    background-color: #004578;
+}
+
+/* Suwaki (slider) */
+QSlider::groove:horizontal {
+    border: 1px solid #999999;
+    height: 8px;
+    background: #e0e0e0;
+    margin: 0px;
+    border-radius: 4px;
+}
+QSlider::handle:horizontal {
+    background: #0078d4;
+    border: 1px solid #5c5c5

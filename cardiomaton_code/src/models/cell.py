@@ -1,8 +1,18 @@
 from __future__ import annotations
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, TypedDict
 from src.models.cell_state import CellState
 
 # from src.models.cell_type import CellType
+
+class CellDict(TypedDict):
+    position: Tuple[int, int]
+    state_value: int
+    state_name: str 
+    charge: float
+    ccs_part: str 
+    cell_type: str
+    auto_polarization: bool
+    neighbours: List[Tuple[int, int]] 
 
 
 class Cell:
@@ -134,7 +144,7 @@ class Cell:
                 self.cell_type.value["name"],
                 self.charge)
 
-    def to_dict(self):
+    def to_dict(self) -> CellDict:
         """
         Method to serialize the cell data for rendering on the front end. Can be changed to dto if the need arises.
 
@@ -147,7 +157,9 @@ class Cell:
             "state_name": self.state.name.capitalize(),
             "charge": self.charge,
             "ccs_part": self.cell_type.value["name"],
+            "cell_type": self.cell_type.name,
             "auto_polarization": self.self_polarization,
+            "neighbours": [nei.position for nei in self.neighbours]
         }
 
     def copy(self) -> Cell:
