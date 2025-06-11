@@ -153,14 +153,7 @@ class MainWindow(QMainWindow):
         """
         Renders and displays the next frame of the simulation.
         """
-        #pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-# <<<<<<< HEAD
-        # pixmap = self.renderer.render_next_frame_charge(self.simulation_label.size())
-        # frame, pixmap = self.render_next_frame_method(self.simulation_label.size())
         frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size(), self.render_charged)
-# =======
-#         frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-# >>>>>>> 4f867e80696183577efc007bc9382acf69fa7b6a
         self.simulation_label.setPixmap(pixmap)
         self.frame_counter_label.setText(f"Frame: {frame}")
         self.frame_counter_label.adjustSize()
