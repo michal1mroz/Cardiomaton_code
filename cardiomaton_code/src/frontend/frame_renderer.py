@@ -5,6 +5,7 @@ from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import Qt
 import cv2
 
+from cardiomaton_code.src.models.cell import CellDict
 from src.frontend.simulation_controller import SimulationController
 
 
@@ -47,7 +48,7 @@ class FrameRenderer:
 
         return self.render_frame(target_size, self.last_data)
 
-    def render_frame(self, target_size, data) -> QImage:
+    def render_frame(self, target_size, data: CellDict) -> QImage:
         self.current_data = data
         #val = np.array([[cell["state_value"] if cell is not None else 0 for cell in row] for row in data])
         size = self.ctrl.automaton.shape
@@ -66,7 +67,7 @@ class FrameRenderer:
 
         return scaled
     
-    def _cell_to_hsv(self, cell: Dict) -> Tuple[int, int, int]:
+    def _cell_to_hsv(self, cell: CellDict) -> Tuple[int, int, int]:
         # Got to think of a better way to get the gray color
         if not cell["auto_polarization"] and cell["state_name"] == "Polarization":
             return (0,0,124)

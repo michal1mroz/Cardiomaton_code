@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+from cardiomaton_code.src.models.cell import CellDict
 from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
@@ -69,7 +70,7 @@ class SimulationController:
         self.automaton.recreate_from_dict(frame)
         self.recorder.drop_newer(ix)
 
-    def step(self) -> List[List[Tuple[int, bool, str, str]]]:
+    def step(self) -> List[CellDict]:
         """
         Alternative step method. Advances the simulation by one frame.
         Returns:

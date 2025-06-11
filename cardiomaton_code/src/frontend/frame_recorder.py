@@ -3,6 +3,8 @@ from typing import List, Tuple, Dict
 
 from PyQt6.QtGui import QPixmap
 
+from cardiomaton_code.src.models.cell import CellDict
+
 class FrameRecorder:
     """
     A recorder that stores the last N rendered frames as QPixmaps.
@@ -12,13 +14,13 @@ class FrameRecorder:
         self.capacity = capacity
         self.buffer = deque(maxlen=capacity)
 
-    def record(self, data: Dict) -> None:
+    def record(self, data: CellDict) -> None:
         """
         Store the automaton data in the buffer.
         """
         self.buffer.append(data)
 
-    def get_frame(self, index: int) -> Dict:
+    def get_frame(self, index: int) -> CellDict:
         """
         Get a frame by buffer index (0 = oldest, -1 = newest).
         """
@@ -27,7 +29,7 @@ class FrameRecorder:
     def __len__(self) -> int:
         return len(self.buffer)
 
-    def get_all(self) -> List[Dict]:
+    def get_all(self) -> List[CellDict]:
         """
         Return a list of all stored frames in order.
         """

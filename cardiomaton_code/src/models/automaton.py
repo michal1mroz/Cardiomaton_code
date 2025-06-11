@@ -1,4 +1,4 @@
-from src.models.cell import Cell
+from src.models.cell import Cell, CellDict
 from src.models.cell_state import CellState
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
@@ -109,7 +109,6 @@ class Automaton:
         for ind, cell in enumerate(self.grid_a):
             #new_state, flag = self.update_method.update(cell, self.frame_counter)
             new_charge, new_state = self.update_method.update(cell)
-            
             #if flag:
             #    reset_frame_counter = True
             
@@ -132,7 +131,7 @@ class Automaton:
             self.draw_array[cell.position] = cell.to_int()
         return self.draw_array
     
-    def to_cell_data(self) -> List[Dict]:#List[List[Tuple[int, bool, str, str]]]:
+    def to_cell_data(self) -> List[CellDict]:
         """
         Simple method to map self.automaton array to array of tuples storing cell informations
         Returns:
@@ -142,7 +141,7 @@ class Automaton:
         """
         return {cell.position: cell.to_dict() for cell in self.grid_a}
 
-    def recreate_from_dict(self, data: List[Dict]) -> None:
+    def recreate_from_dict(self, data: List[CellDict]) -> None:
         """
         Method to recreate grid_a, grid_b and cells data from the dict.
         Updates the automaton in place.
