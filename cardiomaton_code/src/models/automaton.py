@@ -39,12 +39,17 @@ class Automaton:
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = 0
+        self.neighbour_map = self._create_neighbour_map()
         # self.update_method = BasicUpdate()
         #self.update_method = UpdateWithTiming()
         # self.update_method = UpdateCharge()
         self.update_method = UpdateChargeMS()
         self.fig = self.ax = self.img = None
 
+    def _create_neighbour_map(self):
+        return {
+            c.position: tuple([nei.position for nei in c.neighbours]) for c in self.grid_a
+        }
 
     def _create_automaton(self) -> List[Cell]:
         """
@@ -156,12 +161,12 @@ class Automaton:
             cells_a.update({pos: cell_a})
             cells_b.update({pos: cell_b})
         
-        for pos, cell_dict in data.items():
-            cell_a, cell_b = cells_a[pos], cells_b[pos]
-            for nei in cell_dict["neighbours"]:
-                cell_a.add_neighbour(cells_a[nei])
-                cell_b.add_neighbour(cells_b[nei])
-        
+        for pos, nei in self.neighbour_map.items():
+            cell_a,cell_b = cells_a[pos], cells_b[pos]
+            for n in nei:
+                cell_a.add_neighbour(cells_a[n])
+                cell_b.add_neighbour(cells_b[n])
+
         self.cells = cells_a
         self.grid_a = [val for val in cells_a.values()]
         self.grid_b = [val for val in cells_b.values()]

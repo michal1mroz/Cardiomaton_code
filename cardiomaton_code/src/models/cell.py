@@ -12,7 +12,6 @@ class CellDict(TypedDict):
     ccs_part: str 
     cell_type: str
     auto_polarization: bool
-    neighbours: List[Tuple[int, int]] 
 
 
 class Cell:
@@ -155,7 +154,6 @@ class Cell:
             "ccs_part": self.cell_type.value["name"],
             "cell_type": self.cell_type.name,
             "auto_polarization": self.self_polarization,
-            "neighbours": [nei.position for nei in self.neighbours]
         }
 
     def copy(self) -> Cell:
