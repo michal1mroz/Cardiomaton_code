@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple
 
-from cardiomaton_code.src.models.cell import CellDict
+from src.models.cell import CellDict
 from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton

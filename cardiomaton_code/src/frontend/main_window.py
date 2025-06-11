@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy,
-    QPushButton, QLabel, QSlider
+    QPushButton, QLabel, QSlider, QCheckBox
 )
 from PyQt6.QtCore import Qt, QTimer
 from src.frontend.simulation_controller import SimulationController
@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         self.renderer = FrameRenderer(self.sim)
         self.label = MainLabel(self.renderer)
 
-
+        self.render_charged = True
         self.running = False
 
         self._init_ui()
@@ -91,6 +91,24 @@ class MainWindow(QMainWindow):
         slider2_layout.addWidget(self.playback_slider, alignment = Qt.AlignmentFlag.AlignCenter)
         layout.addLayout(slider2_layout)
 
+        # Color by charge / state option
+        self.render_next_frame_method = self.renderer.render_next_frame_charge
+        self.render_next_frame_method = self.renderer.render_next_frame_charge
+        self.state_checkbox = QCheckBox("Color by state")
+        self.state_checkbox.setChecked(False)
+        self.state_checkbox.stateChanged.connect(self.state_checkbox_changed)
+        layout.addWidget(self.state_checkbox)
+
+    def state_checkbox_changed(self, state):
+        """
+        Handle state change of the 'Color by state' checkbox.
+        """
+        if state == Qt.CheckState.Checked.value:
+            # self.render_next_frame_method = self.renderer.render_next_frame
+            self.render_charged = False
+        else:
+            # self.render_next_frame_method = self.renderer.render_next_frame_charge
+            self.render_charged = True
     def _init_timer(self):
         """
         Initializes the QTimer for frame updates.
@@ -136,7 +154,13 @@ class MainWindow(QMainWindow):
         Renders and displays the next frame of the simulation.
         """
         #pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-        frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size())
+# <<<<<<< HEAD
+        # pixmap = self.renderer.render_next_frame_charge(self.simulation_label.size())
+        # frame, pixmap = self.render_next_frame_method(self.simulation_label.size())
+        frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size(), self.render_charged)
+# =======
+#         frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size())
+# >>>>>>> 4f867e80696183577efc007bc9382acf69fa7b6a
         self.simulation_label.setPixmap(pixmap)
         self.frame_counter_label.setText(f"Frame: {frame}")
         self.frame_counter_label.adjustSize()
@@ -158,7 +182,7 @@ class MainWindow(QMainWindow):
             frame, data = self.sim.recorder.get_frame(value)
             self.frame_counter_label.setText(f"Frame: {frame}")
             self.frame_counter_label.adjustSize()
-            pixmap = self.renderer.render_frame(self.simulation_label.size(), data)
+            pixmap = self.renderer.render_frame(self.simulation_label.size(), data, self.render_charged)
             self.label.setPixmap(pixmap)
             
         except Exception:

@@ -3,6 +3,7 @@ from src.models.cell import Cell
 from src.models.cell_state import CellState
 
 from typing import Tuple
+
 from random import uniform
 
 class UpdateChargeMS(UpdateBaseCharge):
@@ -27,21 +28,21 @@ class UpdateChargeMS(UpdateBaseCharge):
         cell_data_dict = cell.cell_data
         
         match cell.state:
-            case CellState.DEAD:
+            case CellState.NECROSIS:
                 return 0, cell.state
 
-            case CellState.REPOLARIZATION_ABS_REFRACTION:
+            case CellState.REPOLARIZATION_ABSOLUTE_REFRACTION:
                 charge = cell.charge - cell_data_dict["repolarization_potential_drop"]
                 if cell.self_polarization:
                     if charge <= cell_data_dict["relative_refractory_period_threshold"]:
-                        return charge, CellState.REPOLARIZATION_REL_REFRACTION
+                        return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
                     return charge, cell.state
                 else:
                     if charge <= cell_data_dict["relative_refractory_period_threshold"]:
-                        return charge, CellState.REPOLARIZATION_REL_REFRACTION
+                        return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
                     return charge, cell.state
             
-            case CellState.REPOLARIZATION_REL_REFRACTION:
+            case CellState.REPOLARIZATION_RELATIVE_REFRACTION:
                 if len(list(filter(lambda x: x.charge - cell.charge >= REFRACTION_POLAR, cell.neighbours))) >= 1:
                     return cell_data_dict["peak_potential"], CellState.RAPID_DEPOLARIZATION
 
@@ -80,4 +81,4 @@ class UpdateChargeMS(UpdateBaseCharge):
 
 
             case CellState.RAPID_DEPOLARIZATION:
-                return cell.charge, CellState.REPOLARIZATION_ABS_REFRACTION
+                return cell.charge, CellState.REPOLARIZATION_ABSOLUTE_REFRACTION

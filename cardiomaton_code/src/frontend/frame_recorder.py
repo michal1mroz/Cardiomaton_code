@@ -3,7 +3,7 @@ from typing import List, Tuple, Dict
 
 from PyQt6.QtGui import QPixmap
 
-from cardiomaton_code.src.models.cell import CellDict
+from src.models.cell import CellDict
 
 class FrameRecorder:
     """

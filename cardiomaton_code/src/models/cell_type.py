@@ -82,7 +82,7 @@ class CellType(Enum):
             "relative_refractory_period_threshold": -60,
         },
             "self_polarization": False,
-        "name": "Aterior internodal tract"
+        "name": "Anterior internodal tract"
     }
     INTERNODAL_MID = {
         "id": 7,
@@ -109,7 +109,7 @@ class CellType(Enum):
             "relative_refractory_period_threshold": -60,
         },
             "self_polarization": False,
-        "name": "Bundle o his"
+        "name": "Bundle of His"
     }
     SA_NODE = {
         "id": 9,
@@ -125,7 +125,7 @@ class CellType(Enum):
             "relative_refractory_period_threshold": -40,
         },
             "self_polarization": True,
-        "name": "Sinoartial node"
+        "name": "Sinoatrial node"
     }
     AV_NODE = {
         "id": 10,
