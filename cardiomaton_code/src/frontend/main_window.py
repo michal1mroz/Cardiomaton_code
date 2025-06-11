@@ -6,6 +6,7 @@ from PyQt6.QtCore import Qt, QTimer
 from src.frontend.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
+from src.utils.data_reader import get_qss_styling
 
 
 class MainWindow(QMainWindow):
@@ -15,6 +16,8 @@ class MainWindow(QMainWindow):
     This window initializes and manages the simulation rendering,
     playback controls, and UI layout.
     """
+    QSS_PATH = "../../resources/style/main_window.qss"
+
     def __init__(self):
         """
         Initialize the main window and its components.
@@ -22,6 +25,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Cardiomaton")
         self.setGeometry(0, 0, 1000, 600)
+        self.setStyleSheet(get_qss_styling())
 
         self.base_frame_time = 0.05
 
@@ -54,13 +58,11 @@ class MainWindow(QMainWindow):
         # Frame counter display
         self.frame_counter_label = QLabel(self.label)
         self.frame_counter_label.move(10, 10)
-        self.frame_counter_label.setStyleSheet(
-            "font-size: 14pt; color: black; background-color: white; padding: 6px;"
-        )
+        self.frame_counter_label.setObjectName("counterLabel") # ref for QSS styling
+        self.setStyleSheet(self.styleSheet())
         self.frame_counter_label.setFixedHeight(40)
         self.frame_counter_label.setText(f"Frame: 0")
         self.frame_counter_label.adjustSize()
-        #self.frame_counter_label.setFixedWidth(110)
         self.frame_counter_label.show()
 
         # Start/stop button
@@ -70,15 +72,15 @@ class MainWindow(QMainWindow):
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.play_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addLayout(button_layout)
-        # layout.addWidget(self.play_button)
 
         # Speed slider
         self.speed_slider = QSlider(Qt.Orientation.Horizontal)
         self.speed_slider.setRange(1, 500)
         self.speed_slider.setValue(100)
         self.speed_slider.valueChanged.connect(self._change_speed)
+        self.speed_slider.setMinimumWidth(200)
         slider_layout = QHBoxLayout()
-        slider_layout.addWidget(self.speed_slider, alignment = Qt.AlignmentFlag.AlignCenter)
+        slider_layout.addWidget(self.speed_slider, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addLayout(slider_layout)
 
         # Playback slider
@@ -86,29 +88,41 @@ class MainWindow(QMainWindow):
         self.playback_slider.setRange(0, 0)
         self.playback_slider.setValue(0)
         self.playback_slider.valueChanged.connect(self._on_slider_change)
-        slider2_layout = QHBoxLayout()
-        slider2_layout.addWidget(QLabel("Playback:"), alignment = Qt.AlignmentFlag.AlignCenter)
-        slider2_layout.addWidget(self.playback_slider, alignment = Qt.AlignmentFlag.AlignCenter)
-        layout.addLayout(slider2_layout)
+        slider2_container = QWidget()
+        slider2_container.setMaximumWidth(400)
+        slider2_container.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+
+        slider2_layout = QHBoxLayout(slider2_container)
+
+        label = QLabel("Playback:")
+        label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.playback_slider.setMinimumWidth(200)
+        self.playback_slider.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        slider2_layout.addWidget(label)
+        slider2_layout.addWidget(self.playback_slider)
+
+        layout.addWidget(slider2_container, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Color by charge / state option
-        self.render_next_frame_method = self.renderer.render_next_frame_charge
-        self.render_next_frame_method = self.renderer.render_next_frame_charge
-        self.state_checkbox = QCheckBox("Color by state")
-        self.state_checkbox.setChecked(False)
-        self.state_checkbox.stateChanged.connect(self.state_checkbox_changed)
-        layout.addWidget(self.state_checkbox)
+        self.toggle_render_button = QPushButton("Color by state")
+        self.toggle_render_button.setCheckable(True)
+        self.toggle_render_button.setChecked(False)
+        self.toggle_render_button.toggled.connect(self.toggle_render_mode)
+        self.toggle_render_button.setMaximumWidth(180)
+        layout.addWidget(self.toggle_render_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def state_checkbox_changed(self, state):
+    def toggle_render_mode(self, checked: bool):
         """
-        Handle state change of the 'Color by state' checkbox.
+        Toggle between rendering modes: by charge or by state.
         """
-        if state == Qt.CheckState.Checked.value:
-            # self.render_next_frame_method = self.renderer.render_next_frame
-            self.render_charged = False
+        self.render_charged = not checked
+        if checked:
+            self.toggle_render_button.setText("Color by charge")
         else:
-            # self.render_next_frame_method = self.renderer.render_next_frame_charge
-            self.render_charged = True
+            self.toggle_render_button.setText("Color by state")
+
     def _init_timer(self):
         """
         Initializes the QTimer for frame updates.
@@ -153,14 +167,7 @@ class MainWindow(QMainWindow):
         """
         Renders and displays the next frame of the simulation.
         """
-        #pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-# <<<<<<< HEAD
-        # pixmap = self.renderer.render_next_frame_charge(self.simulation_label.size())
-        # frame, pixmap = self.render_next_frame_method(self.simulation_label.size())
         frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size(), self.render_charged)
-# =======
-#         frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-# >>>>>>> 4f867e80696183577efc007bc9382acf69fa7b6a
         self.simulation_label.setPixmap(pixmap)
         self.frame_counter_label.setText(f"Frame: {frame}")
         self.frame_counter_label.adjustSize()
@@ -184,6 +191,6 @@ class MainWindow(QMainWindow):
             self.frame_counter_label.adjustSize()
             pixmap = self.renderer.render_frame(self.simulation_label.size(), data, self.render_charged)
             self.label.setPixmap(pixmap)
-            
+
         except Exception:
             pass
