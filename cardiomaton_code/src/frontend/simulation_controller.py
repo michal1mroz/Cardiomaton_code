@@ -25,7 +25,7 @@ class SimulationController:
         _, cell_map = space.capped_neighbours_graph_from_regions(A,B,cap = 8)
 
         self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
-        self.recorder = FrameRecorder(capacity = 200)
+        self.recorder = FrameRecorder(capacity = 1000)
 
     @property
     def frame_time(self) -> float:

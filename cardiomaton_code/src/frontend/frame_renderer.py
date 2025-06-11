@@ -67,7 +67,8 @@ class FrameRenderer:
             val = np.ones((size[0], size[1]), dtype=np.uint8) * 255
             for position, cell in data.items():
                 x, y = position
-                val[x,y] = cell["state_value"]
+                # val[x,y] = cell["state_value"]
+                val[x, y] = cell.get("state_value", cell.get("s", 0)) + (0 if "s" in cell else 0)
             rgba = self.cmap(self.norm(val))
             rgb = (rgba[:, :, :3] * 255).astype(np.uint8)
 
@@ -79,13 +80,38 @@ class FrameRenderer:
 
             return scaled
     
+    # def _cell_to_hsv(self, cell: CellDict) -> Tuple[int, int, int]:
+    #     # Got to think of a better way to get the gray color
+    #     if not cell["auto_polarization"] and cell["state_name"] == "Polarization":
+    #         return (0,0,124)
+    #     # Naive linear cast from range -90...30 to 30...0
+    #     h = max(-cell["charge"] * 0.25 + 7.5, 0)
+    #     return int(h), 255,255
     def _cell_to_hsv(self, cell: CellDict) -> Tuple[int, int, int]:
-        # Got to think of a better way to get the gray color
-        if not cell["auto_polarization"] and cell["state_name"] == "Polarization":
-            return (0,0,124)
-        # Naive linear cast from range -90...30 to 30...0
-        h = max(-cell["charge"] * 0.25 + 7.5, 0)
-        return int(h), 255,255
+        """
+        Converts cell data to HSV color space for visualization.
+        Supports both full and compact formats.
+        """
+        compact_format = "p" in cell and "auto_polarization" not in cell
+
+        if compact_format:
+            auto_pol = cell["p"]
+            state = cell["s"]
+            charge = cell["c"]
+        else:
+            auto_pol = cell["auto_polarization"]
+            state_name = cell["state_name"].lower()
+            state = 1 if "polarization" in state_name else 0  # heuristic
+            charge = cell["charge"]
+
+        # Szary kolor dla niepolaryzujących w stanie polaryzacji
+        if not auto_pol and state == 1:
+            return (0, 0, 124)
+
+        # Rzutowanie napięcia (-90..30 mV) na odcień (30..0)
+        h = max(-charge * 0.25 + 7.5, 0)
+        return int(h), 255, 255
+
 
     def render_next_frame_charge(self, target_size) -> Tuple[int, QPixmap]: 
         """

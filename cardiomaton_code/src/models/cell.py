@@ -144,23 +144,35 @@ class Cell:
                 self.cell_type.value["name"],
                 self.charge)
 
-    def to_dict(self) -> CellDict:
+    def to_dict(self, compact: bool = True) -> CellDict:
         """
-        Method to serialize the cell data for rendering on the front end. Can be changed to dto if the need arises.
+        Serialize the cell data for rendering or storage.
+
+        Args:
+            compact (bool): Whether to return a minimal version (for recording).
 
         Returns:
-            Dict: dictionary that stores all the relevant fields of the cell
+            Dict: dictionary that stores relevant fields of the cell
         """
-        return {
-            "position": self.position,
-            "state_value": self.state.value + 1,
-            "state_name": self.state.name.capitalize(),
-            "charge": self.charge,
-            "ccs_part": self.cell_type.value["name"],
-            "cell_type": self.cell_type.name,
-            "auto_polarization": self.self_polarization,
-            "neighbours": [nei.position for nei in self.neighbours]
-        }
+        if compact:
+            return {
+                "pos": self.position,
+                "s": self.state.value + 1,  # assuming enum starts at 0
+                "c": self.charge,
+                "t": self.cell_type.value["id"],  # assuming there's a numeric ID or short string
+                "p": self.self_polarization
+            }
+        else:
+            return {
+                "position": self.position,
+                "state_value": self.state.value + 1,
+                "state_name": self.state.name.capitalize(),
+                "charge": self.charge,
+                "ccs_part": self.cell_type.value["name"],
+                "cell_type": self.cell_type.name,
+                "auto_polarization": self.self_polarization,
+                "neighbours": [nei.position for nei in self.neighbours]
+            }
 
     def copy(self) -> Cell:
         """
