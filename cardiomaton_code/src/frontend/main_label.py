@@ -69,7 +69,8 @@ class MainLabel(QLabel):
             if self.last_tooltip is not None:
                 QToolTip.hideText()
                 self.last_tooltip = None
-    def show_cell_info(self, info, global_pos, pos):
+
+    def show_cell_info(self, info, global_pos, pos, debug = False):
         """
         Shows information about cell at the given global position.
         """
@@ -80,14 +81,21 @@ class MainLabel(QLabel):
         cell_type = "komórka rozruchowa (placeholder)"
         ccs_part = info["ccs_part"]
 
-        text = (
-            f"<b>Pozycja:<b> {pos}<br><br>"
-            f"<b>Samopolaryzacja:</b> {is_self_polarizing}<br>"
-            f"<b>Stan polaryzacji:</b> {polarization_state}<br><br>"
-            f"<b>Napięcie:</b> {voltage}<br>"
-            f"<b>Rodzaj komórki:</b> {cell_type}<br>"
-            f"<b>Część układu przewodzącego:</b> {ccs_part}"
-        )
+        if debug: # I leave the old version because it may be useful for debugging, especially the position (MS)
+            text = (
+                f"<b>Pozycja:<b> {pos}<br><br>"
+                f"<b>Samopolaryzacja:</b> {is_self_polarizing}<br>"
+                f"<b>Stan polaryzacji:</b> {polarization_state}<br><br>"
+                f"<b>Napięcie:</b> {voltage}<br>"
+                f"<b>Rodzaj komórki:</b> {cell_type}<br>"
+                f"<b>Część układu przewodzącego:</b> {ccs_part}"
+            )
+        else:
+            text = (
+                f"<b>LOCATION:</b> {ccs_part}<br><br>"
+                f"<b>CURRENT STATE:</b> {polarization_state}<br><br>"
+                f"<b>CURRENT VOLTAGE:</b> {info[4]:.0f} mV"
+            )
 
         QToolTip.showText(global_pos, text, self)
 
