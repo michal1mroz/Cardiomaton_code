@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from cardiomaton_code.src.models.cell import CellDict
 from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
@@ -70,14 +70,12 @@ class SimulationController:
         self.automaton.recreate_from_dict(frame)
         self.recorder.drop_newer(ix)
 
-    def step(self) -> List[CellDict]:
+    def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Alternative step method. Advances the simulation by one frame.
         Returns:
-            List[List[Tuple[int, bool, str]]]: A 2D list representing the grid,
-            where each element is a tuple with cell information. Positions without a cell
-            are filled with None.
+            Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
+            mapping of the cell position to the cell state
         """
-        self.automaton.frame_counter += 1
         self.automaton.update_grid()
         return self.automaton.to_cell_data()

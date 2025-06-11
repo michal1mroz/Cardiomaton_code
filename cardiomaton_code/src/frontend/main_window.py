@@ -52,17 +52,16 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.simulation_label)
 
         # Frame counter display
-        """
-        Not working version - frame counter display
         self.frame_counter_label = QLabel(self.label)
         self.frame_counter_label.move(10, 10)
         self.frame_counter_label.setStyleSheet(
             "font-size: 14pt; color: black; background-color: white; padding: 6px;"
         )
         self.frame_counter_label.setFixedHeight(40)
-        self.frame_counter_label.setFixedWidth(110)
+        self.frame_counter_label.setText(f"Frame: 0")
+        self.frame_counter_label.adjustSize()
+        #self.frame_counter_label.setFixedWidth(110)
         self.frame_counter_label.show()
-        """
 
         # Start/stop button
         self.play_button = QPushButton("Play")
@@ -137,13 +136,10 @@ class MainWindow(QMainWindow):
         Renders and displays the next frame of the simulation.
         """
         #pixmap = self.renderer.render_next_frame(self.simulation_label.size())
-        pixmap = self.renderer.render_next_frame(self.simulation_label.size())
+        frame, pixmap = self.renderer.render_next_frame(self.simulation_label.size())
         self.simulation_label.setPixmap(pixmap)
-
-        """
-        Not working version - frame counter display
-        self.frame_counter_label.setText(f"Frame: {self.sim.automaton.frame_counter}")
-        """
+        self.frame_counter_label.setText(f"Frame: {frame}")
+        self.frame_counter_label.adjustSize()
 
         buf_len = len(self.sim.recorder)
         if buf_len > 0:
@@ -159,14 +155,11 @@ class MainWindow(QMainWindow):
             self.running = False
             self.label.set_running(False)
         try:
-            pixmap = self.renderer.render_frame(self.simulation_label.size(), self.sim.recorder.get_frame(value))
+            frame, data = self.sim.recorder.get_frame(value)
+            self.frame_counter_label.setText(f"Frame: {frame}")
+            self.frame_counter_label.adjustSize()
+            pixmap = self.renderer.render_frame(self.simulation_label.size(), data)
             self.label.setPixmap(pixmap)
-
-            """
-                Not working version - frame counter display
-                frame_idx, pixmap = self.renderer.render_frame(self.simulation_label.size(), self.sim.recorder.get_frame(value))
-                self.label.setPixmap(pixmap)
-                self.frame_counter_label.setText(f"Frame: {frame_idx}")
-            """
+            
         except Exception:
             pass

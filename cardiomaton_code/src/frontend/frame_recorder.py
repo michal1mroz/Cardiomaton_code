@@ -14,13 +14,13 @@ class FrameRecorder:
         self.capacity = capacity
         self.buffer = deque(maxlen=capacity)
 
-    def record(self, data: CellDict) -> None:
+    def record(self, data: Tuple[int, Dict[Tuple[int, int], CellDict]]) -> None:
         """
         Store the automaton data in the buffer.
         """
         self.buffer.append(data)
 
-    def get_frame(self, index: int) -> CellDict:
+    def get_frame(self, index: int) -> Tuple[int, Dict[Tuple[int, int] ,CellDict]]:
         """
         Get a frame by buffer index (0 = oldest, -1 = newest).
         """

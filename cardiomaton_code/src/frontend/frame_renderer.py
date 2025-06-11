@@ -26,7 +26,7 @@ class FrameRenderer:
         self.last_data = None
         self.current_data = None
 
-    def render_next_frame(self, target_size) -> QPixmap:
+    def render_next_frame(self, target_size) -> Tuple[int, QPixmap]:
         """
         Renders the next simulation frame and converts it to a QPixmap.
         Sends the data to the recorder for playback.
@@ -36,19 +36,16 @@ class FrameRenderer:
             target_size : QSize
 
         Returns:
-            QPixmap: A pixmap representation of the simulation frame, scaled to the given target size.
+            Tuple[int, QPixmap]: A pixmap representation of the simulation frame, scaled to the given target size and
+                int value of the frame counter
         """
-        data = self.ctrl.step()
+        frame, data = self.ctrl.step()
         self.last_data = data
-        self.ctrl.recorder.record(self.last_data)
-        """
-        Not working version - frame counter display
-        self.ctrl.recorder.record(self.ctrl.automaton.frame_counter, self.last_data)
-        """
+        self.ctrl.recorder.record((frame, data))
 
-        return self.render_frame(target_size, self.last_data)
+        return frame, self.render_frame(target_size, self.last_data)
 
-    def render_frame(self, target_size, data: CellDict) -> QImage:
+    def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict]) -> QImage:
         self.current_data = data
         #val = np.array([[cell["state_value"] if cell is not None else 0 for cell in row] for row in data])
         size = self.ctrl.automaton.shape
@@ -75,7 +72,7 @@ class FrameRenderer:
         h = max(-cell["charge"] * 0.25 + 7.5, 0)
         return int(h), 255,255
 
-    def render_next_frame_charge(self, target_size) -> QPixmap: 
+    def render_next_frame_charge(self, target_size) -> Tuple[int, QPixmap]: 
         """
         Method to create the next simulation frame scaled to the given size. Uses charge as a base for the cell color.
 
@@ -85,7 +82,7 @@ class FrameRenderer:
         Returns:
             QPixmap: generated automaton frame
         """
-        data = self.ctrl.step()
+        frame, data = self.ctrl.step()
         self.last_data = data
 
         size = self.ctrl.automaton.shape
@@ -98,7 +95,7 @@ class FrameRenderer:
         h, w, _ = im_rgb.shape
         bytes_per_line = 3 * w
         qimage = QImage(im_rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-        return QPixmap.fromImage(qimage).scaled(
+        return frame, QPixmap.fromImage(qimage).scaled(
             target_size,
             aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
         )
