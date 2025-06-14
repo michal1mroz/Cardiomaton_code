@@ -107,3 +107,8 @@ def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,t
     junction_pixels = list(all_pixels - region_pixels)
 
     return bin_main, region_dict, junction_pixels
+
+def get_qss_styling(file : str = "main_window.qss"):
+    path = "./resources/style/"
+    with open(path + file) as f:
+        return f.read()

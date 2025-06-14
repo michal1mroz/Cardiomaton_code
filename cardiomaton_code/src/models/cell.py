@@ -1,8 +1,17 @@
 from __future__ import annotations
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, TypedDict
 from src.models.cell_state import CellState
 
 # from src.models.cell_type import CellType
+
+class CellDict(TypedDict):
+    position: Tuple[int, int]
+    state_value: int
+    state_name: str 
+    charge: float
+    ccs_part: str 
+    cell_type: str
+    auto_polarization: bool
 
 
 class Cell:
@@ -38,7 +47,7 @@ class Cell:
 
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: CellType, cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
+    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
         """
         Cell constructor.
         
@@ -118,7 +127,7 @@ class Cell:
         """
         return self.state.value + 1
 
-    def to_tuple(self) -> Tuple[int, bool, str, str]:
+    def to_tuple(self) -> Tuple[int, bool, str, str, float]:
         """
         Simple method to map the current state to tuple with the most important information
         The tuple contains:
@@ -128,9 +137,13 @@ class Cell:
         Returns:
             Tuple[int, bool, str]: A tuple with the cell's Numerical value, self-polarization flag, and state name.
         """
-        return (self.state.value + 1, self.self_polarization, self.state.name.capitalize(), self.cell_type.value["name"])
+        return (self.state.value + 1,
+                self.self_polarization,
+                self.state.name.capitalize(),
+                self.cell_type.value["name"],
+                self.charge)
 
-    def to_dict(self):
+    def to_dict(self) -> CellDict:
         """
         Method to serialize the cell data for rendering on the front end. Can be changed to dto if the need arises.
 
@@ -143,6 +156,7 @@ class Cell:
             "state_name": self.state.name.capitalize(),
             "charge": self.charge,
             "ccs_part": self.cell_type.value["name"],
+            "cell_type": self.cell_type.name,
             "auto_polarization": self.self_polarization,
         }
 
@@ -157,7 +171,7 @@ class Cell:
         copied_cell = Cell(
             position=self.position,
             cell_type=self.cell_type,
-            durations=self.state_durations,
+            cell_data=self.cell_data,
             init_state=self.state,
             self_polarization=self.self_polarization,
             self_polarization_timer=self.self_polar_timer
