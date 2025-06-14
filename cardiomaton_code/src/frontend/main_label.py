@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 from PyQt6.QtWidgets import QLabel, QToolTip
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QMouseEvent
 
 from cardiomaton_code.src.models.cell import CellDict
@@ -13,6 +13,8 @@ class MainLabel(QLabel):
     detailed information about cells under the mouse cursor.
 
     """
+    cellClicked = pyqtSignal(object)
+
     def __init__(self, renderer: FrameRenderer, parent=None):
         super().__init__(parent)
         self.renderer = renderer
@@ -62,7 +64,15 @@ class MainLabel(QLabel):
         return None 
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        pos = event.pos()
+        if self.running or self.pixmap() is None: 
+            return
+        pos = self._mousePosition(event)
+        
+        data = self.renderer.current_data
+        if data is not None and pos is not None:
+            cell_info = data.get(pos)
+            if cell_info is not None:
+                self.cellClicked.emit(cell_info)
 
 
     def mouseMoveEvent(self, event: QMouseEvent):

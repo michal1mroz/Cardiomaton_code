@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QSlider, QCheckBox
 )
 from PyQt6.QtCore import Qt, QTimer
+from cardiomaton_code.src.frontend.cell_inspector import CellInspector
+from cardiomaton_code.src.models.cell import CellDict
 from src.frontend.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
@@ -48,8 +50,16 @@ class MainWindow(QMainWindow):
 
         # Simulation display
         # self.simulation_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        
         self.simulation_label = self.label
-        layout.addWidget(self.simulation_label)
+        #layout.addWidget(self.simulation_label)
+
+        self.main_layout = QHBoxLayout()
+        self.main_layout.addWidget(self.label)
+        layout.addLayout(self.main_layout)
+
+        self.cell_inspector = None
+        self.label.cellClicked.connect(self._show_cell_inspector)
 
         # Frame counter display
         self.frame_counter_label = QLabel(self.label)
@@ -133,6 +143,8 @@ class MainWindow(QMainWindow):
             self.play_button.setText("Stop")
             self.running = True
 
+        if self.cell_inspector is not None:
+            self.cell_inspector.set_running(self.running)
         self.label.set_running(self.running)
 
     def _change_speed(self, percent: int):
@@ -157,6 +169,10 @@ class MainWindow(QMainWindow):
         self.simulation_label.setPixmap(pixmap)
         self.frame_counter_label.setText(f"Frame: {frame}")
         self.frame_counter_label.adjustSize()
+        
+        # Maybe let's think of some observers or other callbacks to update widgets. MM
+        if self.cell_inspector is not None:
+            self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
 
         buf_len = len(self.sim.recorder)
         if buf_len > 0:
@@ -180,3 +196,17 @@ class MainWindow(QMainWindow):
             
         except Exception:
             pass
+
+    def _show_cell_inspector(self, cell_data: CellDict):
+        if self.cell_inspector:
+            self.main_layout.removeWidget(self.cell_inspector)
+            self.cell_inspector.deleteLater()
+
+        self.cell_inspector = CellInspector(cell_data, on_close_callback=self._remove_inspector, running=self.running, ctrl = self.sim)
+        self.main_layout.addWidget(self.cell_inspector)
+
+    def _remove_inspector(self):
+        if self.cell_inspector:
+            self.main_layout.removeWidget(self.cell_inspector)
+            self.cell_inspector.deleteLater()
+            self.cell_inspector = None
