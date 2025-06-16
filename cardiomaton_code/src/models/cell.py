@@ -47,7 +47,7 @@ class Cell:
 
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: CellType, cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
+    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
         """
         Cell constructor.
         
@@ -183,7 +183,7 @@ class Cell:
         copied_cell = Cell(
             position=self.position,
             cell_type=self.cell_type,
-            durations=self.state_durations,
+            cell_data=self.cell_data,
             init_state=self.state,
             self_polarization=self.self_polarization,
             self_polarization_timer=self.self_polar_timer

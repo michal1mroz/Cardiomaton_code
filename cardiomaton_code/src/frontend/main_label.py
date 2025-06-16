@@ -109,9 +109,8 @@ class MainLabel(QLabel):
         """
         is_self_polarizing = "Tak" if info["auto_polarization"] else "Nie"
         polarization_state = info["state_name"]
-
         voltage = info["charge"]
-        cell_type = "komórka rozruchowa (placeholder)"
+        cell_type = "(placeholder)"
         ccs_part = info["ccs_part"]
 
         if debug: # I leave the old version because it may be useful for debugging, especially the position (MS)

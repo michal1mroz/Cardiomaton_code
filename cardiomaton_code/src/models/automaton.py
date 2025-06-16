@@ -24,7 +24,7 @@ class Automaton:
         """
         Automaton constructor.
 
-        frame_time will probably be changed depending on the method used to controle the speed.
+        frame_time will probably be changed depending on the method used to control the speed.
         grid_b is a copy of the array created to avoid the overhead of memory allocation and copying on each update.
 
         Args:
@@ -76,7 +76,6 @@ class Automaton:
             new_cell = Cell(position=cell.position,cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type,
                             self_polarization=cell.self_polarization,
                             self_polarization_timer=cell.self_polar_timer)
-            if len(new_cell.neighbours) != 0: print("cost tu jest nie tak")
             help_dict[cell.position] = new_cell
             arr.append(new_cell)
 
@@ -149,7 +148,8 @@ class Automaton:
         Updates the automaton in place.
         
         Args:
-            data (List[Dict]): result of to_cell_data method
+            data_tuple (Tuple[int, Dict[Tuple[int, int], CellDict]]): first value (int) is index of the frame,
+             second (dict) is data generated in frame
         """
         frame, data = data_tuple
         cells_a, cells_b = {}, {}

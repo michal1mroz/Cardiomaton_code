@@ -18,10 +18,8 @@ class SimulationController:
         Args:
             frame_time (float): Time between frames in seconds.
         """
-        # graph, av_pos = load_to_binary_array()
         graph, A, B = extract_conduction_pixels()
         space = Space(graph)
-        # _, cell_map = space.capped_neighbours_graph(graph, cap=8)
         _, cell_map = space.capped_neighbours_graph_from_regions(A,B,cap = 8)
 
         self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
@@ -46,18 +44,6 @@ class SimulationController:
             t (float): New frame time in seconds.
         """
         self.automaton.frame_time = t
-
-    # def step(self) -> "np.ndarray[int]":
-    #     """
-    #     Advances the simulation by one frame.
-    #
-    #     Returns:
-    #         np.ndarray[int]: Grid state as a 2D NumPy integer array.
-    #     """
-    #     self.automaton.frame_counter += 1
-    #     self.automaton.update_grid()
-    #     return self.automaton._to_numpy().astype(int)
-
     def update_automaton(self, ix) -> None:
         """
         Updates the automaton by setting the state to that from the index ix in the recorders buffer.
