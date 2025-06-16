@@ -3,8 +3,9 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayo
 from collections import deque
 import pyqtgraph as pq
 
-from cardiomaton_code.src.frontend.simulation_controller import SimulationController
-from cardiomaton_code.src.models.cell import CellDict
+from src.frontend.simulation_controller import SimulationController
+from src.models.cell import CellDict
+from src.utils.data_reader import get_qss_styling
 
 class CellInspector(QWidget):
     """
@@ -26,6 +27,8 @@ class CellInspector(QWidget):
         self.key_labels = {}
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
+
+        # self.setStyleSheet(get_qss_styling("cell_inspector.qss"))
 
         self.charge_buffer = deque(maxlen=500)
         
@@ -54,7 +57,7 @@ class CellInspector(QWidget):
         for key, value in self.data.items():
             h_layout = QHBoxLayout()
 
-            key_label = QLabel(f"{key}:", self)
+            key_label = QLabel(f"{key.replace('_', ' ').title()}:", self)
             key_label.setFixedWidth(80)
             self.key_labels[key] = key_label
             h_layout.addWidget(key_label)

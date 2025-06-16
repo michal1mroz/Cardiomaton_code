@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QLabel, QToolTip
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QMouseEvent
 
-from cardiomaton_code.src.models.cell import CellDict
+from src.models.cell import CellDict
 from src.frontend.frame_renderer import FrameRenderer
 
 
@@ -97,7 +97,7 @@ class MainLabel(QLabel):
         if data is not None and self.last_tooltip != pos:
             cell_info = data.get(pos)
             if cell_info is not None:
-                self.show_cell_info(cell_info, event.globalPosition().toPoint(), pos, True)
+                self.show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
                 self.last_tooltip = pos
             else:
                 QToolTip.hideText()

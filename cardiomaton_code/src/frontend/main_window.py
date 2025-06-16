@@ -3,8 +3,8 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QSlider, QCheckBox
 )
 from PyQt6.QtCore import Qt, QTimer
-from cardiomaton_code.src.frontend.cell_inspector import CellInspector
-from cardiomaton_code.src.models.cell import CellDict
+from src.frontend.cell_inspector import CellInspector
+from src.models.cell import CellDict
 from src.frontend.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
