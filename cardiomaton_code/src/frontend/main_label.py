@@ -93,7 +93,8 @@ class MainLabel(QLabel):
             text = (
                 f"<b>LOCATION:</b> {ccs_part.replace('_', ' ')}<br><br>"
                 f"<b>CURRENT STATE:</b> {polarization_state.replace('_', ' ')}<br><br>"
-                f"<b>CURRENT VOLTAGE:</b> {voltage:.0f} mV"
+                f"<b>CURRENT VOLTAGE:</b> {voltage:.0f} mV<br>"
+                f"<span style='color:#000000;font-size:1px'>{pos}</span>"
             )
 
         QToolTip.showText(global_pos, text, self)

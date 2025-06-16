@@ -4,6 +4,7 @@ import numpy as np
 from typing import Tuple
 from src.models.cellular_graph import Space
 from itertools import chain
+from scipy.spatial import KDTree
 from matplotlib import pyplot as plt
 
 def load_to_binary_array(path : str = "./resources/img_ccs/", nr_of_nodes: int = 1500) -> Tuple[np.ndarray, Tuple[float, float]]:
@@ -106,7 +107,28 @@ def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,t
     all_pixels = set(zip(*np.where(bin_main == 255)))
     junction_pixels = list(all_pixels - region_pixels)
 
-    return bin_main, region_dict, junction_pixels
+    # build KDTree to search for the closest point
+    region_kdtrees = {
+        label: KDTree(points)
+        for label, points in region_dict.items()
+    }
+
+    # extended_region_dict = {label: set(points) for label, points in region_dict.items()}
+
+
+    for pixel in junction_pixels:
+        min_dist = float('inf')
+        closest_label = None
+
+        for label, kdtree in region_kdtrees.items():
+            dist, _ = kdtree.query(pixel)
+            if dist < min_dist:
+                min_dist = dist
+                closest_label = label
+        if closest_label:
+            region_dict[closest_label].append(pixel)
+
+    return bin_main, region_dict, []
 
 def get_qss_styling(file : str = "main_window.qss"):
     path = "./resources/style/"

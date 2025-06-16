@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
             self.running = False
         else:
             # Checks if playback was changed and updates the automaton accordingly
-            if self.playback_slider.value() < self.sim.recorder.__len__() - 1:
+            if self.playback_slider.value() < len(self.sim.recorder) - 1:
                 self.sim.update_automaton(self.playback_slider.value())
             self.timer.start(int(self.sim.frame_time * 1000))
             self.play_button.setText("Stop")
@@ -191,6 +191,7 @@ class MainWindow(QMainWindow):
             self.frame_counter_label.adjustSize()
             pixmap = self.renderer.render_frame(self.simulation_label.size(), data, self.render_charged)
             self.label.setPixmap(pixmap)
+            # self.playback_slider.setValue(self.playback_slider.value() + 1)
 
         except Exception:
             pass
