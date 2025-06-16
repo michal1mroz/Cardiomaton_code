@@ -64,10 +64,15 @@ class MainLabel(QLabel):
         return None 
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
+        """
         if self.running or self.pixmap() is None: 
             return
         pos = self._mousePosition(event)
-        
+        """
+        if self.pixmap() is None:
+            return
+        pos = self._mousePosition(event)
+
         data = self.renderer.current_data
         if data is not None and pos is not None:
             cell_info = data.get(pos)

@@ -160,6 +160,18 @@ class Cell:
             "auto_polarization": self.self_polarization,
         }
 
+    def update_data(self, data_dict: CellDict) -> None:
+        """
+        Method to update state of cell from the CellDict. For now allows only
+        for the depolarization of the cell.
+
+        Args:
+            data_dict (CellDict): Dict with new values for the cell
+        """
+        self.state = CellState(int(data_dict['state_value'])) 
+        if self.state == CellState.RAPID_DEPOLARIZATION:
+            self.charge = self.cell_data.get('peak_potential', 0)
+
     def copy(self) -> Cell:
         """
         Creates a copy of the cell with the same state, timers, and configuration.

@@ -172,6 +172,21 @@ class Automaton:
         self.grid_b = [val for val in cells_b.values()]
         self.frame_counter = frame
 
+    def update_cell_from_dict(self, data_dict: CellDict) -> None:
+        """
+        Simple method to find the cell that needs to be updated and calls the update method
+        on both coppies of that cell.
+
+        Args:
+            data_dict (CellDict): New values of the cell
+        """
+
+        for i, cell in enumerate(self.grid_a):
+            if cell.position == data_dict['position']:
+                cell.update_data(data_dict)
+                self.grid_b[i].update_data(data_dict)
+                return
+
     def draw(self, first_time: bool = False) -> None:
         """
         Method to draw the current state of the automaton using matplotlib.

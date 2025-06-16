@@ -70,6 +70,15 @@ class SimulationController:
         self.automaton.recreate_from_dict(frame)
         self.recorder.drop_newer(ix)
 
+    def update_cell(self, updated_data: CellDict) -> None:
+        """
+        Updates a single cell of the automaton with the data from the cell inspector.
+
+        Args
+            updated_data (CellDict): A new data for the specific cell.
+        """
+        self.automaton.update_cell_from_dict(updated_data)        
+
     def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Alternative step method. Advances the simulation by one frame.

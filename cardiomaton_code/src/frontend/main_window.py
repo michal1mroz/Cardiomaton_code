@@ -188,6 +188,7 @@ class MainWindow(QMainWindow):
             self.running = False
             self.label.set_running(False)
         try:
+            self._remove_inspector()
             frame, data = self.sim.recorder.get_frame(value)
             self.frame_counter_label.setText(f"Frame: {frame}")
             self.frame_counter_label.adjustSize()
