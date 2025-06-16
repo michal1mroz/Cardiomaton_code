@@ -1,6 +1,9 @@
+from typing import Tuple, Union
 from PyQt6.QtWidgets import QLabel, QToolTip
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QMouseEvent
 
+from cardiomaton_code.src.models.cell import CellDict
 from src.frontend.frame_renderer import FrameRenderer
 
 
@@ -10,6 +13,8 @@ class MainLabel(QLabel):
     detailed information about cells under the mouse cursor.
 
     """
+    cellClicked = pyqtSignal(object)
+
     def __init__(self, renderer: FrameRenderer, parent=None):
         super().__init__(parent)
         self.renderer = renderer
@@ -25,14 +30,19 @@ class MainLabel(QLabel):
 
         self.last_tooltip = None
 
-    def mouseMoveEvent(self, event):
+    def _mousePosition(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:
         """
-        Show tooltip only if the mouse moves to a new cell.
-        Tooltip remains visible as long as the mouse stays over the same cell.
+        Helper method to get the mouse position in term of pixmaps rows and columns.
+        
+        Args:
+            event (QMouseEvent): Callback event from the mouse action
+        Returns:
+            Tuple[int, int] or None: position on the pixmap (row, col) 
+                or None if there's no pixmap / mouse is outside of it
         """
-        if not self.pixmap() or self.running:
-            return
-
+        if not self.pixmap():
+            return None
+        
         pixmap_size = self.pixmap().size()
         label_size = self.size()
 
@@ -42,31 +52,54 @@ class MainLabel(QLabel):
         x = event.position().x() - offset_x
         y = event.position().y() - offset_y
 
-        if x < 0 or y < 0 or x >= pixmap_size.width() or y >= pixmap_size.height():
-            if self.last_tooltip is not None:
-                QToolTip.hideText()
-                self.last_tooltip = None
-            return
+        if 0 > x or x >= pixmap_size.width() or 0 > y  or y >= pixmap_size.height():
+            return None
 
-        data = self.renderer.current_data
-        if data is None:
-            return
-
-        data_shape = self.renderer.ctrl.automaton.shape
-        rows = data_shape[0]
-        cols = data_shape[1]
-
+        rows, cols = self.renderer.ctrl.automaton.shape
         col = int(x / pixmap_size.width() * cols)
         row = int(y / pixmap_size.height() * rows)
 
         if 0 <= row < rows and 0 <= col < cols:
-            if self.last_tooltip != (row, col):
-                cell_info = data.get((row, col))
-                if cell_info is not None:
-                    self.show_cell_info(cell_info, event.globalPosition().toPoint(), (row, col))
-                    self.last_tooltip = (row, col)
-        else:
-            if self.last_tooltip is not None:
+            return row, col
+        return None 
+    
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """
+        if self.running or self.pixmap() is None: 
+            return
+        pos = self._mousePosition(event)
+        """
+        if self.pixmap() is None:
+            return
+        pos = self._mousePosition(event)
+
+        data = self.renderer.current_data
+        if data is not None and pos is not None:
+            cell_info = data.get(pos)
+            if cell_info is not None:
+                self.cellClicked.emit(cell_info)
+
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        """
+        Show tooltip only if the mouse moves to a new cell.
+        Tooltip remains visible as long as the mouse stays over the same cell.
+        """
+        
+        if self.running or self.pixmap() is None: 
+            return
+        pos = self._mousePosition(event)
+        
+        if pos is None and self.last_tooltip is not None:
+            QToolTip.hideText()
+            self.last_tooltip = None
+        data = self.renderer.current_data
+        if data is not None and self.last_tooltip != pos:
+            cell_info = data.get(pos)
+            if cell_info is not None:
+                self.show_cell_info(cell_info, event.globalPosition().toPoint(), pos, True)
+                self.last_tooltip = pos
+            else:
                 QToolTip.hideText()
                 self.last_tooltip = None
 
