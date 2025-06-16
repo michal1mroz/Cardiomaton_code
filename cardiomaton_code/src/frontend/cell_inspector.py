@@ -45,7 +45,7 @@ class CellInspector(QWidget):
         
         self.submit_button = QPushButton("Submit")
         self.submit_button.clicked.connect(self._submit_data)
-        self.layout.addWidget(self.submit_button)
+        #self.layout.addWidget(self.submit_button)
 
         self.dep_button = QPushButton("Depolarize")
         self.dep_button.clicked.connect(self._dep_callback)
@@ -58,7 +58,7 @@ class CellInspector(QWidget):
             h_layout = QHBoxLayout()
 
             key_label = QLabel(f"{key.replace('_', ' ').title()}:", self)
-            key_label.setFixedWidth(80)
+            key_label.setFixedWidth(135)
             self.key_labels[key] = key_label
             h_layout.addWidget(key_label)
 
@@ -75,15 +75,21 @@ class CellInspector(QWidget):
 
         # Plot setup        
         self.plot_widget = pq.PlotWidget()
-        self.plot_curve = self.plot_widget.plot(pen='g')
+        self.plot_curve = self.plot_widget.plot(pen=pq.mkPen(color='r', width=2))
+        self.plot_widget.setBackground('w')
+        self.plot_widget.setTitle('Charge over time')
+        self.plot_widget.setLabel('left', 'Charge')
+        self.plot_widget.setLabel('bottom', 'Time [Frames]')
+        self.plot_widget.showGrid(x=True, y=True)
 
-        self.layout.addWidget(QLabel("Charge over time:"))
         self.layout.addWidget(self.plot_widget) 
        
+        """
         if not self.running:
             self.layout.addWidget(self.submit_button)
             self.submit_button.setEnabled(True)
-
+        """
+            
     def update(self, cell_data: CellDict) -> None:
         """
         Update method called by the main application. If the cell inspector
