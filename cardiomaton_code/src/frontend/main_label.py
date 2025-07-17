@@ -18,19 +18,19 @@ class MainLabel(QLabel):
     def __init__(self, renderer: FrameRenderer, parent=None):
         super().__init__(parent)
         self.renderer = renderer
+        self.running = False
+        self.last_tooltip = None
+
         self.setMouseTracking(True)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
-
-        self.running = False
-
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setScaledContents(False)
         self.setMinimumSize(1, 1)
         self.setStyleSheet("background-color: navy;border: 2px solid black;")
 
-        self.last_tooltip = None
 
-    def _mousePosition(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:
+
+    def _mouse_position(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:
         """
         Helper method to get the mouse position in term of pixmaps rows and columns.
         
@@ -59,24 +59,16 @@ class MainLabel(QLabel):
         col = int(x / pixmap_size.width() * cols)
         row = int(y / pixmap_size.height() * rows)
 
-        if 0 <= row < rows and 0 <= col < cols:
-            return row, col
-        return None 
+        return (row, col) if (0 <= row < rows and 0 <= col < cols) else None
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        """
-        if self.running or self.pixmap() is None: 
-            return
-        pos = self._mousePosition(event)
-        """
         if self.pixmap() is None:
             return
-        pos = self._mousePosition(event)
 
-        data = self.renderer.current_data
-        if data is not None and pos is not None:
-            cell_info = data.get(pos)
-            if cell_info is not None:
+        pos = self._mouse_position(event)
+        if pos and self.renderer.current_data:
+            cell_info = self.renderer.current_data.get(pos)
+            if cell_info:
                 self.cellClicked.emit(cell_info)
 
 
@@ -85,25 +77,26 @@ class MainLabel(QLabel):
         Show tooltip only if the mouse moves to a new cell.
         Tooltip remains visible as long as the mouse stays over the same cell.
         """
-        
         if self.running or self.pixmap() is None: 
             return
-        pos = self._mousePosition(event)
-        
+
+        pos = self._mouse_position(event)
         if pos is None and self.last_tooltip is not None:
             QToolTip.hideText()
             self.last_tooltip = None
+
+
         data = self.renderer.current_data
         if data is not None and self.last_tooltip != pos:
             cell_info = data.get(pos)
             if cell_info is not None:
-                self.show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
+                self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
                 self.last_tooltip = pos
             else:
                 QToolTip.hideText()
                 self.last_tooltip = None
 
-    def show_cell_info(self, info, global_pos, pos, debug = False):
+    def _show_cell_info(self, info, global_pos, pos, debug = False):
         """
         Shows information about cell at the given global position.
         """
