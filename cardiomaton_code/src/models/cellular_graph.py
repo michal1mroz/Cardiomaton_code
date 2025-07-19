@@ -14,11 +14,8 @@ class Space: #, the final frontier
         self.diagonal_dirs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
         self.root = root
         self.graph = None
-        # self.graph, _ = self.capped_neighbours_graph(binary_array)
-        #self.capped_neighbours_graph(binary_array)
 
-
-    def nearest_neighbours_graph(self,binary_array: np.ndarray):
+    def build_nn_graph(self, binary_array: np.ndarray):
         """
         Creates the graph where cells are connected if they are in sqrt(2) radius - maximum of 8 neighbours.
         One of the ways to create cells neighborhood.
@@ -43,7 +40,7 @@ class Space: #, the final frontier
 
         return G
 
-    def capped_neighbours_graph(self, binary_array, cap = 4):
+    def build_capped_neighbours_graph(self, binary_array, cap = 4):
         """
         Creates the graph where maximum of cap cells are connected if they are in sqrt(2) radius - maximum of 8
         neighbours. Prioritising cells arranged vertically or horizontally.
@@ -66,9 +63,6 @@ class Space: #, the final frontier
             if point == self.root:
                 cell = CellType.create(position=point, cell_type=CellType.AV_NODE,state=CellState.SLOW_DEPOLARIZATION)
             else:
-                # cell = Cell(position=point,cell_type=CellType.SA_NODE,durations = CellType.SA_NODE.value["durations"], self_polarization=True)
-
-                # cell = Cell(position=point)
                 cell = CellType.create(position=point, cell_type=CellType.BACHMANN)
             cells[point] = cell
 
@@ -110,19 +104,19 @@ class Space: #, the final frontier
                 G.add_edge(tuple(point), neighbor, weight=weight)
         return G, cells
 
-    def capped_neighbours_graph_from_regions(self,region_dict, junction_pixels, cap=4):
+    def build_capped_neighbours_graph_from_regions(self, region_dict, junction_pixels, cap=4):
         """
-        Tworzy graf z połączonych komórek na podstawie pikseli regionów oraz junctionów.
-        Typ komórki (CellType) ustalany na podstawie nazwy regionu lub jako junction.
+        Creates a graph of connected cells based on region pixels and junctions. The cell type (CellType) is determined
+        by the region name or as a junction.
 
         Args:
-            region_dict (dict[str, list[(x, y)]]): Mapa sekcji do listy punktów.
-            junction_pixels (list[(x, y)]): Lista punktów połączeń między regionami.
-            cap (int): Maksymalna liczba sąsiadów (domyślnie 4).
+            region_dict (dict[str, list[(x, y)]]): Map of sections to a list of points.
+            junction_pixels (list[(x, y)]): List of connection points between regions.
+            cap (int): Maximum number of neighbors (default 4).
 
         Returns:
-            networkx.Graph: graf połączeń
-            dict[(x, y), Cell]: mapa pozycji do obiektów Cell
+            networkx.Graph: Connection graph
+            dict[(x, y), Cell]: Map of positions to Cell objects
         """
 
         all_points = []
@@ -148,13 +142,12 @@ class Space: #, the final frontier
                 cell_types[pt] = ctype
                 all_points.append(pt)
 
-        # Adding Junction type cells
-        # TODO: assign junction cells to specific(closest) part of CCS
+        # Adding Junction type cells; outdated, left for safety measures
         for pt in junction_pixels:
             cell_types[pt] = CellType.JUNCTION
             all_points.append(pt)
 
-        # Creating Cell obejcts
+        # Creating Cell objects
         cells = {}
         for pt in all_points:
             cells[pt] = CellType.create(position=pt, cell_type=cell_types[pt])

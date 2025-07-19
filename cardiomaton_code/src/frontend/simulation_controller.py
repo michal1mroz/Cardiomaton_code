@@ -20,7 +20,7 @@ class SimulationController:
         """
         graph, A, B = extract_conduction_pixels()
         space = Space(graph)
-        _, cell_map = space.capped_neighbours_graph_from_regions(A,B,cap = 8)
+        _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap = 8)
 
         self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
         self.recorder = FrameRecorder(capacity = 200)
