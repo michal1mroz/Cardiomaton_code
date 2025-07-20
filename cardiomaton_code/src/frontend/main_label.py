@@ -40,10 +40,11 @@ class MainLabel(QLabel):
             Tuple[int, int] or None: position on the pixmap (row, col) 
                 or None if there's no pixmap / mouse is outside of it
         """
-        if not self.pixmap():
+        pixmap = self.pixmap()
+        if pixmap is None:
             return None
-        
-        pixmap_size = self.pixmap().size()
+
+        pixmap_size = pixmap.size()
         label_size = self.size()
 
         offset_x = (label_size.width() - pixmap_size.width()) / 2

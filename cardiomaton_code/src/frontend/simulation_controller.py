@@ -1,7 +1,8 @@
 from typing import Dict, List, Tuple
 
 from src.models.cell import CellDict
-from src.utils.data_reader import load_to_binary_array, extract_conduction_pixels
+from src.utils.image_loader import load_to_binary_array
+from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
 from src.frontend.frame_recorder import FrameRecorder

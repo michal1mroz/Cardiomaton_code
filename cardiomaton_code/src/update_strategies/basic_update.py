@@ -1,5 +1,4 @@
 from src.update_strategies.base import UpdateStrategy
-from src.models.cell import Cell
 from src.models.cell_state import CellState
 
 class BasicUpdate(UpdateStrategy):

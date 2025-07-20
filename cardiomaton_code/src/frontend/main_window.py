@@ -8,7 +8,7 @@ from src.models.cell import CellDict
 from src.frontend.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
-from src.utils.data_reader import get_qss_styling
+from src.utils.style_utils import get_qss_styling
 
 
 class MainWindow(QMainWindow):
@@ -171,7 +171,7 @@ class MainWindow(QMainWindow):
             self.play_button.setText("Stop")
             self.running = True
 
-        if self.cell_inspector is not None:
+        if self.cell_inspector:
             self.cell_inspector.set_running(self.running)
         self.render_label.set_running(self.running)
 
@@ -210,7 +210,7 @@ class MainWindow(QMainWindow):
         self.frame_counter_label.adjustSize()
         
         # Maybe let's think of some observers or other callbacks to update widgets. MM
-        if self.cell_inspector is not None:
+        if self.cell_inspector:
             self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
 
         buf_len = len(self.sim.recorder)
