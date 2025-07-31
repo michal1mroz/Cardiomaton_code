@@ -47,7 +47,7 @@ class FrameRenderer:
 
     def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict], shape: Tuple[int, int], show_charge=False) -> QImage:
         self.current_data = data
-        shape = self.ctrl.automaton.shape
+        shape = self.ctrl.shape
 
         if show_charge:
             return self._render_charge(data, shape, target_size)
