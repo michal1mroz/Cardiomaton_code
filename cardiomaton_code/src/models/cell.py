@@ -13,38 +13,10 @@ class CellDict(TypedDict):
     cell_type: str
     auto_polarization: bool
 
-
 class Cell:
     """
     Class to store information about specific cell.
     """
-
-    # To be moved to better location
-    # For now, we have one(?) self-depolarizing cell and the rest of the cells is treated like regular cardiomycytes
-    # which is not tru biologically, but works well in the first version of simulation
-
-    # CELL DATA MOVED TO CellType enum values (for now?)
-    # cell_data = {
-    #     "default": {
-    #         "resting_membrane_potential": -90,
-    #         "peak_potential": 30,
-    #         "threshold_potential": -5,
-    #         "duration": 60,
-    #         "repolarization_potential_drop": 2, # more values to be established because repolarization pace changes
-    #         "relative_refractory_period_threshold": -60,
-    #     },
-    #     "auto": {
-    #         "resting_membrane_potential": -60,
-    #         "peak_potential": 20,
-    #         "threshold_potential": -35,
-    #         "duration": 40,
-    #         "spontaneous_depolarization_step_slow": 0.13,
-    #         "spontaneous_depolarization_step_fast": 27.5,
-    #         "repolarization_potential_drop": 2,
-    #         "relative_refractory_period_threshold": -40,
-    #     },
-    # }
-
     self_polar_threshold = 200
 
     def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
@@ -59,8 +31,6 @@ class Cell:
         self.self_polarization = self_polarization
         self.cell_type = cell_type
 
-        # self.state_durations = durations
-
         self.self_polar_timer = 0
         self.state_timer = 0
 
@@ -69,11 +39,6 @@ class Cell:
         self.charge = 0
 
         self.cell_data = cell_data
-
-        # # To be changed according to some type of dict
-        # self.type = "default"
-        # if self.self_polarization:
-        #     self.type = "auto"
 
     def reset_timer(self):
         self.state_timer = 0
@@ -110,7 +75,6 @@ class Cell:
             color (str): Color coresponding to the state
         """
         return {
-            # CellState.WAITING: 'gray',
             CellState.POLARIZATION: 'gray',
             CellState.RAPID_DEPOLARIZATION: 'yellow',
             CellState.SLOW_DEPOLARIZATION: 'pink',
@@ -190,5 +154,4 @@ class Cell:
         )
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied
-
         return copied_cell

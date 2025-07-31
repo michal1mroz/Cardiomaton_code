@@ -1,8 +1,6 @@
 from collections import deque
 from typing import List, Tuple, Dict
 
-from PyQt6.QtGui import QPixmap
-
 from src.models.cell import CellDict
 
 class FrameRecorder:
@@ -29,7 +27,7 @@ class FrameRecorder:
     def __len__(self) -> int:
         return len(self.buffer)
 
-    def get_all(self) -> List[CellDict]:
+    def get_all(self) -> List[Tuple[int, Dict[Tuple[int, int], CellDict]]]:
         """
         Return a list of all stored frames in order.
         """

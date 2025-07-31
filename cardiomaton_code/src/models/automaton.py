@@ -40,9 +40,6 @@ class Automaton:
         self.is_running = False
         self.frame_counter = 0
         self.neighbour_map = self._create_neighbour_map()
-        # self.update_method = BasicUpdate()
-        #self.update_method = UpdateWithTiming()
-        # self.update_method = UpdateCharge()
         self.update_method = UpdateChargeMS()
         self.fig = self.ax = self.img = None
 
@@ -109,10 +106,7 @@ class Automaton:
         """
         self.frame_counter += 1
         for ind, cell in enumerate(self.grid_a):
-            #new_state, flag = self.update_method.update(cell, self.frame_counter)
             new_charge, new_state = self.update_method.update(cell)
-            #if flag:
-            #    reset_frame_counter = True
             
             self.grid_b[ind].state = new_state
             self.grid_b[ind].state_timer = cell.state_timer

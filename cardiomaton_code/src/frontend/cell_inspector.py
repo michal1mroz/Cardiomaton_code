@@ -5,7 +5,6 @@ import pyqtgraph as pq
 
 from src.frontend.simulation_controller import SimulationController
 from src.models.cell import CellDict
-from src.utils.data_reader import get_qss_styling
 
 class CellInspector(QWidget):
     """
@@ -28,8 +27,6 @@ class CellInspector(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        # self.setStyleSheet(get_qss_styling("cell_inspector.qss"))
-
         self.charge_buffer = deque(maxlen=500)
         
         self.__init_ui()
@@ -45,7 +42,6 @@ class CellInspector(QWidget):
         
         self.submit_button = QPushButton("Submit")
         self.submit_button.clicked.connect(self._submit_data)
-        #self.layout.addWidget(self.submit_button)
 
         self.dep_button = QPushButton("Depolarize")
         self.dep_button.clicked.connect(self._dep_callback)
@@ -130,7 +126,7 @@ class CellInspector(QWidget):
         while self.layout.count():
             item = self.layout.takeAt(0)
             widget = item.widget()
-            if widget is not None:
+            if widget:
                 widget.deleteLater()
             else:
                 child_layout = item.layout()
