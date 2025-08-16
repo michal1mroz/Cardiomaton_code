@@ -119,7 +119,7 @@ class Cell:
             "state_value": self.state.value + 1,
             "state_name": self.state.name.capitalize(),
             "charge": self.charge,
-            "ccs_part": self.cell_type.value["name"],
+            "ccs_part": self.cell_type.value,
             "cell_type": self.cell_type.name,
             "auto_polarization": self.self_polarization,
         }
