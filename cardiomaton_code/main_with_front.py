@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication
 from src.frontend.main_window import MainWindow
+from src.models.cell_type import ConfigLoader
 
 def main():
     """
@@ -9,6 +10,7 @@ def main():
     Initializes the Qt application, sets up the main window, and starts the event loop. Ensures a clean shutdown
     when the application is closed.
     """
+    ConfigLoader.loadConfig() 
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
