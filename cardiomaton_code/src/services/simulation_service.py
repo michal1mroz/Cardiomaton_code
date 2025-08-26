@@ -70,3 +70,6 @@ class SimulationService:
             t (float): New frame time in seconds.
         """
         self.automaton.frame_time = t
+
+    def get_shape(self) -> Tuple[int, int]:
+        return self.automaton.shape

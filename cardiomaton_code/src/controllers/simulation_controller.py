@@ -23,8 +23,7 @@ class SimulationController:
            Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
            mapping of the cell position to the cell state
         """
-        frame_number, cells = self.service.step()
-        return frame_number, cells
+        return self.service.step()
 
     def update_cell(self, data: CellDict) -> None:
         """
@@ -70,4 +69,4 @@ class SimulationController:
     @property
     def shape(self) -> Tuple[int, int]:
         """ """
-        return self.service.automaton.shape
+        return self.service.get_shape()
