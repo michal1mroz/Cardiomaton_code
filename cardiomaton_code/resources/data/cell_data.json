@@ -113,8 +113,8 @@
         "id": 9,
         "cell_data": {
             "resting_membrane_potential": -60,
-            "peak_potential": 20,
-            "threshold_potential": -35,
+            "peak_potential": 15,
+            "threshold_potential": -40,
             "duration": 40,
             "spontaneous_depolarization_step_slow_min": 0.11,
             "spontaneous_depolarization_step_slow_max": 0.15,
