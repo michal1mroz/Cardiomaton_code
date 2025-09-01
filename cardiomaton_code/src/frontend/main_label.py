@@ -56,7 +56,7 @@ class MainLabel(QLabel):
         if 0 > x or x >= pixmap_size.width() or 0 > y  or y >= pixmap_size.height():
             return None
 
-        rows, cols = self.renderer.ctrl.automaton.shape
+        rows, cols = self.renderer.ctrl.shape
         col = int(x / pixmap_size.width() * cols)
         row = int(y / pixmap_size.height() * rows)
 
