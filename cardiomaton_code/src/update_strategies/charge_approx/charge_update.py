@@ -12,7 +12,7 @@ from src.update_strategies.charge_approx.ms_final import pacemaker_AP_full
 class ChargeUpdate():
 
     def __init__(self):
-        self.period = 100
+        self.period = 200 # modify to change the time (in frames) per function cycle
 
         # Potential improvement - change cell_data in cell_data.json to the uniform dict
         # that can be passed as an argument to those functions 
