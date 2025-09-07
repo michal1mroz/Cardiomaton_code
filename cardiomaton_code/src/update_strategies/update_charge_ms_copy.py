@@ -36,49 +36,36 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
         # cell_data_dict = cell.cell_data[cell.type]
         cell_data_dict = cell.cell_data
         
-        cell.update_timer()
 
         match cell.state:
             case CellState.NECROSIS:
                 return 0, cell.state
 
             case CellState.REPOLARIZATION_ABSOLUTE_REFRACTION:
-                if cell.self_polarization:
-                    charge = self.chargeUpdate.update(cell)
-                    if charge <= cell_data_dict["relative_refractory_period_threshold"]:
-                        return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
-                    return charge, cell.state
-                else:
-                    charge = cell.charge - cell_data_dict["repolarization_potential_drop"]
-                    if charge <= cell_data_dict["relative_refractory_period_threshold"]:
-                        return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
-                    return charge, cell.state
+                cell.update_timer()
+                charge = self.chargeUpdate.update(cell)
+                if charge <= cell_data_dict["V_thresh"]:
+                    return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
+                return charge, cell.state
             
             case CellState.REPOLARIZATION_RELATIVE_REFRACTION:
                 if len(list(filter(lambda x: x.charge - cell.charge >= REFRACTION_POLAR, cell.neighbours))) >= 1:
+                    return self.chargeUpdate.depolarize(cell), CellState.RAPID_DEPOLARIZATION
+
+                cell.update_timer()
+                charge = self.chargeUpdate.update(cell)
+                if charge <= cell_data_dict["V_rest"]:
                     if cell.self_polarization:
-                        return self.chargeUpdate.depolarize(cell), CellState.RAPID_DEPOLARIZATION
-                    return cell_data_dict["peak_potential"], CellState.RAPID_DEPOLARIZATION
-
-                if cell.self_polarization:
-                    charge = self.chargeUpdate.update(cell)
-
-                    if charge <= cell_data_dict["resting_membrane_potential"]:
-                        return cell_data_dict["resting_membrane_potential"], CellState.SLOW_DEPOLARIZATION
-                    return charge, cell.state
-                else:
-                    charge = cell.charge - cell_data_dict["repolarization_potential_drop"]
-                    if charge <= cell_data_dict["resting_membrane_potential"]:
-                        return cell_data_dict["resting_membrane_potential"], CellState.POLARIZATION
-                    return charge, cell.state
-
+                        return cell_data_dict["V_rest"], CellState.SLOW_DEPOLARIZATION
+                    else:
+                        return cell_data_dict["V_rest"], CellState.POLARIZATION
+                return charge, cell.state
 
             case CellState.POLARIZATION:
                 if len(list(filter(lambda x: x.state == CellState.RAPID_DEPOLARIZATION, cell.neighbours))) >= 1:
-                    if cell.self_polarization:
-                        return self.chargeUpdate.depolarize(cell), CellState.RAPID_DEPOLARIZATION
-                    return cell_data_dict["peak_potential"], CellState.RAPID_DEPOLARIZATION
+                    return self.chargeUpdate.depolarize(cell), CellState.RAPID_DEPOLARIZATION
                 if cell.self_polarization:
+                    cell.update_timer()
                     charge = self.chargeUpdate.update(cell)
                     return charge, CellState.SLOW_DEPOLARIZATION
                 else:
@@ -87,17 +74,17 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
 
             case CellState.SLOW_DEPOLARIZATION:
                 # only self-depolarizing cells have this state
-                if cell.charge >= cell_data_dict["peak_potential"]:
-                    return cell_data_dict["peak_potential"], CellState.RAPID_DEPOLARIZATION
-                if cell.charge >= cell_data_dict["threshold_potential"]: # ???
+                if cell.charge >= cell_data_dict["V_peak"]:
+                    return cell_data_dict["V_peak"], CellState.RAPID_DEPOLARIZATION
+                cell.update_timer() 
+                if cell.charge >= cell_data_dict["V_thresh"]: # ???
                     return self.chargeUpdate.update(cell), CellState.RAPID_DEPOLARIZATION
-                    # return cell.charge + cell_data_dict["spontaneous_depolarization_step_fast"], CellState.RAPID_DEPOLARIZATION
                 else:
                     charge = self.chargeUpdate.update(cell)
-
                     return charge, CellState.SLOW_DEPOLARIZATION
 
             case CellState.RAPID_DEPOLARIZATION:
                 if cell.self_polarization:
+                    cell.update_timer()
                     return self.chargeUpdate.update(cell), CellState.REPOLARIZATION_ABSOLUTE_REFRACTION
                 return cell.charge, CellState.REPOLARIZATION_ABSOLUTE_REFRACTION

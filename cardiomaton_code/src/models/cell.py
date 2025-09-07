@@ -19,7 +19,7 @@ class Cell:
     """
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
+    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0): # type: ignore
         """
         Cell constructor.
         
@@ -134,7 +134,7 @@ class Cell:
         """
         self.state = CellState(int(data_dict['state_value'])) 
         if self.state == CellState.RAPID_DEPOLARIZATION:
-            self.charge = self.cell_data.get('peak_potential', 0)
+            self.charge = self.cell_data.get('V_peak', 0)
 
     def copy(self) -> Cell:
         """

@@ -18,21 +18,19 @@ class ChargeUpdate():
         # that can be passed as an argument to those functions 
         conf = CellType.SA_NODE.config['cell_data']
         # Arguments for the method used. Should correspond to those present in the cell data for the given cell type
-        args = {"V_rest": conf['resting_membrane_potential'], "V_thresh": conf['threshold_potential'], "V_peak": conf['peak_potential'],
-                    "t_thresh": 0.35, "t_peak": 0.45, "t_end": 0.80,
-                    "eps":0.005}     
-
         # Period of the pacemaker_AP_full is 0.8. a is used to cast the frame time to that period
         self.a = 0.8 / float(self.period) 
 
         self.functions = {
-            CellType.SA_NODE: lambda t: pacemaker_AP_full((t % self.period) * self.a, **args)
+            CellType.SA_NODE: lambda t: pacemaker_AP_full((t % self.period) * self.a, **conf)
                 }
 
         # Value for which self.function returns max value
         self.max_args = {
             CellType.SA_NODE: self._get_max_arg(self.functions[CellType.SA_NODE])
             }
+        self.default_func = lambda t: pacemaker_AP_full((t % self.period) * (1.2 / 200), **CellType.INTERNODAL_ANT.config['cell_data'])
+        self.default_arg = self._get_max_arg(self.default_func)
 
     def _get_max_arg(self, func) -> int:
         """
@@ -54,12 +52,12 @@ class ChargeUpdate():
             Returns the max charge available for that function.
             Updates the state_timer of a call to the max_arg value
         """
-        cell.state_timer = self.max_args[cell.cell_type]
-        return self.function(cell.state_timer)
+        cell.state_timer = self.max_args.get(cell.cell_type, self.default_arg)
+        return self.functions.get(cell.cell_type, self.default_func)(cell.state_timer)
 
     def update(self, cell: Cell) -> float:
         """
             Returns the new charge of the cell
         """
-        return self.functions[cell.cell_type](cell.state_timer)
+        return self.functions.get(cell.cell_type, self.default_func)(cell.state_timer)
        
