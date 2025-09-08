@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Any, List, Tuple
 import numpy as np
 
 from cardiomaton_code.src.models.cell import Cell
@@ -6,7 +6,10 @@ from src.models.cell_state import CellState
 from src.models.cell_type import CellType
 
 """
-    This module provides the functions needed to serialize the cell data into a blob
+    This module provides the functions needed to serialize and deserialize the cells into/from the binary blob.
+
+    Deserialization returns a list of cell_dtype that needs additional handling - especially handling for the neighbors -
+    before they can be used
 """
 
 ##############################################################################
@@ -145,4 +148,43 @@ def decode_cell(blob: np.void) -> Tuple[Cell, List[Tuple[int, int]]]:
         state=state
     )
     cell.charge = float(blob["charge"])
+    cell.self_polarization = self_polar
     return cell, neighbors
+
+def serialize_cells(cells: List[Cell]) -> bytes:
+    """
+        Function that serializes a list of cells to a byte array.
+
+        Args:
+            cells: List[Cell] - list of cells to be encoded
+        
+        Returns:
+            bytes - a byte array with encoded cells
+    """
+    n = len(cells)
+    if n == 0:
+        return b""
+    
+    arr = np.empty(n, dtype=cell_dtype)
+    for i, c in enumerate(cells):
+        encoded = encode_cell(c)
+        if isinstance(encoded, np.ndarray):
+            arr[i] = encoded[0]
+        else:
+            arr[i] = encoded
+
+    return arr.tobytes()
+
+def deserialize_cells(blob: bytes) -> List[np.ndarray[Any]]:
+    """
+        Function that deserializes a byte blob to the list of cell_dtype objects
+
+        Args:
+            blob: bytes - encoded binary blob
+
+        Returns: 
+            List[np.ndarray[Any]] - List of cell_dtype objects
+    """
+    if not blob:
+        return None    
+    return np.frombuffer(blob, dtype=cell_dtype)
