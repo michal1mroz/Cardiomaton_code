@@ -2,8 +2,6 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, TypedDict
 from src.models.cell_state import CellState
 
-# from src.models.cell_type import CellType
-
 class CellDict(TypedDict):
     position: Tuple[int, int]
     state_value: int
@@ -19,7 +17,7 @@ class Cell:
     """
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0):
+    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0): # type: ignore
         """
         Cell constructor.
         
@@ -155,3 +153,10 @@ class Cell:
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied
         return copied_cell
+
+    def neighbors_to_ints(self) -> List[Tuple[int, int]]:
+        res = []
+        for nei in self.neighbours:
+            x, y = nei.position
+            res.append((self.position[0] - x, self.position[1] - y))
+        return res

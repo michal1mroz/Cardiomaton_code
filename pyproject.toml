@@ -14,7 +14,8 @@ dependencies = [
     "scipy (>=1.15.3,<2.0.0)",
     "opencv-python (>=4.11.0.86,<5.0.0.0)",
     "pyqt6 (>=6.9.0,<7.0.0)",
-    "pyqtgraph (>=0.13.7,<0.14.0)"
+    "pyqtgraph (>=0.13.7,<0.14.0)",
+    "sqlalchemy (>=2.0.43,<3.0.0)"
 ]
 
 
@@ -25,4 +26,5 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.1.1"
 ipykernel = "^6.29.5"
+alembic = "^1.16.5"
 
