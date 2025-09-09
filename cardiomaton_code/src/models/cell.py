@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Tuple, Dict, TypedDict
 from src.models.cell_state import CellState
+from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
 class CellDict(TypedDict):
     position: Tuple[int, int]
@@ -38,11 +39,15 @@ class Cell:
 
         self.cell_data = cell_data
 
+        self.period = self.cell_data.get("range")
+
+        self.charges, self.charge_max = ChargeUpdate.get_func(self.cell_data)
+
     def reset_timer(self):
         self.state_timer = 0
 
     def update_timer(self):
-        self.state_timer += 1
+        self.state_timer = (self.state_timer + 1) % self.period
 
     def reset_self_polar_timer(self):
         self.self_polar_timer = 0
@@ -132,7 +137,7 @@ class Cell:
         """
         self.state = CellState(int(data_dict['state_value'])) 
         if self.state == CellState.RAPID_DEPOLARIZATION:
-            self.charge = self.cell_data.get('peak_potential', 0)
+            self.charge = self.cell_data.get('V_peak', 0)
 
     def copy(self) -> Cell:
         """
@@ -153,6 +158,7 @@ class Cell:
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied
         return copied_cell
+<<<<<<< HEAD
 
     def neighbors_to_ints(self) -> List[Tuple[int, int]]:
         res = []
@@ -160,3 +166,12 @@ class Cell:
             x, y = nei.position
             res.append((self.position[0] - x, self.position[1] - y))
         return res
+=======
+    
+    def update_charge(self):
+        return self.charges[self.state_timer]
+
+    def depolarize(self):
+        self.state_timer = self.charge_max
+        return self.charges[self.charge_max]
+>>>>>>> @mm/potential_approx

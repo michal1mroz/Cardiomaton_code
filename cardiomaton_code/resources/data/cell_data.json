@@ -2,12 +2,15 @@
     "JUNCTION" : {
         "id": 1,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Junction"
@@ -16,39 +19,48 @@
     "HIS_LEFT": {
         "id": 2,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Left bundle branch"
     },
     "HIS_RIGHT": {
-            "id": 3,
+        "id": 3,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
-            "self_polarization": false,
+        "self_polarization": false,
         "name": "Right bundle branch"
     },
     
     "BACHMANN": {
         "id": 4,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Bachmann's bundle"
@@ -57,12 +69,15 @@
     "INTERNODAL_POST": {
         "id": 5,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Posterior internodal tract"
@@ -70,12 +85,15 @@
     "INTERNODAL_ANT": {
         "id": 6,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Anterior internodal tract"
@@ -84,12 +102,15 @@
     "INTERNODAL_MID": { 
         "id": 7,
         "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Middle internodal tract"
@@ -97,13 +118,16 @@
 
     "HIS_BUNDLE": {
         "id": 8,
-        "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+        "cell_data": { 
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.5, 
+            "t_peak":0.45, 
+            "t_end":0.95,
+            "eps":0.01,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Bundle of His"
@@ -112,15 +136,15 @@
     "SA_NODE": {
         "id": 9,
         "cell_data": {
-            "resting_membrane_potential": -60,
-            "peak_potential": 20,
-            "threshold_potential": -35,
-            "duration": 40,
-            "spontaneous_depolarization_step_slow_min": 0.11,
-            "spontaneous_depolarization_step_slow_max": 0.15,
-            "spontaneous_depolarization_step_fast": 27.5,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -40
+            "V_rest":-60.0, 
+            "V_thresh":-40.0, 
+            "V_peak":15.0,
+            "t_thresh":0.35, 
+            "t_peak":0.45, 
+            "t_end":0.80,
+            "eps":0.005,
+            "period":0.8,
+            "range": 200
         },
         "self_polarization": true,
         "name": "Sinoatrial node"
@@ -128,13 +152,16 @@
 
     "AV_NODE": {
         "id": 10,
-        "cell_data": {
-            "resting_membrane_potential": -90,
-            "peak_potential": 30,
-            "threshold_potential": -5,
-            "duration": 60,
-            "repolarization_potential_drop": 2,
-            "relative_refractory_period_threshold": -60
+        "cell_data": { 
+            "V_rest":-60.0, 
+            "V_thresh":-60.0, 
+            "V_peak":15.0,
+            "t_thresh":0.35, 
+            "t_peak":0.45, 
+            "t_end":0.80,
+            "eps":0.005,
+            "period":1.2,
+            "range": 200
         },
         "self_polarization": false,
         "name": "Atrioventricular node"

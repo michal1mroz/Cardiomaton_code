@@ -4,7 +4,7 @@ from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
 from src.models.cell_type import CellType
 from src.update_strategies.update_charge import UpdateCharge
-from src.update_strategies.update_charge_ms import UpdateChargeMS
+from src.update_strategies.update_charge_ms_copy import UpdateChargeMSCopy
 
 import copy
 from typing import Dict, List, Tuple
@@ -40,7 +40,7 @@ class Automaton:
         self.is_running = False
         self.frame_counter = 0
         self.neighbour_map = self._create_neighbour_map()
-        self.update_method = UpdateChargeMS()
+        self.update_method = UpdateChargeMSCopy()
         self.fig = self.ax = self.img = None
 
     def _create_neighbour_map(self):
