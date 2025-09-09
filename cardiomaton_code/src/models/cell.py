@@ -158,7 +158,6 @@ class Cell:
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied
         return copied_cell
-<<<<<<< HEAD
 
     def neighbors_to_ints(self) -> List[Tuple[int, int]]:
         res = []
@@ -166,7 +165,6 @@ class Cell:
             x, y = nei.position
             res.append((self.position[0] - x, self.position[1] - y))
         return res
-=======
     
     def update_charge(self):
         return self.charges[self.state_timer]
@@ -174,4 +172,3 @@ class Cell:
     def depolarize(self):
         self.state_timer = self.charge_max
         return self.charges[self.charge_max]
->>>>>>> @mm/potential_approx
