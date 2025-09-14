@@ -1,8 +1,10 @@
+import os
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from PyQt6.QtGui import QFontDatabase
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        self.load_fonts()
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1000, 600)
         sizePolicy = QtWidgets.QSizePolicy(
@@ -17,7 +19,7 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QtCore.QSize(1000, 600))
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet(
-            "background-image: url(C:/Users/gabry/Desktop/background.png);\n"
+            "background-image: url(./resources/style/backgroundv2.png);\n"
             "background-repeat: no-repeat;\n"
             "background-position: center;\n"
         )
@@ -76,7 +78,6 @@ class Ui_MainWindow(object):
         self.logo.setMaximumSize(QtCore.QSize(50, 50))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Emoji")
-        font.setPointSize(-1)
         self.logo.setFont(font)
         self.logo.setStyleSheet("border-radius: 25px;\n"
                                 "background-color: #6D98F4;\n"
@@ -121,7 +122,6 @@ class Ui_MainWindow(object):
                 color: #233348;            
             }
             QPushButton:hover {
-                cursor: pointer;        
                 color: #6D98F4; 
             }
         """)
@@ -140,7 +140,6 @@ class Ui_MainWindow(object):
                         color: #233348;            
                     }
                     QPushButton:hover {
-                        cursor: pointer;        
                         color: #6D98F4; 
                     }
                 """)
@@ -159,7 +158,6 @@ class Ui_MainWindow(object):
                         color: #233348;            
                     }
                     QPushButton:hover {
-                        cursor: pointer;        
                         color: #6D98F4; 
                     }
                 """)
@@ -411,12 +409,8 @@ class Ui_MainWindow(object):
         self.speed_slider_label.setText(_translate("MainWindow", "Speed"))
         self.playback_slider_label.setText(_translate("MainWindow", "Playback"))
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec())
+    def load_fonts(self):
+        fonts_dir = "resources/fonts"
+        for filename in os.listdir(fonts_dir):
+            if filename.lower().endswith(".ttf"):
+                QFontDatabase.addApplicationFont(os.path.join(fonts_dir, filename))

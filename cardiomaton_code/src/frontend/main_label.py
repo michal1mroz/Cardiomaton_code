@@ -26,8 +26,6 @@ class MainLabel(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setScaledContents(False)
         self.setMinimumSize(1, 1)
-        self.setStyleSheet("background-color: navy;border: 2px solid black;")
-
 
 
     def _mouse_position(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:

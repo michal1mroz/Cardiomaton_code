@@ -17,7 +17,6 @@ class MainWindow(QMainWindow):
     This window initializes and manages the simulation rendering,
     playback controls, and UI layout.
     """
-    QSS_PATH = "../../resources/style/main_window.qss"
 
     def __init__(self):
         """
@@ -48,6 +47,7 @@ class MainWindow(QMainWindow):
 
         # Simulation display
         self.ui.simulation_layout.addWidget(self.render_label)
+
 
         self.cell_inspector = None
         self.render_label.cellClicked.connect(self._show_cell_inspector)
