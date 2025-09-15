@@ -88,9 +88,9 @@ class MainWindow(QMainWindow):
         """
         self.render_charged = not checked
         if checked:
-            self.ui.toggle_render_button.setText("Color by charge")
+            self.ui.toggle_render_button.setText("Colored by state")
         else:
-            self.ui.toggle_render_button.setText("Color by state")
+            self.ui.toggle_render_button.setText("Colored by charge")
 
     def _init_timer(self):
         """

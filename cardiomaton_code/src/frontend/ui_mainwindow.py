@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QtCore.QSize(1100, 600))
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet(
-            "background-image: url(./resources/style/backgroundv6.png);\n"
+            "background-image: url(./resources/style/background.png);\n"
             "background-repeat: no-repeat;\n"
             "background-position: center;\n"
         )
@@ -434,7 +434,7 @@ class Ui_MainWindow(object):
         self.pushButton_help.setText(_translate("MainWindow", "Help"))
         self.pushButton_about_us.setText(_translate("MainWindow", "About us"))
         self.play_button.setText(_translate("MainWindow", "▶"))
-        self.toggle_render_button.setText(_translate("MainWindow", "Color by state"))
+        self.toggle_render_button.setText(_translate("MainWindow", "Colored by charge"))
         self.speed_slider_label.setText(_translate("MainWindow", "Speed"))
         self.playback_slider_label.setText(_translate("MainWindow", "Playback"))
 
