@@ -106,14 +106,14 @@ class MainWindow(QMainWindow):
         """
         if self.running:
             self.timer.stop()
-            self.ui.play_button.setText("▶")
+            self.ui.play_button.setText("▸")
             self.running = False
         else:
             # Checks if playback was changed and updates the automaton accordingly
             if self.ui.playback_slider.value() < len(self.sim.recorder) - 1:
                 self.sim.update_automaton(self.ui.playback_slider.value())
             self.timer.start(int(self.sim.frame_time * 1000))
-            self.ui.play_button.setText("■")
+            self.ui.play_button.setText("▪")
             self.running = True
 
         if self.cell_inspector:
@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
 
     def _set_running_state(self, running: bool):
         self.running = running
-        self.ui.play_button.setText("■" if running else "▶")
+        self.ui.play_button.setText("▪" if running else "▸")
         if self.cell_inspector:
             self.cell_inspector.set_running(running)
         self.render_label.set_running(running)

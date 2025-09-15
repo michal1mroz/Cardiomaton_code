@@ -1,12 +1,13 @@
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtGui import QFontDatabase
+from PyQt6.QtGui import QFontDatabase, QColor
+from PyQt6.QtWidgets import QGraphicsDropShadowEffect
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.load_fonts()
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1000, 600)
+        MainWindow.resize(1100, 600)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Policy.Expanding,
             QtWidgets.QSizePolicy.Policy.Expanding
@@ -16,10 +17,10 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(100, 60))
-        MainWindow.setMaximumSize(QtCore.QSize(1000, 600))
+        MainWindow.setMaximumSize(QtCore.QSize(1100, 600))
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet(
-            "background-image: url(./resources/style/backgroundv2.png);\n"
+            "background-image: url(./resources/style/backgroundv6.png);\n"
             "background-repeat: no-repeat;\n"
             "background-position: center;\n"
         )
@@ -86,6 +87,12 @@ class Ui_MainWindow(object):
                                 "")
         self.logo.setObjectName("logo")
         self.horizontalLayout.addWidget(self.logo)
+
+        logo_shadow = QGraphicsDropShadowEffect()
+        logo_shadow.setBlurRadius(30)
+        logo_shadow.setOffset(2, 2)
+        logo_shadow.setColor(QColor(150, 150, 150, 100))
+        self.logo.setGraphicsEffect(logo_shadow)
 
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.logo)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -187,6 +194,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.bottom_layout)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.horizontalLayout_3.setSpacing(40)
 
         # Settings layout
         self.settings_layout = QtWidgets.QWidget(parent=self.bottom_layout)
@@ -210,6 +218,13 @@ class Ui_MainWindow(object):
             "border-radius: 20px;\n"
         )
         self.presets_layout.setObjectName("presets_layout")
+
+        presets_layout_shadow = QGraphicsDropShadowEffect()
+        presets_layout_shadow.setBlurRadius(30)
+        presets_layout_shadow.setOffset(2, 2)
+        presets_layout_shadow.setColor(QColor(150, 150, 150, 100))
+        self.presets_layout.setGraphicsEffect(presets_layout_shadow)
+
         self.verticalLayout_2.addWidget(self.presets_layout)
 
         self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
@@ -218,6 +233,13 @@ class Ui_MainWindow(object):
             "border-radius: 20px;\n"
         )
         self.parameters_layout.setObjectName("parameters_layout")
+
+        parameters_layout_shadow = QGraphicsDropShadowEffect()
+        parameters_layout_shadow.setBlurRadius(30)
+        parameters_layout_shadow.setOffset(2, 2)
+        parameters_layout_shadow.setColor(QColor(150, 150, 150, 100))
+        self.parameters_layout.setGraphicsEffect(parameters_layout_shadow)
+
         self.verticalLayout_2.addWidget(self.parameters_layout)
 
         self.players_layout = QtWidgets.QWidget(parent=self.settings_layout)
@@ -226,6 +248,12 @@ class Ui_MainWindow(object):
             "border-radius: 20px;\n"
         )
         self.players_layout.setObjectName("players_layout")
+
+        players_layout_shadow = QGraphicsDropShadowEffect()
+        players_layout_shadow.setBlurRadius(30)
+        players_layout_shadow.setOffset(2, 2)
+        players_layout_shadow.setColor(QColor(150, 150, 150, 100))
+        self.players_layout.setGraphicsEffect(players_layout_shadow)
 
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.players_layout)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -253,7 +281,8 @@ class Ui_MainWindow(object):
             "border-radius: 20px;\n"
             "background-color: #EF8481;\n"
             "color: white;\n"
-            "font-size: 24px;\n"
+            "font-size: 35px;\n"
+            "padding-bottom: 2px;\n"
         )
         self.play_button.setObjectName("play_button")
         self.horizontalLayout_5.addWidget(self.play_button)
@@ -384,8 +413,8 @@ class Ui_MainWindow(object):
         self.simulation_layout = QtWidgets.QVBoxLayout(self.simulation_widget)
 
         self.horizontalLayout_3.addWidget(self.simulation_widget)
-        self.horizontalLayout_3.setStretch(0, 4)
-        self.horizontalLayout_3.setStretch(1, 5)
+        self.horizontalLayout_3.setStretch(0, 11)
+        self.horizontalLayout_3.setStretch(1, 13)
 
         self.verticalLayout.addWidget(self.bottom_layout)
         self.verticalLayout.setStretch(0, 1)
