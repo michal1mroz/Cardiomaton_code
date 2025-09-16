@@ -19,8 +19,7 @@ class MainWindow(QMainWindow):
         Initialize the main window and its components.
         """
         super().__init__()
-        self.ui = UiMainWindow()
-        self.ui.setup_ui(self)
+        self.ui = UiMainWindow(self)
 
         self.base_frame_time = 0.05
 
