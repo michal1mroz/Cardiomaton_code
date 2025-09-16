@@ -1,12 +1,28 @@
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QFontDatabase, QColor
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget
+from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow
 
 
 class UiMainWindow(object):
-    def __init__(self, main_window):
+    """
+    Graphical user interface for the Cardiomaton simulation application.
+
+    This class sets up the main window, including layouts, buttons, sliders,
+    labels, and other widgets necessary for controlling and visualizing
+    the simulation.
+    """
+
+    def __init__(self, main_window: QMainWindow):
+        """
+        Initialize the UI for the main window.
+
+        Args:
+            main_window (QMainWindow): The main window instance to set up the UI in.
+        """
         self.load_fonts()
+
+        # Main window
         main_window.resize(1100, 600)
         size_policy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Policy.Expanding,
@@ -94,7 +110,6 @@ class UiMainWindow(object):
         self.pushButton_about_us = self.create_pushbutton(self.upper_layout)
         self.horizontalLayout.addWidget(self.pushButton_about_us)
 
-        # Stretch settings
         self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(1, 1)
         self.horizontalLayout.setStretch(2, 4)
@@ -257,7 +272,14 @@ class UiMainWindow(object):
         self.retranslate_ui(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
-    def retranslate_ui(self, main_window):
+    def retranslate_ui(self, main_window: QMainWindow):
+        """
+        Set text values for all widgets to allow for translation support.
+
+        Args:
+            main_window (QMainWindow): The main window instance for setting the window title.
+        """
+
         _translate = QtCore.QCoreApplication.translate
         main_window.setWindowTitle(_translate("MainWindow", "Cardiomaton"))
         self.project_name.setText(_translate("MainWindow", "Cardiomaton"))
@@ -271,15 +293,28 @@ class UiMainWindow(object):
 
     @staticmethod
     def load_fonts():
+        """
+        Load all TrueType fonts from the resources/fonts directory into the application.
+        """
         fonts_dir = "resources/fonts"
         for filename in os.listdir(fonts_dir):
             if filename.lower().endswith(".ttf"):
                 QFontDatabase.addApplicationFont(os.path.join(fonts_dir, filename))
 
     @staticmethod
-    def add_shadow(widget, blur=30, offset_x=2, offset_y=2,
-                   color=QColor(150, 150, 150, 100)) -> None:
-        """Adds shadow to a widget."""
+    def add_shadow(widget: QWidget, blur: int = 30, offset_x: int = 2, offset_y: int = 2,
+                   color: QColor = QColor(150, 150, 150, 100)) -> None:
+        """
+        Adds a drop shadow effect to the given widget.
+
+        Args:
+            widget (QWidget): The widget to add a shadow to.
+            blur (int, optional): Blur radius of the shadow.
+            offset_x (int, optional): Horizontal offset of the shadow.
+            offset_y (int, optional): Vertical offset of the shadow.
+            color (QColor, optional): Color of the shadow. Defaults to semi-transparent gray.
+        """
+
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(blur)
         shadow.setOffset(offset_x, offset_y)
@@ -287,8 +322,23 @@ class UiMainWindow(object):
         widget.setGraphicsEffect(shadow)
 
     @staticmethod
-    def create_label(parent, text="", font_family="Mulish",
-                     font_size=12, bold=True, color="#233348") -> QtWidgets.QLabel:
+    def create_label(parent: QWidget, text: str = "", font_family: str = "Mulish",
+                     font_size: int = 12, bold: bool = True, color: str = "#233348") -> QtWidgets.QLabel:
+        """
+        Creates a QLabel with specified font, size, color, and parent.
+
+        Parameters:
+            parent (QWidget): Parent widget.
+            text (str, optional): Label text.
+            font_family (str, optional): Font family
+            font_size (int, optional): Font size.
+            bold (bool, optional): Whether font is bold.
+            color (str, optional): Font color in hex.
+
+        Returns:
+            QtWidgets.QLabel: The created QLabel instance.
+        """
+
         label = QtWidgets.QLabel(parent)
         font = QtGui.QFont()
         font.setFamily(font_family)
@@ -297,11 +347,28 @@ class UiMainWindow(object):
         label.setFont(font)
         label.setStyleSheet(f"color: {color};")
         label.setText(text)
+
         return label
 
     @staticmethod
-    def create_pushbutton(parent, font_family="Mulish",
-                           font_size=13, bold=True, color="#233348", hover_color="#6D98F4") -> QtWidgets.QPushButton:
+    def create_pushbutton(parent: QWidget, font_family: str = "Mulish",
+                          font_size:int = 13, bold: bool = True, color: str = "#233348",
+                          hover_color: str = "#6D98F4") -> QtWidgets.QPushButton:
+        """
+        Creates a QPushButton with a specified font and hover color.
+
+        Parameters:
+            parent (QWidget): Parent widget.
+            font_family (str, optional): Font family.
+            font_size (int, optional): Font size.
+            bold (bool, optional): Whether font is bold.
+            color (str, optional): Text color.
+            hover_color (str, optional): Text color on hover.
+
+        Returns:
+            QtWidgets.QPushButton: The created QPushButton instance.
+        """
+
         pushbutton = QtWidgets.QPushButton(parent)
         font = QtGui.QFont()
         font.setFamily(font_family)
@@ -317,10 +384,21 @@ class UiMainWindow(object):
                 color: {hover_color}; 
             }}
         """)
+
         return pushbutton
 
     @staticmethod
-    def create_widget(parent) -> QWidget:
+    def create_widget(parent: QWidget) -> QWidget:
+        """
+        Creates a transparent QWidget with expanding size policy.
+
+        Parameters:
+            parent (QWidget): The parent widget.
+
+        Returns:
+            QWidget: The created QWidget instance with transparent background and expanding size policy.
+        """
+
         widget = QtWidgets.QWidget(parent)
         widget.setEnabled(True)
         size_policy = QtWidgets.QSizePolicy(
@@ -330,10 +408,21 @@ class UiMainWindow(object):
         size_policy.setHeightForWidth(widget.sizePolicy().hasHeightForWidth())
         widget.setSizePolicy(size_policy)
         widget.setStyleSheet("background: transparent;")
+
         return widget
 
     @staticmethod
-    def create_slider(parent) -> QtWidgets.QSlider:
+    def create_slider(parent: QWidget) -> QtWidgets.QSlider:
+        """
+        Creates a horizontal QSlider with customized style.
+
+        Parameters:
+            parent (QWidget): The parent widget.
+
+        Returns:
+            QtWidgets.QSlider: The created QSlider instance.
+        """
+
         slider = QtWidgets.QSlider(parent)
         slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
         slider.setStyleSheet("""
@@ -357,4 +446,5 @@ class UiMainWindow(object):
                 border-radius: 2px;
             }
             """)
+
         return slider
