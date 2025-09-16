@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer
 from src.frontend.cell_inspector import CellInspector
 from src.models.cell import CellDict
-from src.frontend.simulation_controller import SimulationController
+from src.controllers.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
 from src.utils.style_utils import get_qss_styling
