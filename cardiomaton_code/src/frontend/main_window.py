@@ -1,21 +1,17 @@
-from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy,
-    QPushButton, QLabel, QSlider
-)
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtCore import QTimer
 from src.frontend.cell_inspector import CellInspector
 from src.models.cell import CellDict
 from src.controllers.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
-from src.frontend.ui_mainwindow import Ui_MainWindow
+from src.frontend.ui_main_window import UiMainWindow
 
 class MainWindow(QMainWindow):
     """
     Main application window for the Cardiomaton simulator.
 
-    This window initializes and manages the simulation rendering,
-    playback controls, and UI layout.
+    This window initializes and manages the simulation rendering, playback controls.
     """
 
     def __init__(self):
@@ -23,8 +19,8 @@ class MainWindow(QMainWindow):
         Initialize the main window and its components.
         """
         super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.ui = UiMainWindow()
+        self.ui.setup_ui(self)
 
         self.base_frame_time = 0.05
 
@@ -48,39 +44,20 @@ class MainWindow(QMainWindow):
         # Simulation display
         self.ui.simulation_layout.addWidget(self.render_label)
 
-
         self.cell_inspector = None
         self.render_label.cellClicked.connect(self._show_cell_inspector)
-
-        # Frame counter display
-        self._setup_frame_counter()
-        self.setStyleSheet(self.styleSheet())
 
         # Start/stop button
         self.ui.play_button.clicked.connect(self.toggle_simulation)
 
         # Speed slider
-        self.ui.speed_slider.setRange(1, 500)
-        self.ui.speed_slider.setValue(100)
         self.ui.speed_slider.valueChanged.connect(self._change_speed)
 
         # Playback slider
-        self.ui.playback_slider.setRange(0, 0)
-        self.ui.playback_slider.setValue(0)
         self.ui.playback_slider.valueChanged.connect(self._on_slider_change)
 
         # Color by charge / state option
-        self.ui.toggle_render_button.setCheckable(True)
-        self.ui.toggle_render_button.setChecked(False)
         self.ui.toggle_render_button.toggled.connect(self.toggle_render_mode)
-
-    def _setup_frame_counter(self):
-        self.frame_counter_label = QLabel(self.render_label)
-        self.frame_counter_label.move(10, 10)
-        self.frame_counter_label.setObjectName("counterLabel")
-        self.frame_counter_label.setFixedHeight(40)
-        self._update_frame_counter(0)
-        self.frame_counter_label.show()
 
     def toggle_render_mode(self, checked: bool):
         """
@@ -142,8 +119,7 @@ class MainWindow(QMainWindow):
             self.timer.start(int(new_frame_time * 1000))
 
     def _update_frame_counter(self, frame: int):
-        self.frame_counter_label.setText(f"Frame: {frame}")
-        self.frame_counter_label.adjustSize()
+        self.ui.frame_counter_label.setText(f"Frame: {frame}")
 
     def _update_frame(self):
         """
@@ -151,8 +127,7 @@ class MainWindow(QMainWindow):
         """
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
         self.render_label.setPixmap(pixmap)
-        self.frame_counter_label.setText(f"Frame: {frame}")
-        self.frame_counter_label.adjustSize()
+        self.ui.frame_counter_label.setText(f"Frame: {frame}")
         
         # Maybe let's think of some observers or other callbacks to update widgets. MM
         if self.cell_inspector:
