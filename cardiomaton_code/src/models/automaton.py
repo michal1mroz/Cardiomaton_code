@@ -14,6 +14,9 @@ import matplotlib.pyplot as plt # type: ignore
 from IPython.display import clear_output, display
 from time import sleep, time
 
+import os
+from concurrent.futures import ThreadPoolExecutor
+import time
 
 class Automaton:
     """
@@ -42,6 +45,9 @@ class Automaton:
         self.neighbour_map = self._create_neighbour_map()
         self.update_method = UpdateChargeMS()
         self.fig = self.ax = self.img = None
+
+        self.num_workers = os.cpu_count() or 4
+        self.executor = ThreadPoolExecutor(max_workers=self.num_workers)
 
     def _create_neighbour_map(self):
         return {
@@ -104,10 +110,11 @@ class Automaton:
         """
         Method to update the grid based on the current state.
         """
+
         self.frame_counter += 1
         for ind, cell in enumerate(self.grid_a):
             new_charge, new_state = self.update_method.update(cell)
-            
+
             self.grid_b[ind].state = new_state
             self.grid_b[ind].state_timer = cell.state_timer
             self.grid_b[ind].charge = new_charge

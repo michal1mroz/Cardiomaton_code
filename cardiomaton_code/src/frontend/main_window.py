@@ -9,6 +9,9 @@ from src.controllers.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
 from src.utils.style_utils import get_qss_styling
+from src.workers.backend_init_worker import BackendInitWorker
+from PyQt6.QtCore import QThread
+
 
 
 class MainWindow(QMainWindow):
@@ -28,8 +31,26 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Cardiomaton")
         self.setGeometry(0, 0, 1000, 600)
         self.setStyleSheet(get_qss_styling())
-
         self.base_frame_time = 0.05
+
+        self.render_label = QLabel("Loading simulation...", self)
+        self.render_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setCentralWidget(self.render_label)
+
+        self.backend_thread = QThread()
+        self.backend_worker = BackendInitWorker()
+        self.backend_worker.moveToThread(self.backend_thread)
+
+        self.backend_thread.started.connect(self.backend_worker.run)
+        self.backend_worker.finished.connect(self.on_backend_ready)
+        self.backend_worker.finished.connect(self.backend_thread.quit)
+        self.backend_worker.finished.connect(self.backend_worker.deleteLater)
+        self.backend_thread.finished.connect(self.backend_thread.deleteLater)
+
+        self.backend_thread.start()
+
+    def on_backend_ready(self, sim: SimulationController):
+        self.sim = sim
 
         self.sim = SimulationController(frame_time=self.base_frame_time)
         self.renderer = FrameRenderer(self.sim)
