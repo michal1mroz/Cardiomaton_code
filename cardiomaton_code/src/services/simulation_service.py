@@ -21,7 +21,7 @@ class SimulationService:
         space = Space(graph)
         _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
 
-        self.automaton = Automaton(graph, cell_map, frame_time=frame_time)
+        self.automaton = Automaton(graph.shape, cell_map, frame_time=frame_time)
 
     def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """

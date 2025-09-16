@@ -20,7 +20,7 @@ class Automaton:
     Stores the cell array and controles the simulation.
     is_running (bool): Stops the update on the automaton
     """
-    def __init__(self, data_array: np.ndarray, cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2):
+    def __init__(self, shape: Tuple[int, int], cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2):
         """
         Automaton constructor.
 
@@ -28,10 +28,11 @@ class Automaton:
         grid_b is a copy of the array created to avoid the overhead of memory allocation and copying on each update.
 
         Args:
+            shape Tuple[int, int]: size of the automatons grid
             cells Dict[Tuple[int, int], Cell]: mapping of the cell to a position
             frame_time (float, optional): Frame time in seconds. Defaults to 0.2s.
         """
-        self.shape = data_array.shape
+        self.shape = shape
         self.draw_array = np.zeros(self.shape)
         self.cells = cells
         self.grid_a = self._create_automaton()
