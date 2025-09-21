@@ -39,7 +39,7 @@ class Cell:
 
         self.cell_data = cell_data
 
-        self.period = self.cell_data.get("range")
+        self.period = self.cell_data.get("duration")
 
         self.charges, self.charge_max = ChargeUpdate.get_func(self.cell_data)
 

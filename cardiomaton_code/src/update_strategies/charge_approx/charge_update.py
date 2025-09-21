@@ -42,7 +42,7 @@ class ChargeUpdate():
                 int - time % range for the greatest argument
         """
         cell_data = dict(cell_data)
-        period = cell_data["range"]
+        period = cell_data["duration"]
         a = cell_data['period'] / period
         func = lambda t: pacemaker_AP_full((t % period) * a, **cell_data)
         args = list(range(int(period)))

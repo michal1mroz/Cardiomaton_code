@@ -20,7 +20,7 @@ class Automaton:
     Stores the cell array and controles the simulation.
     is_running (bool): Stops the update on the automaton
     """
-    def __init__(self, shape: Tuple[int, int], cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2):
+    def __init__(self, shape: Tuple[int, int], cells: Dict[Tuple[int, int], Cell], frame_time: float = 0.2, frame=0):
         """
         Automaton constructor.
 
@@ -39,7 +39,7 @@ class Automaton:
         self.grid_b = self._copy_grid(self.grid_a)
         self.frame_time = frame_time
         self.is_running = False
-        self.frame_counter = 0
+        self.frame_counter = frame
         self.neighbour_map = self._create_neighbour_map()
         self.update_method = UpdateChargeMSCopy()
         self.fig = self.ax = self.img = None
