@@ -3,11 +3,13 @@ from typing import List, Tuple, Dict
 
 from src.models.cell import CellDict
 
+
 class FrameRecorder:
     """
     A recorder that stores the last N rendered frames as QPixmaps.
     Enables smooth playback control and frame-by-frame navigation through the simulation history.
     """
+
     def __init__(self, capacity: int = 100):
         self.capacity = capacity
         self.buffer = deque(maxlen=capacity)
@@ -18,7 +20,7 @@ class FrameRecorder:
         """
         self.buffer.append(data)
 
-    def get_frame(self, index: int) -> Tuple[int, Dict[Tuple[int, int] ,CellDict]]:
+    def get_frame(self, index: int) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Get a frame by buffer index (0 = oldest, -1 = newest).
         """
@@ -32,7 +34,7 @@ class FrameRecorder:
         Return a list of all stored frames in order.
         """
         return list(self.buffer)
-    
+
     def drop_newer(self, idx: int) -> None:
         """
         Slices and removes all the entries newer then the specified index. Changes buffer in place.
@@ -40,4 +42,4 @@ class FrameRecorder:
         Args:
             idx (int): selected index.
         """
-        self.buffer = deque(list(self.buffer)[:idx+1], maxlen=self.buffer.maxlen)
+        self.buffer = deque(list(self.buffer)[: idx + 1], maxlen=self.buffer.maxlen)

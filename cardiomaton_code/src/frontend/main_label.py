@@ -26,9 +26,13 @@ class MainLabel(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setScaledContents(False)
         self.setMinimumSize(1, 1)
-        self.setStyleSheet("background-color: navy;border: 2px solid black;")
 
-
+        self.setStyleSheet("""
+            QToolTip {
+                background-color: #cfe3fc;
+                padding: 12px;
+            }
+        """)
 
     def _mouse_position(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:
         """
@@ -56,7 +60,7 @@ class MainLabel(QLabel):
         if 0 > x or x >= pixmap_size.width() or 0 > y  or y >= pixmap_size.height():
             return None
 
-        rows, cols = self.renderer.ctrl.automaton.shape
+        rows, cols = self.renderer.ctrl.shape
         col = int(x / pixmap_size.width() * cols)
         row = int(y / pixmap_size.height() * rows)
 
@@ -117,12 +121,13 @@ class MainLabel(QLabel):
                 f"<b>Część układu przewodzącego:</b> {ccs_part}"
             )
         else:
-            text = (
-                f"<b>LOCATION:</b> {ccs_part.replace('_', ' ')}<br><br>"
-                f"<b>CURRENT STATE:</b> {polarization_state.replace('_', ' ')}<br><br>"
-                f"<b>CURRENT VOLTAGE:</b> {voltage:.0f} mV<br>"
-                f"<span style='color:#000000;font-size:1px'>{pos}</span>"
-            )
+            text = f"""
+            <div style='font-family:Mulish;font-size:11pt;color:#233348;'>
+                <b>Location:</b> {ccs_part.replace('_', ' ')}<br><br>
+                <b>Current state:</b> {polarization_state.replace('_', ' ')}<br><br>
+                <b>Current voltage:</b> {voltage:.0f} mV<br>
+            </div>
+            """
 
         QToolTip.showText(global_pos, text, self)
 

@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayo
 from collections import deque
 import pyqtgraph as pq
 
-from src.frontend.simulation_controller import SimulationController
+from src.controllers.simulation_controller import SimulationController
 from src.models.cell import CellDict
 
 class CellInspector(QWidget):
@@ -28,7 +28,7 @@ class CellInspector(QWidget):
         self.setLayout(self.layout)
 
         self.charge_buffer = deque(maxlen=500)
-        
+
         self.__init_ui()
 
     def __init_ui(self):
@@ -39,7 +39,7 @@ class CellInspector(QWidget):
         self.close_button = QPushButton("Close")
         self.close_button.clicked.connect(self.close_inspector)
         self.layout.addWidget(self.close_button)
-        
+
         self.submit_button = QPushButton("Submit")
         self.submit_button.clicked.connect(self._submit_data)
 
@@ -69,7 +69,7 @@ class CellInspector(QWidget):
 
             self.layout.addLayout(h_layout)
 
-        # Plot setup        
+        # Plot setup
         self.plot_widget = pq.PlotWidget()
         self.plot_curve = self.plot_widget.plot(pen=pq.mkPen(color='r', width=2))
         self.plot_widget.setBackground('w')
@@ -78,14 +78,14 @@ class CellInspector(QWidget):
         self.plot_widget.setLabel('bottom', 'Time [Frames]')
         self.plot_widget.showGrid(x=True, y=True)
 
-        self.layout.addWidget(self.plot_widget) 
-       
+        self.layout.addWidget(self.plot_widget)
+
         """
         if not self.running:
             self.layout.addWidget(self.submit_button)
             self.submit_button.setEnabled(True)
         """
-            
+
     def update(self, cell_data: CellDict) -> None:
         """
         Update method called by the main application. If the cell inspector
@@ -107,7 +107,7 @@ class CellInspector(QWidget):
                 self.labels[key].setText(str(value))
             elif key in self.edit_fields and key in self.keys:
                 self.edit_fields[key].setText(str(value))
-                    
+
     def set_running(self, running: bool) -> None:
         """
         Changes state of flag CellInspector.running and updates the ui
@@ -147,7 +147,7 @@ class CellInspector(QWidget):
 
     def _dep_callback(self):
         """
-        Simple callback that depolarizes given cell. 
+        Simple callback that depolarizes given cell.
         Will have to be reworked in the future
         """
         payload = self.data
@@ -171,7 +171,7 @@ class CellInspector(QWidget):
         print("new", updated_data)
         self.ctrl.update_cell(updated_data)
         """
-        
+
     def close_inspector(self):
         """ Call to method in MainWindow to kill the inspector"""
         if self.on_close_callback:
