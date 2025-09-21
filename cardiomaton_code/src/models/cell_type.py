@@ -3,8 +3,8 @@ import json
 from typing import Any, Dict, Tuple
 
 from src.models.cell import Cell
-from src.models.cell_state import CellState
-
+from src.backend.models.cell_state import CellState
+#from src.models.cell_state import CellState
 
 class ConfigLoader:
     _config: Dict[str, Any] = {}

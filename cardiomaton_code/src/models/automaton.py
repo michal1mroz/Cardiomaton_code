@@ -1,5 +1,8 @@
 from src.models.cell import Cell, CellDict
-from src.models.cell_state import CellState
+
+#from src.models.cell_state import CellState
+from src.backend.models.cell_state import CellState
+
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
 from src.models.cell_type import CellType

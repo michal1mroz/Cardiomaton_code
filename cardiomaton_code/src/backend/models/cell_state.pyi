@@ -1,0 +1,10 @@
+# cell_state.pyi
+from enum import Enum
+
+class CellState(Enum):
+    POLARIZATION: int
+    SLOW_DEPOLARIZATION: int
+    RAPID_DEPOLARIZATION: int
+    REPOLARIZATION_ABSOLUTE_REFRACTION: int
+    REPOLARIZATION_RELATIVE_REFRACTION: int
+    NECROSIS: int

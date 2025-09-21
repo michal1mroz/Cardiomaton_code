@@ -1,6 +1,8 @@
 from src.update_strategies.base import UpdateBaseCharge
 from src.models.cell import Cell 
-from src.models.cell_state import CellState
+
+#from src.models.cell_state import CellState
+from src.backend.models.cell_state import CellState
 
 from typing import Tuple
 
