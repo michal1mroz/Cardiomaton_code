@@ -1,7 +1,7 @@
-from src.models.cell import Cell, CellDict
-
+# from src.models.cell import Cell, CellDict
+from src.backend.models.cell import Cell, CellDict
 #from src.models.cell_state import CellState
-from src.backend.models.cell_state import CellState
+from src.backend.models.cell_state import CellState, state_to_cenum
 
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
@@ -48,7 +48,7 @@ class Automaton:
 
     def _create_neighbour_map(self):
         return {
-            c.position: tuple([nei.position for nei in c.neighbours]) for c in self.grid_a
+            (c.pos_x, c.pos_y): tuple([(nei.pos_x, nei.pos_y) for nei in c.neighbours]) for c in self.grid_a
         }
 
     def _create_automaton(self) -> List[Cell]:
@@ -73,15 +73,14 @@ class Automaton:
         arr = []
         help_dict = {}
         for cell in cell_list:
-            new_cell = Cell(position=cell.position,cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type,
-                            self_polarization=cell.self_polarization,
-                            self_polarization_timer=cell.self_polar_timer)
-            help_dict[cell.position] = new_cell
+            new_cell = Cell(position=(cell.pos_x, cell.pos_y),cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type_py,
+                            self_polarization=cell.self_polarization)
+            help_dict[(cell.pos_x, cell.pos_y)] = new_cell
             arr.append(new_cell)
 
         for i, cell in enumerate(cell_list):
             for nei in cell.neighbours:
-                pos = nei.position
+                pos = (nei.pos_x, nei.pos_y)
                 arr[i].add_neighbour(help_dict[pos])
         return arr
 
@@ -111,7 +110,7 @@ class Automaton:
         for ind, cell in enumerate(self.grid_a):
             new_charge, new_state = self.update_method.update(cell)
             
-            self.grid_b[ind].state = new_state
+            self.grid_b[ind].state = state_to_cenum(new_state)
             self.grid_b[ind].state_timer = cell.state_timer
             self.grid_b[ind].charge = new_charge
 
@@ -137,7 +136,7 @@ class Automaton:
                 first int represents the current frame, dict is a mapping of position to
                 a cell state serialized with CellDict.
         """
-        return self.frame_counter ,{cell.position: cell.to_dict() for cell in self.grid_a}
+        return self.frame_counter ,{(cell.pos_x, cell.pos_y): cell.to_dict() for cell in self.grid_a}
 
     def recreate_from_dict(self, data_tuple: Tuple[int, Dict[Tuple[int, int], CellDict]]) -> None:
         """

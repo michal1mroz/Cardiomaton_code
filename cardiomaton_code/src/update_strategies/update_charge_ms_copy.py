@@ -1,8 +1,9 @@
 from src.update_strategies.base import UpdateBaseCharge
-from src.models.cell import Cell 
+# from src.models.cell import Cell 
+from src.backend.models.cell import Cell
 
 #from src.models.cell_state import CellState
-from src.backend.models.cell_state import CellState
+from src.backend.models.cell_state import CellState, state_to_pyenum
 
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
@@ -39,8 +40,7 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
         # cell_data_dict = cell.cell_data[cell.type]
         cell_data_dict = cell.cell_data
         
-
-        match cell.state:
+        match state_to_pyenum(cell.state):
             case CellState.NECROSIS:
                 return 0, cell.state
 

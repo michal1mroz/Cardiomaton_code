@@ -6,8 +6,9 @@ from scipy.sparse.csgraph import minimum_spanning_tree # type: ignore
 
 #from src.models.cell_state import CellState
 from src.backend.models.cell_state import CellState
-
-from src.models.cell_type import CellType
+from src.backend.models.cell import Cell
+from src.backend.models.cell_type import CellType
+# from src.models.cell_type import CellType
 
 class Space: #, the final frontier
 
@@ -63,9 +64,14 @@ class Space: #, the final frontier
             point = (p[0], p[1])
             cell = None
             if point == self.root:
-                cell = CellType.create(position=point, cell_type=CellType.AV_NODE,state=CellState.SLOW_DEPOLARIZATION)
+                cell = Cell(position=point, cell_type=CellType.AV_NODE,state=CellState.SLOW_DEPOLARIZATION)
+ 
+                #CellType.create(position=point, cell_type=CellType.AV_NODE,state=CellState.SLOW_DEPOLARIZATION)
             else:
-                cell = CellType.create(position=point, cell_type=CellType.BACHMANN)
+                cell = Cell(position=point, cell_type=CellType.BACHMANN)
+
+                # CellType.create(position=point, cell_type=CellType.BACHMANN)
+
             cells[point] = cell
 
         tree = cKDTree(points)
@@ -152,7 +158,8 @@ class Space: #, the final frontier
         # Creating Cell objects
         cells = {}
         for pt in all_points:
-            cells[pt] = CellType.create(position=pt, cell_type=cell_types[pt])
+            cells[pt] = Cell(position=pt, cell_type=cell_types[pt])
+            #CellType.create(position=pt, cell_type=cell_types[pt])
 
         # array for searching neighbours
         array_points = np.array(all_points)

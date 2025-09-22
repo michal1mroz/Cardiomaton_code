@@ -46,7 +46,7 @@ class ChargeUpdate():
         a = cell_data['period'] / period
         func = lambda t: pacemaker_AP_full((t % period) * a, **cell_data)
         args = list(range(int(period)))
-        m = {t: func(t) for t in args}
+        m = [func(t) for t in args]
         return m, ChargeUpdate._get_max_arg(func, period)
     
     @staticmethod
