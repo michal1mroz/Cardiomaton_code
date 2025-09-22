@@ -4,6 +4,7 @@ from src.frontend.frame_recorder import FrameRecorder
 from src.services.simulation_service import SimulationService
 
 
+
 class SimulationController:
     def __init__(self, frame_time: float):
         """
