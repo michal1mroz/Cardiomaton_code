@@ -9,7 +9,6 @@ from src.frontend.main_label import MainLabel
 from src.utils.style_utils import get_qss_styling
 from src.workers.backend_init_worker import BackendInitWorker
 from PyQt6.QtCore import QThread
-from src.workers.simulation_worker import SimulationWorker
 from src.frontend.ui_main_window import UiMainWindow
 
 class MainWindow(QMainWindow):
@@ -62,7 +61,6 @@ class MainWindow(QMainWindow):
 
         self._init_ui()
         self._init_timer()
-        self._init_worker()
 
     def _init_ui(self):
         """
@@ -104,17 +102,6 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._update_frame)
         QTimer.singleShot(0, self._update_frame)
-
-    def _init_worker(self):
-        self.worker = SimulationWorker(self.sim)
-
-        self.worker_thread = QThread()
-        self.worker.moveToThread(self.worker_thread)
-
-        self.worker.frame_ready.connect(self.on_frame_ready)
-        self.worker_thread.started.connect(lambda: None)
-
-        self.worker_thread.start()
 
     def toggle_simulation(self):
         """
@@ -161,24 +148,14 @@ class MainWindow(QMainWindow):
         self.ui.frame_counter_label.setText(f"Frame: {frame}")
 
     def _update_frame(self):
-        if self.running:
-            self.worker.request_next_frame.emit()
-
-    def on_frame_ready(self, frame: int, data: dict):
-        pixmap = self.renderer.render_frame(
-            self.render_label.size(),
-            data,
-            self.sim.shape,
-            self.render_charged
-        )
+        """
+        Renders and displays the next frame of the simulation.
+        """
+        frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
         self.render_label.setPixmap(pixmap)
         self.ui.frame_counter_label.setText(f"Frame: {frame}")
         if self.cell_inspector:
-            frame_data = self.sim.recorder.get_frame(-1)
-            if frame_data:
-                cell_data = frame_data[1].get(self.cell_inspector.position)
-
-                self.cell_inspector.update(cell_data)
+            self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
 
         buf_len = len(self.sim.recorder)
         if buf_len > 0:
@@ -197,12 +174,9 @@ class MainWindow(QMainWindow):
             self._update_frame_counter(frame)
             pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
             self.render_label.setPixmap(pixmap)
-            if self.cell_inspector:
-                cell_data = data.get(self.cell_inspector.position)
-                self.cell_inspector.update(cell_data)
-
         except Exception:
             pass
+
 
     def _show_cell_inspector(self, cell_data: CellDict):
         if self.cell_inspector:
@@ -219,13 +193,3 @@ class MainWindow(QMainWindow):
             self.ui.simulation_layout.removeWidget(self.cell_inspector)
             self.cell_inspector.deleteLater()
             self.cell_inspector = None
-
-    def closeEvent(self, event):
-        if hasattr(self, 'timer') and self.timer.isActive():
-            self.timer.stop()
-
-        if hasattr(self, 'worker_thread'):
-            self.worker_thread.quit()
-            self.worker_thread.wait()
-
-        event.accept()
