@@ -1,9 +1,8 @@
-from src.models.cell import Cell, CellDict
+# from src.models.cell import Cell, CellDict
+from src.models.cell_new import Cell
 from src.models.cell_state import CellState
-from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
 from src.models.cell_type import CellType
-from src.update_strategies.update_charge import UpdateCharge
 from src.update_strategies.update_charge_ms import UpdateChargeMS
 
 import copy
@@ -132,7 +131,7 @@ class Automaton:
             self.draw_array[cell.position] = cell.to_int()
         return self.draw_array
     
-    def to_cell_data(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
+    def to_cell_data(self) -> Tuple[int, Dict[Tuple[int, int], dict]]:
         """
         Method to map the automaton state to a tuple with the current frame.
 
@@ -143,7 +142,7 @@ class Automaton:
         """
         return self.frame_counter ,{cell.position: cell.to_dict() for cell in self.grid_a}
 
-    def recreate_from_dict(self, data_tuple: Tuple[int, Dict[Tuple[int, int], CellDict]]) -> None:
+    def recreate_from_dict(self, data_tuple: Tuple[int, Dict[Tuple[int, int], dict]]) -> None:
         """
         Method to recreate grid_a, grid_b and cells data from the dict.
         Updates the automaton in place.
@@ -173,7 +172,7 @@ class Automaton:
         self.grid_b = [val for val in cells_b.values()]
         self.frame_counter = frame
 
-    def update_cell_from_dict(self, data_dict: CellDict) -> None:
+    def update_cell_from_dict(self, data_dict: dict) -> None:
         """
         Simple method to find the cell that needs to be updated and calls the update method
         on both coppies of that cell.

@@ -2,7 +2,7 @@ from enum import Enum
 import json
 from typing import Any, Dict, Tuple
 
-from src.models.cell import Cell
+from src.models.cell_new import Cell
 from src.models.cell_state import CellState
 
 

@@ -212,7 +212,7 @@ class UiMainWindow(object):
         self.horizontalLayout_6.addWidget(self.speed_slider_label)
 
         self.speed_slider = self.create_slider(self.speed_slider_layout)
-        self.speed_slider.setRange(1, 500)
+        self.speed_slider.setRange(1, 1000)
         self.speed_slider.setValue(100)
 
         self.horizontalLayout_6.addWidget(self.speed_slider)

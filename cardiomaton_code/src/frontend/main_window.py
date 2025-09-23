@@ -10,6 +10,7 @@ from src.utils.style_utils import get_qss_styling
 from src.workers.backend_init_worker import BackendInitWorker
 from PyQt6.QtCore import QThread
 from src.frontend.ui_main_window import UiMainWindow
+from time import perf_counter
 
 class MainWindow(QMainWindow):
     """
@@ -23,6 +24,7 @@ class MainWindow(QMainWindow):
         Initialize the main window and its components.
         """
         super().__init__()
+        self.avg_render_time_buf = []
 
         # self.setWindowTitle("Cardiomaton")
         # self.setGeometry(0, 0, 1000, 600)
@@ -151,6 +153,7 @@ class MainWindow(QMainWindow):
         """
         Renders and displays the next frame of the simulation.
         """
+        start = perf_counter() # POMIAR CZASU
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
         self.render_label.setPixmap(pixmap)
         self.ui.frame_counter_label.setText(f"Frame: {frame}")
@@ -163,6 +166,12 @@ class MainWindow(QMainWindow):
             self.ui.playback_slider.setRange(0, buf_len - 1)
             self.ui.playback_slider.setValue(buf_len - 1)
             self.ui.playback_slider.blockSignals(False)
+        end = perf_counter() # POMIAR CZASU
+        elapsed = end - start
+        self.avg_render_time_buf.append(elapsed)
+        if len(self.avg_render_time_buf) >= 100:
+            print(f"Sredni czas wykonania: {sum(self.avg_render_time_buf)/len(self.avg_render_time_buf):.9f} sekund")
+            self.avg_render_time_buf=[]
 
     def _on_slider_change(self, value: int):
         if self.running:

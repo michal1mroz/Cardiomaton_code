@@ -3,7 +3,6 @@ from src.models.cell import CellDict
 from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
-from time import sleep
 
 class SimulationService:
     """
@@ -17,7 +16,6 @@ class SimulationService:
         Args:
             frame_time (float): Time between frames in seconds.
         """
-        sleep(5)
         graph, A, B = extract_conduction_pixels()
         space = Space(graph)
         _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
