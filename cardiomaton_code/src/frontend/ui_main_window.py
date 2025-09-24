@@ -157,90 +157,128 @@ class UiMainWindow(object):
         self.add_shadow(self.players_layout)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.players_layout)
 
+        #Player controls layout
+        self.player_controls_layout = QtWidgets.QHBoxLayout()
+        self.player_controls_layout.setContentsMargins(20, 0, 20, 0)
 
-        # Buttons layout
-        self.buttons_layout = QtWidgets.QWidget(parent=self.players_layout)
-        self.buttons_layout.setStyleSheet("")
+        self.speed_dropdown = QtWidgets.QComboBox(parent=self.players_layout)
+        self.speed_dropdown.addItems(["1x", "2x", "3x", "4x", "5x"])
+        self.speed_dropdown.setCurrentText("1x")
+        self.speed_dropdown.setStyleSheet("""
+            QComboBox {
+                font-family: Mulish;
+                font-size: 25px;
+                font-weight: bold;
+                color: #EF8481;
+                max-width: 40px;
+            }
+            QComboBox:hover {
+                color: #E74440;
+            }
+            QComboBox QAbstractItemView {
+                background: white;
+                border-radius: 5px;
+                color: #EF8481;
+            }
+            
+            QComboBox::drop-down {
+                width: 0px; 
+                border: none; 
+            }
+            
+            QComboBox::down-arrow {
+                image: none;
+                width: 0px;
+                height: 0px;
+                border: none;
+            }
+        """)
 
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.buttons_layout)
-        self.horizontalLayout_5.setContentsMargins(55, -1, 55, -1)
-        self.horizontalLayout_5.setSpacing(40)
+        view = QtWidgets.QListView()
+        font_popup = QtGui.QFont("Mulish", 12)
+        font_popup.setBold(True)
+        view.setFont(font_popup)
 
-        self.play_button = QtWidgets.QPushButton(parent=self.buttons_layout)
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Expanding
-        )
-        size_policy.setHeightForWidth(self.play_button.sizePolicy().hasHeightForWidth())
-        self.play_button.setSizePolicy(size_policy)
-        self.play_button.setMinimumSize(QtCore.QSize(40, 40))
-        self.play_button.setMaximumSize(QtCore.QSize(40, 40))
-        self.play_button.setStyleSheet(
-            "border-radius: 20px;\n"
-            "background-color: #EF8481;\n"
-            "color: white;\n"
-            "font-size: 35px;\n"
-            "padding-bottom: 2px;\n"
-        )
-        self.add_shadow(self.play_button)
-        self.horizontalLayout_5.addWidget(self.play_button)
+        view.setSpacing(0)
+        view.setUniformItemSizes(True)
+        view.setMaximumWidth(40)
+        view.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
 
-        self.toggle_render_button = QtWidgets.QPushButton(parent=self.buttons_layout)
-        font = QtGui.QFont()
-        font.setFamily("Mulish")
-        font.setPointSize(12)
-        font.setBold(True)
-        self.toggle_render_button.setFont(font)
-        self.toggle_render_button.setStyleSheet(
-            "color: white;\n"
-            "background-color: #6D98F4;\n"
-            "border: 4px solid #6D98F4;\n"
-            "border-radius: 12px;\n"
-        )
-        self.toggle_render_button.setCheckable(True)
-        self.toggle_render_button.setChecked(False)
-        self.add_shadow(self.toggle_render_button)
-        self.horizontalLayout_5.addWidget(self.toggle_render_button)
+        self.speed_dropdown.setView(view)
+        self.player_controls_layout.addWidget(self.speed_dropdown)
 
-        self.verticalLayout_3.addWidget(self.buttons_layout)
+        large_spacer = QtWidgets.QSpacerItem(20, 0, QtWidgets.QSizePolicy.Policy.Fixed,
+                                             QtWidgets.QSizePolicy.Policy.Minimum)
+        self.player_controls_layout.addItem(large_spacer)
 
-        # Speed slider
-        self.speed_slider_layout = QtWidgets.QWidget(parent=self.players_layout)
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.speed_slider_layout)
+        self.prev_button = QtWidgets.QPushButton("❮❮", parent=self.players_layout)
+        self.prev_button.setStyleSheet("""
+            QPushButton {
+                font-size: 30px;
+                font-weight: bold;
+                color: #EF8481;
+                background: none;  
+                border: none;
+            }
+            QPushButton:hover {
+                color: #E74440;  
+            }
+        """)
+        self.player_controls_layout.addWidget(self.prev_button)
 
-        self.speed_slider_label = self.create_label(self.speed_slider_layout, "Speed")
-        self.horizontalLayout_6.addWidget(self.speed_slider_label)
+        small_spacer = QtWidgets.QSpacerItem(2, 0, QtWidgets.QSizePolicy.Policy.Fixed,
+                                             QtWidgets.QSizePolicy.Policy.Minimum)
+        self.player_controls_layout.addItem(small_spacer)
 
-        self.speed_slider = self.create_slider(self.speed_slider_layout)
-        self.speed_slider.setRange(1, 500)
-        self.speed_slider.setValue(100)
+        self.play_button = QtWidgets.QPushButton("▶", parent=self.players_layout)
+        self.play_button.setFixedSize(60, 60)
+        self.play_button.setStyleSheet("""
+            QPushButton {
+                font-size: 50px;
+                border-radius: 30px;
+                background-color: #EF8481;
+                color: white;
+            }
+            QPushButton:hover {
+                background-color: #E74440;
+            }
+        """)
+        self.player_controls_layout.addWidget(self.play_button)
 
-        self.horizontalLayout_6.addWidget(self.speed_slider)
+        small_spacer = QtWidgets.QSpacerItem(2, 0, QtWidgets.QSizePolicy.Policy.Fixed,
+                                             QtWidgets.QSizePolicy.Policy.Minimum)
+        self.player_controls_layout.addItem(small_spacer)
 
-        self.horizontalLayout_6.setStretch(0, 1)
-        self.horizontalLayout_6.setStretch(1, 4)
-        self.verticalLayout_3.addWidget(self.speed_slider_layout)
+        self.next_button = QtWidgets.QPushButton("❯❯", parent=self.players_layout)
+        self.next_button.setStyleSheet("""
+            QPushButton {
+                font-size: 30px;
+                font-weight: bold;
+                color: #EF8481;
+                background: none;   
+                border: none;
+            }
+            QPushButton:hover {
+                color: #E74440; 
+            }
+        """)
 
-        # Playback slider
-        self.playback_slider_layout = QtWidgets.QWidget(parent=self.players_layout)
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.playback_slider_layout)
+        self.player_controls_layout.addWidget(self.next_button)
 
-        self.playback_slider_label = self.create_label(self.playback_slider_layout, "Playback")
-        self.horizontalLayout_7.addWidget(self.playback_slider_label)
+        large_spacer = QtWidgets.QSpacerItem(20, 0, QtWidgets.QSizePolicy.Policy.Fixed,
+                                             QtWidgets.QSizePolicy.Policy.Minimum)
+        self.player_controls_layout.addItem(large_spacer)
 
-        self.playback_slider = self.create_slider(self.playback_slider_layout)
-        self.playback_slider.setRange(0, 0)
-        self.playback_slider.setValue(0)
-        self.horizontalLayout_7.addWidget(self.playback_slider)
+        self.extra_button = QtWidgets.QPushButton("?", parent=self.players_layout)
+        self.extra_button.setStyleSheet("font-size: 18px; border-radius: 10px; background:#6D98F4; color:white;")
+        self.player_controls_layout.addWidget(self.extra_button)
 
-        self.horizontalLayout_7.setStretch(0, 1)
-        self.horizontalLayout_7.setStretch(1, 4)
-        self.verticalLayout_3.addWidget(self.playback_slider_layout)
+        self.verticalLayout_3.addLayout(self.player_controls_layout)
 
         self.verticalLayout_2.addWidget(self.players_layout)
         self.verticalLayout_2.setStretch(0, 1)
-        self.verticalLayout_2.setStretch(1, 4)
-        self.verticalLayout_2.setStretch(2, 3)
+        self.verticalLayout_2.setStretch(1, 6)
+        self.verticalLayout_2.setStretch(2, 1)
 
         self.horizontalLayout_3.addWidget(self.settings_layout)
 
@@ -286,10 +324,6 @@ class UiMainWindow(object):
         self.pushButton_app.setText(_translate("MainWindow", "App"))
         self.pushButton_help.setText(_translate("MainWindow", "Help"))
         self.pushButton_about_us.setText(_translate("MainWindow", "About us"))
-        self.play_button.setText(_translate("MainWindow", "▶"))
-        self.toggle_render_button.setText(_translate("MainWindow", "Colored by charge"))
-        self.speed_slider_label.setText(_translate("MainWindow", "Speed"))
-        self.playback_slider_label.setText(_translate("MainWindow", "Playback"))
 
     @staticmethod
     def load_fonts():

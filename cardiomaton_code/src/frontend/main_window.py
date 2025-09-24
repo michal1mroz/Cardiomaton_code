@@ -35,6 +35,9 @@ class MainWindow(QMainWindow):
         self._init_ui()
         self._init_timer()
 
+        self.frames_per_click = 10
+        self.current_playback_buffer_index = -1
+
     def _init_ui(self):
         """
         Builds the user interface layout and widgets.
@@ -49,14 +52,17 @@ class MainWindow(QMainWindow):
         # Start/stop button
         self.ui.play_button.clicked.connect(self.toggle_simulation)
 
-        # Speed slider
-        self.ui.speed_slider.valueChanged.connect(self._change_speed)
+        # Speed dropdown
+        self.ui.speed_dropdown.currentTextChanged.connect(self._change_speed)
 
-        # Playback slider
-        self.ui.playback_slider.valueChanged.connect(self._on_slider_change)
+        # Playback button
+        self.ui.prev_button.clicked.connect(self._on_playback)
+
+        # Fast-forward button
+        self.ui.next_button.clicked.connect(self._on_forward)
 
         # Color by charge / state option
-        self.ui.toggle_render_button.toggled.connect(self.toggle_render_mode)
+        #self.ui.toggle_render_button.toggled.connect(self.toggle_render_mode)
 
     def toggle_render_mode(self, checked: bool):
         """
@@ -85,9 +91,7 @@ class MainWindow(QMainWindow):
             self.ui.play_button.setText("▸")
             self.running = False
         else:
-            # Checks if playback was changed and updates the automaton accordingly
-            if self.ui.playback_slider.value() < len(self.sim.recorder) - 1:
-                self.sim.update_automaton(self.ui.playback_slider.value())
+            self.sim.update_automaton(self.current_playback_buffer_index)
             self.timer.start(int(self.sim.frame_time * 1000))
             self.ui.play_button.setText("▪")
             self.running = True
@@ -104,14 +108,27 @@ class MainWindow(QMainWindow):
         self.render_label.set_running(running)
         if not running:
             self.timer.stop()
-    def _change_speed(self, percent: int):
+    def _change_speed(self):
         """
         Updates the simulation speed based on slider value.
-
-        Args:
-            prercent (int): % of change speed
         """
-        multiplier = percent / 100
+        current_speed = self.ui.speed_dropdown.currentText()
+        speed_int = int(current_speed[0])
+
+        match speed_int:
+            case 1:
+                multiplier = 1
+            case 2:
+                multiplier = 10
+            case 3:
+                multiplier = 100
+            case 4:
+                multiplier = 250
+            case 5:
+                multiplier = 500
+            case _:
+                multiplier = 1  # wartość domyślna
+
         new_frame_time = self.base_frame_time / multiplier
         self.sim.frame_time = new_frame_time
         if self.timer.isActive():
@@ -132,20 +149,37 @@ class MainWindow(QMainWindow):
         if self.cell_inspector:
             self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
 
-        buf_len = len(self.sim.recorder)
-        if buf_len > 0:
-            self.ui.playback_slider.blockSignals(True)
-            self.ui.playback_slider.setRange(0, buf_len - 1)
-            self.ui.playback_slider.setValue(buf_len - 1)
-            self.ui.playback_slider.blockSignals(False)
-
-    def _on_slider_change(self, value: int):
+    def _on_playback(self):
         if self.running:
             self._set_running_state(False)
 
         try:
+            new_index = self.current_playback_buffer_index - self.frames_per_click
+            if new_index < -self.sim.recorder.get_buffer_size():
+                new_index = -self.sim.recorder.get_buffer_size()
+
+            self.current_playback_buffer_index = new_index
+
             self._remove_inspector()
-            frame, data = self.sim.recorder.get_frame(value)
+            frame, data = self.sim.recorder.get_frame(new_index)
+            self._update_frame_counter(frame)
+            pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
+            self.render_label.setPixmap(pixmap)
+        except Exception:
+            pass
+
+    def _on_forward(self):
+        if self.running:
+            self._set_running_state(False)
+
+        try:
+            new_index = self.current_playback_buffer_index + self.frames_per_click
+            if new_index > -1:
+                new_index = -1
+            self.current_playback_buffer_index = new_index
+
+            self._remove_inspector()
+            frame, data = self.sim.recorder.get_frame(new_index)
             self._update_frame_counter(frame)
             pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
             self.render_label.setPixmap(pixmap)

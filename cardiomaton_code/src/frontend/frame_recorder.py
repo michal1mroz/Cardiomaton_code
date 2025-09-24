@@ -43,3 +43,6 @@ class FrameRecorder:
             idx (int): selected index.
         """
         self.buffer = deque(list(self.buffer)[: idx + 1], maxlen=self.buffer.maxlen)
+
+    def get_buffer_size(self) -> int:
+        return len(self.buffer)
