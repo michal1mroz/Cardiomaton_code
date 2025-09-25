@@ -32,11 +32,11 @@ class MainWindow(QMainWindow):
 
         self.cell_inspector = None
 
-        self._init_ui()
-        self._init_timer()
-
         self.frames_per_click = 10
         self.current_playback_buffer_index = -1
+
+        self._init_ui()
+        self._init_timer()
 
     def _init_ui(self):
         """
@@ -55,24 +55,30 @@ class MainWindow(QMainWindow):
         # Speed dropdown
         self.ui.speed_dropdown.currentTextChanged.connect(self._change_speed)
 
-        # Playback button
-        self.ui.prev_button.clicked.connect(self._on_playback)
+        # Playback hold
+        self.ui.prev_button.pressed.connect(self._start_playback_hold)
+        self.ui.prev_button.released.connect(self._stop_playback_hold)
 
-        # Fast-forward button
-        self.ui.next_button.clicked.connect(self._on_forward)
+        # Forward hold
+        self.ui.next_button.pressed.connect(self._start_forward_hold)
+        self.ui.next_button.released.connect(self._stop_forward_hold)
+
+        # Timers for playback and forward buttons
+        self.playback_timer = QTimer(self)
+        self.playback_timer.timeout.connect(self._on_playback)
+
+        self.forward_timer = QTimer(self)
+        self.forward_timer.timeout.connect(self._on_forward)
 
         # Color by charge / state option
-        #self.ui.toggle_render_button.toggled.connect(self.toggle_render_mode)
+        self.ui.toggle_render_button.clicked.connect(self.toggle_render_mode)
 
-    def toggle_render_mode(self, checked: bool):
+    def toggle_render_mode(self):
         """
         Toggle between rendering modes: by charge or by state.
         """
-        self.render_charged = not checked
-        if checked:
-            self.ui.toggle_render_button.setText("Colored by state")
-        else:
-            self.ui.toggle_render_button.setText("Colored by charge")
+        self.render_charged = not self.render_charged
+        self.ui.toggle_render_button.setText("↯" if self.render_charged else "️⏣")
 
     def _init_timer(self):
         """
@@ -115,19 +121,7 @@ class MainWindow(QMainWindow):
         current_speed = self.ui.speed_dropdown.currentText()
         speed_int = int(current_speed[0])
 
-        match speed_int:
-            case 1:
-                multiplier = 1
-            case 2:
-                multiplier = 10
-            case 3:
-                multiplier = 100
-            case 4:
-                multiplier = 250
-            case 5:
-                multiplier = 500
-            case _:
-                multiplier = 1  # wartość domyślna
+        multiplier = 2 ** (speed_int - 1)
 
         new_frame_time = self.base_frame_time / multiplier
         self.sim.frame_time = new_frame_time
@@ -149,7 +143,21 @@ class MainWindow(QMainWindow):
         if self.cell_inspector:
             self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
 
-    def _on_playback(self):
+    def _start_playback_hold(self):
+        self._on_playback()
+        self.playback_timer.start(100)
+
+    def _stop_playback_hold(self):
+        self.playback_timer.stop()
+
+    def _start_forward_hold(self):
+        self._on_forward()
+        self.forward_timer.start(100)
+
+    def _stop_forward_hold(self):
+        self.forward_timer.stop()
+
+    def _on_playback(self) -> None:
         if self.running:
             self._set_running_state(False)
 
@@ -158,17 +166,11 @@ class MainWindow(QMainWindow):
             if new_index < -self.sim.recorder.get_buffer_size():
                 new_index = -self.sim.recorder.get_buffer_size()
 
-            self.current_playback_buffer_index = new_index
-
-            self._remove_inspector()
-            frame, data = self.sim.recorder.get_frame(new_index)
-            self._update_frame_counter(frame)
-            pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
-            self.render_label.setPixmap(pixmap)
+            self._render_buffer_frame(new_index)
         except Exception:
             pass
 
-    def _on_forward(self):
+    def _on_forward(self) -> None:
         if self.running:
             self._set_running_state(False)
 
@@ -176,18 +178,21 @@ class MainWindow(QMainWindow):
             new_index = self.current_playback_buffer_index + self.frames_per_click
             if new_index > -1:
                 new_index = -1
-            self.current_playback_buffer_index = new_index
 
-            self._remove_inspector()
-            frame, data = self.sim.recorder.get_frame(new_index)
-            self._update_frame_counter(frame)
-            pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
-            self.render_label.setPixmap(pixmap)
+            self._render_buffer_frame(new_index)
         except Exception:
             pass
 
+    def _render_buffer_frame(self, index: int) -> None:
+        """Load and render a frame from the simulation recorder buffer."""
+        self.current_playback_buffer_index = index
+        self._remove_inspector()
+        frame, data = self.sim.recorder.get_frame(index)
+        self._update_frame_counter(frame)
+        pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
+        self.render_label.setPixmap(pixmap)
 
-    def _show_cell_inspector(self, cell_data: CellDict):
+    def _show_cell_inspector(self, cell_data: CellDict) -> None:
         if self.cell_inspector:
             self._remove_inspector()
 
@@ -197,7 +202,7 @@ class MainWindow(QMainWindow):
         )
         self.ui.simulation_layout.addWidget(self.cell_inspector)
 
-    def _remove_inspector(self):
+    def _remove_inspector(self) -> None:
         if self.cell_inspector:
             self.ui.simulation_layout.removeWidget(self.cell_inspector)
             self.cell_inspector.deleteLater()

@@ -41,11 +41,10 @@ class FrameRenderer:
         frame, data = self.ctrl.step()
         self.last_data = data
         self.ctrl.recorder.record((frame, data))
-        shape = self.ctrl.shape
 
-        return frame, self.render_frame(target_size, self.last_data, shape, if_charged)
+        return frame, self.render_frame(target_size, self.last_data, if_charged)
 
-    def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict], shape: Tuple[int, int], show_charge=False) -> QImage:
+    def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict], show_charge=False) -> QImage:
         self.current_data = data
         shape = self.ctrl.shape
 
