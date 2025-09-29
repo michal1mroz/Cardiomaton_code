@@ -1,4 +1,5 @@
 # from src.models.cell import Cell, CellDict
+from dataclasses import dataclass
 from src.backend.models.cell import Cell, CellDict
 #from src.models.cell_state import CellState
 from src.backend.models.cell_state import CellState, state_to_cenum
@@ -17,6 +18,10 @@ import matplotlib.pyplot as plt # type: ignore
 from IPython.display import clear_output, display
 from time import sleep, time
 
+@dataclass
+class CellData:
+    neighbors: list[Tuple[int, int]]
+    cell_data: dict[str, float]
 
 class Automaton:
     """
@@ -42,10 +47,19 @@ class Automaton:
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = 0
+        self.cell_data = self._create_data_map()
         self.neighbour_map = self._create_neighbour_map()
         self.update_method = UpdateChargeMSCopy()
         self.fig = self.ax = self.img = None
 
+    def _create_data_map(self) -> dict[Tuple[int, int], CellData]:
+        return {
+            (c.pos_x, c.pos_y): CellData(neighbors=
+                                         [(nei.pos_x, nei.pos_y) for nei in c.neighbours],
+                                         cell_data = c.cell_data) 
+            for c in self.grid_a
+        }
+    
     def _create_neighbour_map(self):
         return {
             (c.pos_x, c.pos_y): tuple([(nei.pos_x, nei.pos_y) for nei in c.neighbours]) for c in self.grid_a

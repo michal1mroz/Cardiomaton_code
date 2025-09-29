@@ -23,11 +23,11 @@ cdef class Cell:
 
     cpdef dict to_dict(self)
     cpdef void update_data(self, dict data_dict)
-    cdef double _update_charge_nogil(self)
+    cdef double _update_charge_nogil(self) nogil
     cpdef double update_charge(self)
-    cdef double _depolarize_nogil(self) 
+    cdef double _depolarize_nogil(self) nogil
     cpdef double depolarize(self)
-    cdef void _reset_timer_nogil(self)
+    cdef void _reset_timer_nogil(self) nogil
     cpdef void reset_timer(self)
-    cdef void _update_timer_nogil(self) 
+    cdef void _update_timer_nogil(self) nogil
     cpdef void update_timer(self)

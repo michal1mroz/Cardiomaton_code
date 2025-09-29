@@ -24,26 +24,6 @@ class CellDict(TypedDict):
 
 cdef class Cell:
     # Class to store information about specific cell.
-    
-    cdef public int pos_x
-    cdef public int pos_y
-
-    cdef public cstate.CellStateC state 
-    cdef public bint self_polarization
-    cdef public int state_timer
-
-    cdef public int period
-    cdef public object _charges_array
-    cdef public double[:] charges_mv
-
-    cdef public int charge_max
-    cdef public double charge
-
-    cdef public object cell_type_py
-    cdef public object cell_data
-    cdef public object neighbours
-    cdef public object _dict_cache
-
 
     def __init__(self, position: Tuple[int, int], cell_type: PyCellType,
                  cell_data: Dict = None, init_state: PyCellState = None,
@@ -93,26 +73,26 @@ cdef class Cell:
         }
 
 
-    cdef inline void _reset_timer_nogil(self) nogil:
+    cdef void _reset_timer_nogil(self) nogil:
         self.state_timer = 0
 
     cpdef void reset_timer(self):
         self._reset_timer_nogil()
 
-    cdef inline void _update_timer_nogil(self) nogil:
+    cdef void _update_timer_nogil(self) nogil:
         self.state_timer = (self.state_timer + 1) % self.period
 
-    cpdef update_timer(self):
+    cpdef void update_timer(self):
         self._update_timer_nogil()
 
-    cdef inline double _update_charge_nogil(self) nogil:
+    cdef double _update_charge_nogil(self) nogil:
         cdef int idx = self.state_timer
         return self.charges_mv[idx]
 
     cpdef double update_charge(self):
         return self._update_charge_nogil()
 
-    cdef inline double _depolarize_nogil(self) nogil:
+    cdef double _depolarize_nogil(self) nogil:
         self.state_timer = self.charge_max
         return self.charges_mv[self.charge_max]
 
@@ -134,7 +114,7 @@ cdef class Cell:
         return d
 
 
-    cpdef void update_data(self, data_dict: CellDict):
+    cpdef void update_data(self, dict data_dict):
         """
         Method to update state of cell from the CellDict. For now allows only
         for the depolarization of the cell.

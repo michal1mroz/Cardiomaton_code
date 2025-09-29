@@ -1,3 +1,4 @@
+from time import time
 from typing import Dict, Tuple
 from src.models.cell import CellDict
 from src.utils.graph_builder import extract_conduction_pixels
@@ -30,8 +31,12 @@ class SimulationService:
             Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
             mapping of the cell position to the cell state
         """
+        start = time()
         self.automaton.update_grid()
-        return self.automaton.to_cell_data()
+        d = self.automaton.to_cell_data()
+        print(f"time: {time() - start}")
+
+        return d 
 
     def update_cell(self, data: CellDict) -> None:
         """
