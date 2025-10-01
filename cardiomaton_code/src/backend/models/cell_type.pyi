@@ -38,13 +38,13 @@ class CellType(str, Enum):
         """
         ...
 
-def to_cenum(py_val: CellType) -> int:
+def type_to_cenum(py_val: CellType) -> int:
     """
     Returns c-like enum for the provided CellType
     """
     ...
 
-def to_pyenum(c_val: int) -> CellType:
+def type_to_pyenum(c_val: int) -> CellType:
     """
     Returns python-like CellType enum form the provided c-type enum
     """

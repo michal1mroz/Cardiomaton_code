@@ -24,7 +24,7 @@ cdef dict _CELLSTATE_NAMES = {
     CellStateC.NECROSIS: "NECROSIS",
 }
 
-cpdef str CellStateName(CellStateC val):
+cpdef str cell_state_name(CellStateC val):
     """
     Return the string name of the enum value.
     """

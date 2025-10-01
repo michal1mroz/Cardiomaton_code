@@ -1,7 +1,6 @@
 from enum import Enum
 import json
 from typing import Any, Dict
-cimport cell_type
 
 class ConfigLoader:
     _config: Dict[str, Any] = {}
@@ -42,23 +41,23 @@ class CellType(str, Enum):
         return ConfigLoader.getConfig(self.value)
 
 cdef dict _CELLTYPE_NAME_MAP = {
-    cell_type.JUNCTION: "JUNCTION",
-    cell_type.HIS_LEFT: "HIS_LEFT",
-    cell_type.HIS_RIGHT: "HIS_RIGHT",
-    cell_type.BACHMANN: "BACHMANN",
-    cell_type.INTERNODAL_POST: "INTERNODAL_POST",
-    cell_type.INTERNODAL_ANT: "INTERNODAL_ANT",
-    cell_type.INTERNODAL_MID: "INTERNODAL_MID",
-    cell_type.HIS_BUNDLE: "HIS_BUNDLE",
-    cell_type.SA_NODE: "SA_NODE",
-    cell_type.AV_NODE: "AV_NODE",
+    CellTypeC.JUNCTION: "JUNCTION",
+    CellTypeC.HIS_LEFT: "HIS_LEFT",
+    CellTypeC.HIS_RIGHT: "HIS_RIGHT",
+    CellTypeC.BACHMANN: "BACHMANN",
+    CellTypeC.INTERNODAL_POST: "INTERNODAL_POST",
+    CellTypeC.INTERNODAL_ANT: "INTERNODAL_ANT",
+    CellTypeC.INTERNODAL_MID: "INTERNODAL_MID",
+    CellTypeC.HIS_BUNDLE: "HIS_BUNDLE",
+    CellTypeC.SA_NODE: "SA_NODE",
+    CellTypeC.AV_NODE: "AV_NODE",
 }
 
-cpdef cell_type.CellTypeC to_cenum(object py_val):
+cpdef CellTypeC type_to_cenum(object py_val):
     for k,v in _CELLTYPE_NAME_MAP.items():
         if v == py_val.value:
             return k
     raise ValueError(f"Unknown CellType: {py_val}")
 
-cpdef object to_pyenum(cell_type.CellTypeC c_val):
+cpdef object type_to_pyenum(CellTypeC c_val):
     return CellType(_CELLTYPE_NAME_MAP[c_val])

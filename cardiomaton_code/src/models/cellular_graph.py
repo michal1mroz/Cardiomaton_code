@@ -107,7 +107,7 @@ class Space: #, the final frontier
 
             p = (point[0], point[1])
             for neighbor in neighbors:
-                cells[p].add_neighbour(cells[neighbor])
+                cells[p].add_neighbor(cells[neighbor])
                 weight = np.linalg.norm(np.array(point) - np.array(neighbor))
                 G.add_edge(tuple(point), neighbor, weight=weight)
         return G, cells
@@ -188,7 +188,7 @@ class Space: #, the final frontier
                         break
 
             for n in neighbors:
-                cells[pt].add_neighbour(cells[n])
+                cells[pt].add_neighbor(cells[n])
                 dist = np.linalg.norm(np.array(pt) - np.array(n))
                 G.add_edge(pt, n, weight=dist)
         return G, cells

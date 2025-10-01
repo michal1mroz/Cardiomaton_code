@@ -6,5 +6,6 @@ cdef enum CellStateC:
     REPOLARIZATION_RELATIVE_REFRACTION = 4
     NECROSIS = 5
 
+cpdef str cell_state_name(CellStateC)
 cpdef CellStateC state_to_cenum(object)
 cpdef object state_to_pyenum(CellStateC)

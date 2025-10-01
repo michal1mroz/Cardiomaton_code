@@ -9,3 +9,6 @@ cdef enum CellTypeC:
     HIS_BUNDLE = 7
     SA_NODE = 8
     AV_NODE = 9
+
+cpdef CellTypeC type_to_cenum(object)
+cpdef object type_to_pyenum(CellTypeC)
