@@ -15,6 +15,9 @@ class CellDict(TypedDict):
     auto_polarization: bool
 
 class Cell:
+    """
+    Helper class used to store the cell before it can be loaded to the automaton
+    """
     def __init__(self, position: Tuple[int, int], cell_type: CellType, cell_state: CellState = CellState.POLARIZATION,
                  cell_data: Dict[str, float] = None, self_polarization: bool = None):
         

@@ -3,6 +3,9 @@ import json
 from typing import Any, Dict
 
 class ConfigLoader:
+    """
+    Class to load config files for the cell data
+    """
     _config: Dict[str, Any] = {}
 
     @classmethod
@@ -25,6 +28,9 @@ class ConfigLoader:
         return cls._config[key]
 
 class CellType(str, Enum):
+    """
+    Python implemntation of the CellType enum
+    """
     JUNCTION = "JUNCTION" 
     HIS_LEFT = "HIS_LEFT" 
     HIS_RIGHT = "HIS_RIGHT" 
@@ -38,8 +44,14 @@ class CellType(str, Enum):
 
     @property
     def config(self) -> Dict[str, Any]:
+        """
+        Helper method. Provides config dictionary tied to the given CellType
+        """
         return ConfigLoader.getConfig(self.value)
 
+"""
+Helper dictionary for the cython-python conversion
+"""
 cdef dict _CELLTYPE_NAME_MAP = {
     CellTypeC.JUNCTION: "JUNCTION",
     CellTypeC.HIS_LEFT: "HIS_LEFT",
@@ -54,10 +66,16 @@ cdef dict _CELLTYPE_NAME_MAP = {
 }
 
 cpdef CellTypeC type_to_cenum(object py_val):
+    """
+    Converts python CellType to the cython equivalent
+    """
     for k,v in _CELLTYPE_NAME_MAP.items():
         if v == py_val.value:
             return k
     raise ValueError(f"Unknown CellType: {py_val}")
 
 cpdef object type_to_pyenum(CellTypeC c_val):
+    """
+    Converts cython CellTypeC to the python equivalent
+    """
     return CellType(_CELLTYPE_NAME_MAP[c_val])

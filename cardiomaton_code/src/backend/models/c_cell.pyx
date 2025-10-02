@@ -15,6 +15,20 @@ from src.backend.models.cell import CellDict
 ##########################################################
 
 cdef CCell* create_c_cell(int pos_x, int pos_y):
+    """
+    Creates a pointer to CCell struct and returns it. Assigns its position to the
+    one specified with the passed arguments and zeroes the rest of the data.
+
+    Args:
+        pos_x int - x position of the cell.
+        pos_y int - y position of the cell.
+    
+    Returns:
+        CCell* ptr - pointer to the allocated object.
+    
+    Throws:
+        MemoryError - on the failed malloc
+    """
     cdef CCell* c_cell = <CCell*> malloc(sizeof(CCell))
     if c_cell == NULL:
         raise MemoryError()
@@ -40,6 +54,18 @@ cdef CCell* create_c_cell(int pos_x, int pos_y):
     return c_cell 
 
 cdef void add_cell_charges(CCell* cell, double[:] py_charges):
+    """
+    Method to allocate the memory for the charges array and copy the values from the passed
+    memory view.
+
+    Args:
+        cell CCell* - pointer to the cell
+        py_charges double[:] - memory view of the float list
+
+    Throws:
+        RuntimeError - on the empty cell pointer
+        MemoryError - on the failed malloc call
+    """
     # Allocates the memory for charges and adds them to the cell
     if cell == NULL:
         raise RuntimeError()
@@ -57,6 +83,17 @@ cdef void add_cell_charges(CCell* cell, double[:] py_charges):
         cell.charges[i] = py_charges[i]
 
 cdef void allocate_neighbors(CCell* cell, int size):
+    """
+    Function to allocate the memory for the cell neighbors.
+
+    Args:
+        cell CCell* - target cell
+        size int - neighbor count
+
+    Throws:
+        runtimeError - on the empty cell pointer.
+        MemoryError - on the failed malloc
+    """
     if cell == NULL:
         raise RuntimeError()
     if cell.neighbors != NULL:
@@ -72,6 +109,15 @@ cdef void allocate_neighbors(CCell* cell, int size):
 
 
 cdef void free_cell_charges(CCell* cell):
+    """
+    Helper method to free the memory used to store the charges
+
+    Args:
+        cell CCell* - pointer to the target cell
+
+    Throws:
+        RuntimeError - on the empty cell pointer
+    """
     if cell == NULL:
         raise RuntimeWarning("Trying to free memory from the NULL pointer")
     if cell.charges != NULL:
@@ -80,6 +126,13 @@ cdef void free_cell_charges(CCell* cell):
         cell.n_charges = 0
 
 cdef void free_c_cell(CCell* cell):
+    """
+    Attempts to remove all the memory for the cell. Doesn't remove/dereference neighbors,
+    only frees the array used to store their pointers
+
+    Args:
+        cell CCell* - pointer to the target cell
+    """
     if cell != NULL:
         if cell.neighbors != NULL:
             free(cell.neighbors)
@@ -90,14 +143,24 @@ cdef void free_c_cell(CCell* cell):
         free(cell)
 
 cdef dict cell_to_dict(CCell* cell, dict target):
-    #py_type = type_to_pyenum(cell.c_type)
-    #auto = False if cell.self_polarization == 0 else True
+    """
+    Fills the dynamic data to the target dict. Assumes that it follows the structure of the
+    CellDict python object.
+
+    Args:
+        cell CCell* - mapped cell
+        target dict - python dictionary object
+    """
+
     target["state_value"] = cell.c_state + 1
     target["state_name"] = cell_state_name(cell.c_state)
     target["charge"] = float(cell.charge)
     return target
 
-    
+##################################################
+# Currently not used. I've rewrote them since they were present in the pure python version
+##################################################
+
 cdef void reset_cell_timer(CCell* cell):
     cell.timer = 0
 
@@ -111,10 +174,19 @@ cdef double depolarize(CCell* cell):
     cell.timer = cell.charge_max
     return cell.charges[cell.charge_max]
 
+#############################################################
+
 cdef int is_neighbor_depolarized(CCell* cell):
-    # Check if there are at least NEIGHBOR_DEPOLARIZATION_COUNT
-    # references with the state set to RAPID_DEPOLARIZATION.
-    # returns 1 if yes and 0 otherwise
+    """
+    Check if at least NEIGHBOR_DEPOLARIZATION_COUNT neighbors of the cell 
+    are in RAPID_DEPOLARIZATION state
+
+    Args:
+        cell CCell* - target cell
+    
+    Returns:
+        int 1 if true, else 0
+    """
     if cell == NULL or cell.neighbors == NULL:
         return 0
     
@@ -131,6 +203,18 @@ cdef int is_neighbor_depolarized(CCell* cell):
     return 0
 
 cdef int is_relative_repolarization(CCell* cell):
+    """
+    Check if the repolarization in relative refraction is possible.
+    For it to be possible at least NEIGHBOR_REFRACTION_POLAR neighbors must have
+    the charge greater or equal to REFRACTION_POLAR constant
+
+    Args:
+        cell CCell* - pointer to the target cell
+    
+    Returns:
+        int 1 if true, 0 else
+    """
+    
     if cell == NULL or cell.neighbors == NULL:
         return 0 
     cdef int i = 0

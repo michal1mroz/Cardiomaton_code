@@ -30,10 +30,8 @@ class SimulationService:
             Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
             mapping of the cell position to the cell state
         """
-        self.automaton.update_cell()
-        d = self.automaton.to_cell_data()
-
-        return d 
+        self.automaton.update_grid()
+        return self.automaton.to_cell_data()
 
     def update_cell(self, data: CellDict) -> None:
         """

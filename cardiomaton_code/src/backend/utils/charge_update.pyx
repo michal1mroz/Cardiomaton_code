@@ -3,6 +3,14 @@ from src.backend.models.c_cell cimport CCell, is_neighbor_depolarized, is_relati
 from src.backend.models.cell_type cimport CellTypeC
 
 cdef void update_charge(CCell* cell_a, CCell* cell_b):
+    """
+    Update method. Mirrors update_charge_ms.py, but performes changes in place.
+    Cython doesn't support the switch-case syntax, so had to split it into if-elif chain :<<
+
+    Args:
+        cell_a CCell* - pointer to the current cell (taken from the grid_a of the automaton)
+        cell_b CCell* - pointer to the next cell (taken from the grid_b of the automaton)
+    """
     cdef int new_timer
     cdef double charge
 

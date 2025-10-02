@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from typing import Tuple, Dict
 
 from src.backend.models.cell import Cell, CellDict
+from src.backend.models.cell_type import CellType
+from src.backend.models.cell_state import CellState
 
 @dataclass
 class CellData:
@@ -21,6 +23,10 @@ class CellData:
 cdef class Automaton:
 
     def __init__(self, size: Tuple[int, int], cells: dict[Tuple[int, int], Cell], frame_time: float = 0.2):
+        """
+        Constructor. Assumes size is the size of the image on which the grid is projected. Uses the same values
+        as the previous version, but stores as much data as possible in c containers.
+        """
         self.size = size
         self.frame_time = <double> frame_time
         cell_list = list(cells.values())
@@ -63,6 +69,9 @@ cdef class Automaton:
         self._generate_grid(self.grid_b, cell_list)
 
     def __dealloc__(self):
+        """
+        Destructor to free the resources for grids
+        """
         if self.grid_a is not NULL:
             self._dealloc_grid(self.grid_a)
             self.grid_a = NULL
@@ -71,8 +80,12 @@ cdef class Automaton:
             self.grid_b = NULL
 
     cdef void _dealloc_grid(self, CCell** grid):
+        """
+        Helper function to deallocate the data in one grid.
+        Can possibly fail if the grid has non NULL not allocated fields
+        """
+        cdef int i
         if grid != NULL:
-            # cdef int i
             for i in range(self.n_nodes):
                 if grid[i] != NULL:
                     free_c_cell(grid[i])
@@ -80,6 +93,10 @@ cdef class Automaton:
             free(grid) 
 
     cpdef dict _create_data_map(self, dict cells):
+        """
+        Helper method to provide the python object with the data mapping.
+        Stores the information about the cell_data and neighbor positions for each cell
+        """
         return {
             (pos): CellData(
                 neighbors=[(nei.pos_x, nei.pos_y) for nei in cell.neighbors],
@@ -89,6 +106,12 @@ cdef class Automaton:
         }
 
     cdef void _generate_grid(self, CCell** grid, list py_cells): 
+        """
+        Automaton grid creator. Expects the caller to allocate the required memory for the CCell** grid.
+        list py_cells should contain the python list of python Cell class objects.
+        For each creates CCell object and maps the data from py_cells onto it.
+        """
+        
         cdef dict pos_to_ccell = {}
         cdef int n = len(py_cells)
         cdef int i, j 
@@ -149,9 +172,13 @@ cdef class Automaton:
         ...
 
     cpdef void update_grid(self):
+        """
+        Simple update method for the python API. The logic should be moved to the nogil pure C implementation.
+        """
         cdef CCell* cell_a
         cdef CCell* cell_b
         cdef int i
+        self.frame_counter += 1
         for i in range(self.n_nodes):
             cell_a = self.grid_a[i]
             cell_b = self.grid_b[i]
@@ -161,6 +188,9 @@ cdef class Automaton:
         self.grid_b = tmp
 
     cpdef dict _cells_to_dict(self):
+        """
+        Helper method to map the cell objects to the cached dictionary. Performed in-place
+        """
         cdef int i
         cdef CCell* cell
         for i in range(self.n_nodes):
@@ -168,12 +198,58 @@ cdef class Automaton:
             self.dict_mapping[(cell.pos_x, cell.pos_y)] = cell_to_dict(cell, self.dict_mapping[(cell.pos_x, cell.pos_y)])
     
     cpdef tuple to_cell_data(self):
+        """
+        Getter for the serialized data. Returns the Tuple with the current frame and the serialized cells.
+        """
         self._cells_to_dict()
         return tuple((int(self.frame_counter), self.dict_mapping))
 
     cpdef void recreate_from_dict(self, tuple vals):
-        ...
+        """
+        Code here works, but the serialization relies on resuage of a single dict.
+        In result frame recorder needs a deepcopy to save the data which
+        is prohibitively slow
+        """
+        # Remove the old grid objects
+        self._dealloc_grid(self.grid_a)
+        self._dealloc_grid(self.grid_b)
+        self.grid_a = NULL
+        self.grid_b = NULL
 
+        # Generate cell mapping on python objects:
+        cells = {}
+        frame, serialized_cells = vals
+        for pos, cell_dict in serialized_cells.items():
+            data_dict = self.cell_data[cell_dict["position"]].cell_data
+            py_cell = Cell(position = cell_dict["position"], cell_type=CellType[cell_dict["cell_type"]],
+                            cell_state = CellState[cell_dict["state_name"].upper()], 
+                            self_polarization=cell_dict["auto_polarization"])
+            py_cell.charge = cell_dict["charge"]
+            cells.update({pos: py_cell})
+
+        for pos, cell_dict in self.cell_data.items():
+            for nei in cell_dict.neighbors:
+                cells[pos].add_neighbor(cells[nei])
+
+        cell_list = list(cells.values())
+        self.n_nodes = <int> len(cell_list)
+
+        grid_size = len(cell_list) * sizeof(CCell*)
+        self.grid_a = <CCell**> malloc(grid_size)
+        if self.grid_a is NULL:
+            raise MemoryError()
+        self.grid_b = <CCell**> malloc(grid_size)
+        if self.grid_b is NULL:
+            free(self.grid_a)
+            raise MemoryError()
+
+        self.frame_counter = <int> frame
+        self._generate_grid(self.grid_a, cell_list)
+        self._generate_grid(self.grid_b, cell_list)
+
+    """
+    Set of getters and setters for the python API
+    """ 
     cpdef float get_frame_time(self):
         return float(self.frame_time)
     

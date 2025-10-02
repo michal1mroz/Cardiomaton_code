@@ -15,6 +15,7 @@ class CellState(IntEnum):
     NECROSIS = 5
     # HYPERPOLARIZATION - to determine if we will need this
 
+# Dictionary with the name mappings for the python version
 cdef dict _CELLSTATE_NAMES = {
     CellStateC.POLARIZATION: "POLARIZATION",
     CellStateC.SLOW_DEPOLARIZATION: "SLOW_DEPOLARIZATION",
@@ -31,8 +32,27 @@ cpdef str cell_state_name(CellStateC val):
     return _CELLSTATE_NAMES.get(val, f"<UNKNOWN:{val}>")
 
 cpdef CellStateC state_to_cenum(object py_val):
+    """
+    Conversion from python CellState to cython CellStateC
+    
+    Args:
+        py_val object (CellState) - python instance of CellState
+
+    Returns:
+        CellStateC - cython equivalent
+    """
     return py_val
 
 cpdef object state_to_pyenum(CellStateC c_val):
+    """
+    Conversion from cython CellStateC to python CellState
+
+    Args:
+        c_val CellStateC - cython state
+
+    Returns:
+        object (CellState) - python equivalent
+    """
+    
     return CellState(int(c_val))
 
