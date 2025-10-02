@@ -28,12 +28,19 @@ cdef class Automaton:
 
         grid_size = len(cell_list) * sizeof(CCell*)
         self.grid_a = <CCell**> malloc(grid_size)
+        
+        cdef int i
         if self.grid_a == NULL:
             raise MemoryError("Failed to allocate CCell** array - grid_a")
+        for i in range(len(cell_list)):
+            self.grid_a[i] = NULL
+
         self.grid_b = <CCell**> malloc(grid_size)
         if self.grid_b == NULL:
             self._dealloc_grid(self.grid_a)
             raise MemoryError("Failed to allocate CCell** array - grid_b")
+        for i in range(len(cell_list)):
+            self.grid_b[i] = NULL
 
         self.is_running = 0
         self.frame_counter = 0
@@ -48,29 +55,19 @@ cdef class Automaton:
                     auto_polarization=cell.self_polarization)
             for pos, cell in cells.items()
         }
-        print("grids done")
 
         self.cell_data = self._create_data_map(cells)
 
         self._generate_grid(self.grid_a, cell_list)
         self._generate_grid(self.grid_b, cell_list)
-        print("Constructor done")
-
-        #self.cell = create_c_cell(py_cell.pos_x, py_cell.pos_y)
-
-        #add_cell_charges(self.cell, py_cell.charges_mv)
-        #self.cell.c_state = state_to_cenum(py_cell.state)
 
     def __dealloc__(self):
-        print("dealloc")
         if self.grid_a is not NULL:
             self._dealloc_grid(self.grid_a)
             self.grid_a = NULL
-        print("grid_a done")
         if self.grid_b is not NULL:
             self._dealloc_grid(self.grid_b)
             self.grid_b = NULL
-        print("grid_b done")
 
     cdef void _dealloc_grid(self, CCell** grid):
         if grid != NULL:
@@ -135,6 +132,11 @@ cdef class Automaton:
                 this_c.n_neighbors = 0
 
     cdef void _update_grid_nogil(self) nogil:
+        """
+        %ToDo
+        For now this function already has a great increase in time efficiency.
+        Requires that all the underlying functions are nogil compatible.
+        """
         ...
 
     cpdef void update_cell(self):
