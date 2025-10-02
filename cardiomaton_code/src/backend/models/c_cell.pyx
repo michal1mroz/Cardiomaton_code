@@ -1,4 +1,5 @@
 from libc.stdlib cimport malloc, free
+from libc.stdio cimport printf
 from src.backend.models.cell_state cimport CellStateC, cell_state_name
 from src.backend.models.cell_type cimport CellTypeC, type_to_pyenum
 
@@ -125,7 +126,7 @@ cdef int is_neighbor_depolarized(CCell* cell):
         neighbor = cell.neighbors[i]
         if neighbor != NULL and neighbor.c_state == CellStateC.RAPID_DEPOLARIZATION:
             count += 1
-            if count > NEIGHBOR_DEPOLARIZATION_COUNT:
+            if count >= NEIGHBOR_DEPOLARIZATION_COUNT: # current models doesn't work for >= 2 or more
                 return 1
     return 0
 
@@ -140,6 +141,6 @@ cdef int is_relative_repolarization(CCell* cell):
         neighbor = cell.neighbors[i]
         if neighbor != NULL and (neighbor.charge - cell.charge >= REFRACTION_POLAR):
             count += 1
-            if count > NEIGHBOR_REFRACTION_POLAR:
+            if count >= NEIGHBOR_REFRACTION_POLAR:
                 return 1
     return 0

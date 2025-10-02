@@ -30,10 +30,8 @@ class SimulationService:
             Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
             mapping of the cell position to the cell state
         """
-        start = time()
         self.automaton.update_cell()
         d = self.automaton.to_cell_data()
-        print(f"time: {time() - start}")
 
         return d 
 
@@ -64,8 +62,7 @@ class SimulationService:
         Returns:
             float: Frame time in seconds.
         """
-        return 0.02
-        #return self.automaton.frame_time
+        return self.automaton.get_frame_time()
 
     @frame_time.setter
     def frame_time(self, t: float):
@@ -75,9 +72,7 @@ class SimulationService:
         Args:
             t (float): New frame time in seconds.
         """
-        ...
-        #self.automaton.frame_time = t
+        self.automaton.set_frame_time(t)
 
-    def get_shape(self) -> Tuple[int, int]:
-        ...
-        return self.automaton.size
+    def get_shape(self) -> Tuple[int, int]: 
+        return self.automaton.get_shape()

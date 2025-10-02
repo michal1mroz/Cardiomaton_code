@@ -22,6 +22,7 @@ cdef class Automaton:
 
     def __init__(self, size: Tuple[int, int], cells: dict[Tuple[int, int], Cell], frame_time: float = 0.2):
         self.size = size
+        self.frame_time = <double> frame_time
         cell_list = list(cells.values())
 
         self.n_nodes = <int> len(cell_list)
@@ -103,11 +104,19 @@ cdef class Automaton:
             grid[i].c_type = type_to_cenum(py_cell.cell_type)
             grid[i].self_polarization = 1 if py_cell.self_polarization else 0
 
-            grid[i].charge = <double> py_cell.charge
             grid[i].period = <int> py_cell.period
             grid[i].timer = <int> py_cell.timer
             grid[i].charge_max = <int> py_cell.max_charge
-
+            
+            # If the retrieval from cell_data failes the data is not correct
+            # and so probably it's not possible to construct the automaton.
+            # The caller of the automatons constructor should handle any exception,
+            # automaton will only free its memory
+            grid[i].V_peak = <double> py_cell.cell_data.get("V_peak")
+            grid[i].V_rest = <double> py_cell.cell_data.get("V_rest")
+            grid[i].V_thresh = <double> py_cell.cell_data.get("V_thresh")
+            grid[i].charge = 0
+            
             if py_cell.charges is not None:
                 add_cell_charges(grid[i], np.asarray(py_cell.charges, dtype=np.float64))
             else:
@@ -139,7 +148,7 @@ cdef class Automaton:
         """
         ...
 
-    cpdef void update_cell(self):
+    cpdef void update_grid(self):
         cdef CCell* cell_a
         cdef CCell* cell_b
         cdef int i
@@ -147,7 +156,6 @@ cdef class Automaton:
             cell_a = self.grid_a[i]
             cell_b = self.grid_b[i]
             update_charge(cell_a, cell_b)
-        
         cdef CCell** tmp = self.grid_a
         self.grid_a = self.grid_b
         self.grid_b = tmp
@@ -166,3 +174,11 @@ cdef class Automaton:
     cpdef void recreate_from_dict(self, tuple vals):
         ...
 
+    cpdef float get_frame_time(self):
+        return float(self.frame_time)
+    
+    cpdef void set_frame_time(self, double frame_time):
+        self.frame_time = <double> frame_time
+
+    cpdef tuple get_shape(self):
+        return self.size

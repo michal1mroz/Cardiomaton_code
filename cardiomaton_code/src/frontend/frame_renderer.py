@@ -93,7 +93,7 @@ class FrameRenderer:
 
     def _cell_to_hsv(self, cell: CellDict) -> Tuple[int, int, int]:
         # Got to think of a better way to get the gray color
-        if not cell["auto_polarization"] and cell["state_name"] == "Polarization":
+        if not cell["auto_polarization"] and cell["state_name"] == "POLARIZATION":
             return 120, 58, 175
         # Naive linear cast from range -90...30 to 30...0
         h = max(-cell["charge"] * 0.25 + 7.5, 0)

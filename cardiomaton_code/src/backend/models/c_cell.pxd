@@ -31,6 +31,10 @@ cdef struct CCell:
     int n_charges
     int charge_max
 
+    double V_thresh
+    double V_rest
+    double V_peak
+
 #####################################
 # Function signatures
 
