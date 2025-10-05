@@ -1,7 +1,7 @@
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QFontDatabase, QColor
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow
+from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow, QVBoxLayout
 
 
 class UiMainWindow(object):
@@ -146,8 +146,18 @@ class UiMainWindow(object):
             "background-color: white;\n"
             "border-radius: 20px;\n"
         )
+        self.parameters_layout.setLayout(QVBoxLayout())
         self._add_shadow(self.parameters_layout)
         self.verticalLayout_2.addWidget(self.parameters_layout)
+
+        self.cell_inspector_container= QWidget()
+        self.cell_inspector_container.setStyleSheet("""
+                    background-color: white;
+                    border-radius: 20px;
+                """)
+        self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
+        self.cell_inspector_layout.setContentsMargins(20, 0, 12, 10)
+        self.cell_inspector_layout.setSpacing(20)
 
         self.players_layout = QtWidgets.QWidget(parent=self.settings_layout)
         self.players_layout.setStyleSheet(
@@ -171,7 +181,6 @@ class UiMainWindow(object):
                 font-size: 25px;
                 font-weight: bold;
                 color: #EF8481;
-                max-width: 40px;
             }
             QComboBox:hover {
                 color: #E74440;
@@ -180,6 +189,7 @@ class UiMainWindow(object):
                 background: white;
                 border-radius: 5px;
                 color: #EF8481;
+                font-size: 12px;
             }
             
             QComboBox::drop-down {
@@ -294,7 +304,7 @@ class UiMainWindow(object):
 
         # Frame counter label
         self.frame_counter_label = self._create_label(self.simulation_widget, "Frame: 0", font_size=14)
-        self.frame_counter_label.setGeometry(10, 10, 150, 40)
+        self.frame_counter_label.setGeometry(40, 400, 150, 40)
 
         self.verticalLayout.addWidget(self.bottom_layout)
         self.verticalLayout.setStretch(0, 1)

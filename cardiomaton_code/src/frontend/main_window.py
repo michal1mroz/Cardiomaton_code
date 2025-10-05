@@ -200,10 +200,17 @@ class MainWindow(QMainWindow):
             cell_data, on_close_callback=self._remove_inspector,
             running=self.running, ctrl=self.sim
         )
-        self.ui.simulation_layout.addWidget(self.cell_inspector)
+        self.ui.cell_inspector_layout.addWidget(self.cell_inspector)
+        self.ui.parameters_layout.setVisible(False)
+        self.ui.presets_layout.setVisible(False)
+        self.ui.cell_inspector_container.setParent(self.ui.settings_layout)
+
+        self.ui.verticalLayout_2.insertWidget(0, self.ui.cell_inspector_container, 7)
 
     def _remove_inspector(self) -> None:
         if self.cell_inspector:
-            self.ui.simulation_layout.removeWidget(self.cell_inspector)
+            self.ui.cell_inspector_container.setParent(None)
+            self.ui.parameters_layout.setVisible(True)
+            self.ui.presets_layout.setVisible(True)
             self.cell_inspector.deleteLater()
             self.cell_inspector = None
