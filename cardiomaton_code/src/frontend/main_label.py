@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import QLabel, QToolTip
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QMouseEvent
 
+from PyQt6.QtGui import QPainter, QColor
+
 from src.models.cell import CellDict
 from src.frontend.frame_renderer import FrameRenderer
 
@@ -15,11 +17,14 @@ class MainLabel(QLabel):
     """
     cellClicked = pyqtSignal(object)
 
-    def __init__(self, renderer: FrameRenderer, parent=None):
+    def __init__(self, renderer: FrameRenderer, brush_size_slider, brush_type_combobox, parent=None):
         super().__init__(parent)
         self.renderer = renderer
         self.running = False
         self.last_tooltip = None
+
+        self.brush_type_combobox = brush_type_combobox
+        self.brush_size_slider = brush_size_slider
 
         self.setMouseTracking(True)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
@@ -67,40 +72,83 @@ class MainLabel(QLabel):
         return (row, col) if (0 <= row < rows and 0 <= col < cols) else None
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        if self.pixmap() is None:
+        if self.running or self.pixmap() is None:
             return
+        self._paint_cells(self._mouse_position(event))
 
         pos = self._mouse_position(event)
-        if pos and self.renderer.current_data:
-            cell_info = self.renderer.current_data.get(pos)
-            if cell_info:
-                self.cellClicked.emit(cell_info)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._paint_cells(pos, add=True)
+        elif event.button() == Qt.MouseButton.RightButton:
+            self._paint_cells(pos, add=False)
+        # if self.pixmap() is None:
+        #     return
+        #
+        # pos = self._mouse_position(event)
+        # if pos and self.renderer.current_data:
+        #     cell_info = self.renderer.current_data.get(pos)
+        #     if cell_info:
+        #         self.cellClicked.emit(cell_info)
 
 
     def mouseMoveEvent(self, event: QMouseEvent):
-        """
-        Show tooltip only if the mouse moves to a new cell.
-        Tooltip remains visible as long as the mouse stays over the same cell.
-        """
-        if self.running or self.pixmap() is None: 
+        if self.running or self.pixmap() is None:
             return
 
         pos = self._mouse_position(event)
-        if pos is None and self.last_tooltip is not None:
-            QToolTip.hideText()
-            self.last_tooltip = None
+        if event.buttons() & Qt.MouseButton.LeftButton:
+            self._paint_cells(pos, add=True)
+        elif event.buttons() & Qt.MouseButton.RightButton:
+            self._paint_cells(pos, add=False)
+        # """
+        # Show tooltip only if the mouse moves to a new cell.
+        # Tooltip remains visible as long as the mouse stays over the same cell.
+        # """
+        # if self.running or self.pixmap() is None:
+        #     return
+        #
+        # pos = self._mouse_position(event)
+        # if pos is None and self.last_tooltip is not None:
+        #     QToolTip.hideText()
+        #     self.last_tooltip = None
+        #
+        #
+        # data = self.renderer.current_data
+        # if data is not None and self.last_tooltip != pos:
+        #     cell_info = data.get(pos)
+        #     if cell_info is not None:
+        #         self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
+        #         self.last_tooltip = pos
+        #     else:
+        #         QToolTip.hideText()
+        #         self.last_tooltip = None
 
+    def _paint_cells(self, pos, add = True):
+        if pos is None:
+            return
+        radius = self.brush_size_slider.value()
+        brush_index = self.brush_type_combobox.currentIndex()
+        brush_obj = self.brush_type_combobox.itemData(brush_index)
+        row, col = pos
+        pixmap = self.pixmap()
+        pixmap_size = pixmap.size()
 
-        data = self.renderer.current_data
-        if data is not None and self.last_tooltip != pos:
-            cell_info = data.get(pos)
-            if cell_info is not None:
-                self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
-                self.last_tooltip = pos
-            else:
-                QToolTip.hideText()
-                self.last_tooltip = None
+        if brush_obj is None:
+            return
 
+        for i in range(row - radius, row + radius + 1):
+            for j in range(col - radius, col + radius + 1):
+                if 0 <= i < pixmap_size.width() and 0 <= j < pixmap_size.height():
+                    if (i - row) ** 2 + (j - col) ** 2 <= radius ** 2:
+
+                        if add:
+                            brush_obj.add_cells((i, j))
+                            payload = self.renderer.current_data.get((i,j))
+                            if payload is not None:
+                                payload["state_value"] = 5
+                                self.renderer.ctrl.update_cell(payload)
+                        else:
+                            brush_obj.remove_cells((i, j))
     def _show_cell_info(self, info, global_pos, pos, debug = False):
         """
         Shows information about cell at the given global position.

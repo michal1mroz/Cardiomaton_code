@@ -2,6 +2,7 @@ import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QFontDatabase, QColor
 from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow
+from src.frontend.cell_modificator import CellModificator
 
 
 class UiMainWindow(object):
@@ -143,11 +144,37 @@ class UiMainWindow(object):
 
         self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
         self.parameters_layout.setStyleSheet(
-            "background-color: white;\n"
+            "background-color: black;\n"
             "border-radius: 20px;\n"
         )
         self.add_shadow(self.parameters_layout)
         self.verticalLayout_2.addWidget(self.parameters_layout)
+
+        # --- Parameters layout widgets --- EXPERIMENTAL
+
+        self.brush_layout = QtWidgets.QVBoxLayout(self.parameters_layout)
+        self.brush_layout.setContentsMargins(20, 20, 20, 20)
+        self.brush_layout.setSpacing(15)
+
+        self.brush_size_label = self.create_label(self.parameters_layout, "Brush Size", font_size=14)
+        self.brush_layout.addWidget(self.brush_size_label)
+
+        self.brush_size_slider = self.create_slider(self.parameters_layout)
+        self.brush_size_slider.setRange(1, 15)
+        self.brush_size_slider.setValue(5)
+        self.brush_layout.addWidget(self.brush_size_slider)
+
+        self.brush_type_label = self.create_label(self.parameters_layout, "Brush Type", font_size=14)
+        self.brush_layout.addWidget(self.brush_type_label)
+
+        self.brush_type_combobox = QtWidgets.QComboBox(self.parameters_layout)
+        deff = CellModificator()
+        self.brush_type_combobox.addItem(deff.name, deff)
+        self.brush_layout.addWidget(self.brush_type_combobox)
+
+        self.brush_layout.addStretch()
+
+        #  --- Parameters layout widgets --- EXPERIMENTAL
 
         self.players_layout = QtWidgets.QWidget(parent=self.settings_layout)
         self.players_layout.setStyleSheet(

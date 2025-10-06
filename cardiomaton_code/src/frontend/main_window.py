@@ -7,6 +7,8 @@ from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
 from src.frontend.ui_main_window import UiMainWindow
 
+from PyQt6.QtGui import QPainter, QColor
+
 class MainWindow(QMainWindow):
     """
     Main application window for the Cardiomaton simulator.
@@ -25,7 +27,7 @@ class MainWindow(QMainWindow):
 
         self.sim = SimulationController(frame_time=self.base_frame_time)
         self.renderer = FrameRenderer(self.sim)
-        self.render_label = MainLabel(self.renderer)
+        self.render_label = MainLabel(self.renderer, self.ui.brush_size_slider, self.ui.brush_type_combobox)
 
         self.render_charged = True # flag telling how simulation is rendered : True - showing charge; False - showing state
         self.running = False
@@ -82,7 +84,7 @@ class MainWindow(QMainWindow):
         """
         if self.running:
             self.timer.stop()
-            self.ui.play_button.setText("▸")
+            self.ui.play_button.setText("▶")
             self.running = False
         else:
             # Checks if playback was changed and updates the automaton accordingly
@@ -98,7 +100,7 @@ class MainWindow(QMainWindow):
 
     def _set_running_state(self, running: bool):
         self.running = running
-        self.ui.play_button.setText("▪" if running else "▸")
+        self.ui.play_button.setText("▪" if running else "▶")
         if self.cell_inspector:
             self.cell_inspector.set_running(running)
         self.render_label.set_running(running)
@@ -125,6 +127,34 @@ class MainWindow(QMainWindow):
         Renders and displays the next frame of the simulation.
         """
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
+
+        # -- EXPERIMENTAL
+
+        painter = QPainter(pixmap)
+
+        for i in range(self.ui.brush_type_combobox.count()):
+            brush_obj = self.ui.brush_type_combobox.itemData(i)
+            if brush_obj is None:
+                continue
+
+            color = brush_obj.color
+            painter.setBrush(color)
+            painter.setPen(QColor(0, 0, 0, 0))
+            cell_size = 2
+            pixmap_size = pixmap.size()
+            label_size = self.render_label.size()
+            # cell_size = int((label_size.width() / pixmap_size.width()))
+
+            offset_x = int((label_size.width() - pixmap_size.width()) / 2)
+            offset_y = int( (label_size.height() - pixmap_size.height()) / 2)
+
+            for row, col in brush_obj.selected_cells:
+                painter.drawRect(col * cell_size + 2, row * cell_size + 2, cell_size, cell_size)
+
+        painter.end()
+
+        # -- EXPERIMENTAL
+
         self.render_label.setPixmap(pixmap)
         self.ui.frame_counter_label.setText(f"Frame: {frame}")
         
