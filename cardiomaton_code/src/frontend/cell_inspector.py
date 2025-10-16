@@ -1,4 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QLineEdit
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QLineEdit, QSizePolicy
 
 from collections import deque
 import pyqtgraph as pq
@@ -29,6 +30,9 @@ class CellInspector(QWidget):
 
         self.charge_buffer = deque(maxlen=500)
 
+        font = QFont("Mulish", 12)
+        self.setFont(font)
+
         self.__init_ui()
 
     def __init_ui(self):
@@ -36,16 +40,57 @@ class CellInspector(QWidget):
         self._clear_layout()
 
         # button setup
-        self.close_button = QPushButton("Close")
-        self.close_button.clicked.connect(self.close_inspector)
-        self.layout.addWidget(self.close_button)
+        top_layout = QHBoxLayout()
+        top_layout.addStretch()
 
+        self.close_button = QPushButton("X")
+        self.close_button.setFixedSize(30, 30)
+        self.close_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.close_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #EF8481;  
+                    color: white;
+                    border-radius: 15px;      
+                    font-weight: bold;
+                    font-family: Mulish;
+                    font-size: 14px;
+                }
+                QPushButton:hover {
+                    background-color: #E74440;
+                }
+            """)
+        self.close_button.clicked.connect(self.close_inspector)
+        top_layout.addWidget(self.close_button)
+
+        self.layout.addLayout(top_layout)
+
+        button_style = """
+                QPushButton {
+                    font-family: Mulish ExtraBold;
+                    font-weight: bold;
+                    font-size: 13px;
+                    background-color: #6D98F4;
+                    color: white;
+                    border-radius: 10px;
+                    padding: 2px 2px;
+                }
+                QPushButton:hover {
+                    background-color: #3466CF;
+                }
+            """
+        """
         self.submit_button = QPushButton("Submit")
+        self.submit_button.setStyleSheet(button_style)
         self.submit_button.clicked.connect(self._submit_data)
+        self.layout.addWidget(self.submit_button)
+        """
 
         self.dep_button = QPushButton("Depolarize")
+        self.dep_button.setStyleSheet(button_style)
+        self.dep_button.setFixedWidth(100)
         self.dep_button.clicked.connect(self._dep_callback)
         self.layout.addWidget(self.dep_button)
+        self.layout.addSpacing(10)
 
         self.setLayout(self.layout)
 
