@@ -44,7 +44,7 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
             case CellState.REPOLARIZATION_ABSOLUTE_REFRACTION:
                 cell.update_timer()
                 charge = cell.update_charge()
-                if charge <= cell_data_dict["V_thresh"]:
+                if charge <= cell.ref_threshold:
                     return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
                 return charge, cell.state
             
