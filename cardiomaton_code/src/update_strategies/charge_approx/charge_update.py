@@ -3,7 +3,9 @@ import numpy as np
 from functools import lru_cache
 
 from src.update_strategies.charge_approx.ms_final import pacemaker_AP_full
-from src.update_strategies.charge_approx.pacemakers import pacemaker_AP # type: ignore
+from src.update_strategies.charge_approx.pacemakers import pacemaker_AP 
+from src.update_strategies.charge_approx.atrial import atrial_AP
+from src.update_strategies.charge_approx.purkinje import purkinje_AP
 
 """
     Wrapper on pacemaker_AP_full working as a function factor.
@@ -13,8 +15,13 @@ from src.update_strategies.charge_approx.pacemakers import pacemaker_AP # type: 
 # Constant used to calculate the threshold between absolute and relative refraction.
 # This can be changed to more elaborate method
 REF_CONSTANT = 2./3
+
+# To add new function just log it here and make sure the arguments follow the
+# convention in `resources/data/cell_data.json`
 CHARGE_FUNCTIONS = {
     "PACEMAKER": pacemaker_AP, 
+    "ATRIAL": atrial_AP,
+    "PURKINJE": purkinje_AP,
 }
 
 class ChargeUpdate():
