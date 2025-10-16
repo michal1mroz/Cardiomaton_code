@@ -75,6 +75,4 @@ class ChargeUpdate():
         fun = CHARGE_FUNCTIONS.get(config["charge_function"], pacemaker_AP_full) 
         key = frozenset(config["cell_data"].items())
         res = ChargeUpdate._get_func(key, config["period"], config["range"], fun)
-        if config["charge_function"] == "PACEMAKER":
-            print(res)
         return res

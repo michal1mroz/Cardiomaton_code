@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import expit
 
 def smooth_transition(x, x0, eps=0.005):
     """
@@ -8,12 +9,14 @@ def smooth_transition(x, x0, eps=0.005):
     eps controls the "width" of the transition region.
     Smaller eps = sharper transition.
     """
-    return 1.0 / (1.0 + np.exp(-(x - x0)/eps))
+    return expit((x - x0) / eps)
 
 def sigmoid(t, V_lo, V_hi, t0, k):
     """
     Sigmoid-based time-voltage function for potential curve fitting.
     Used for phase 0 estimation (rapid depolarization).
+
+    can the exp ever explode here??? @mm
     """
     return V_lo + (V_hi - V_lo) / (1 + np.exp(-(t - t0)/k))
 

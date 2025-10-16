@@ -12,6 +12,9 @@ from random import uniform
         - cells with self_polarize use ChargeUpdate class to update the value of the charge
 """
 
+# Approximated function may not achieve the threshold values, so we use small EPSILON
+EPSILON = 1.
+
 class UpdateChargeMSCopy(UpdateBaseCharge):
     def __init__(self):
         self.chargeUpdate = ChargeUpdate()
@@ -54,9 +57,9 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
 
                 cell.update_timer()
                 charge = cell.update_charge()
-                if charge <= cell_data_dict["V_rest"]:
+                if (charge - cell_data_dict["V_rest"]) <= EPSILON:
                     if cell.self_polarization:
-                        return cell_data_dict["V_rest"], CellState.SLOW_DEPOLARIZATION
+                        return charge, CellState.SLOW_DEPOLARIZATION
                     else:
                         return cell_data_dict["V_rest"], CellState.POLARIZATION
                 return charge, cell.state
@@ -74,6 +77,9 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
 
             case CellState.SLOW_DEPOLARIZATION:
                 # only self-depolarizing cells have this state
+                if len(list(filter(lambda x: x.state == CellState.RAPID_DEPOLARIZATION, cell.neighbours))) >= 1:
+                    return cell.depolarize(), CellState.RAPID_DEPOLARIZATION
+
                 if cell.charge >= cell_data_dict["V_peak"]:
                     return cell_data_dict["V_peak"], CellState.RAPID_DEPOLARIZATION
                 cell.update_timer() 
