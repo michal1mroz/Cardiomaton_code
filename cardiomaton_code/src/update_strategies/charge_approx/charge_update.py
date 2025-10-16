@@ -14,7 +14,7 @@ from src.update_strategies.charge_approx.purkinje import purkinje_AP
 
 # Constant used to calculate the threshold between absolute and relative refraction.
 # This can be changed to more elaborate method
-REF_CONSTANT = 2./3
+REF_CONSTANT = 1./3
 
 # To add new function just log it here and make sure the arguments follow the
 # convention in `resources/data/cell_data.json`
