@@ -32,7 +32,7 @@
             "t40": 0.507
         },
         "period":0.507,
-        "range": 200,
+        "range": 100,
         "self_polarization": false,
         "charge_function": "PURKINJE",
         "name": "Left bundle branch"
@@ -52,7 +52,7 @@
             "t40": 0.507
         },
         "period":0.507,
-        "range": 200,
+        "range": 100,
         "self_polarization": false,
         "charge_function": "PURKINJE",
         "name": "Right bundle branch"
