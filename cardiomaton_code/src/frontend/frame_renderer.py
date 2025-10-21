@@ -21,7 +21,7 @@ class FrameRenderer:
             controller : The simulation controller that provides the next simulation frame as a NumPy array.
         """
         self.ctrl = controller
-        self.cmap = ListedColormap(['white', '#8787af', 'yellow', 'red', 'blue', 'green', 'black'])
+        self.cmap = ListedColormap(['white', '#f4f8ff', 'yellow', 'red', 'blue', 'green', 'black'])
         self.norm = BoundaryNorm(np.arange(-0.5, 7.5, 1), self.cmap.N)
         self.last_data = None
         self.current_data = None
@@ -41,11 +41,10 @@ class FrameRenderer:
         frame, data = self.ctrl.step()
         self.last_data = data
         self.ctrl.recorder.record((frame, data))
-        shape = self.ctrl.shape
 
-        return frame, self.render_frame(target_size, self.last_data, shape, if_charged)
+        return frame, self.render_frame(target_size, self.last_data, if_charged)
 
-    def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict], shape: Tuple[int, int], show_charge=False) -> QImage:
+    def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict], show_charge=False) -> QImage:
         self.current_data = data
         shape = self.ctrl.shape
 

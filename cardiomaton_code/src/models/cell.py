@@ -23,7 +23,8 @@ class Cell:
     """
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0): # type: ignore
+    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_config: Dict, init_state: CellState = CellState.POLARIZATION, # type: ignore
+                 self_polarization: bool = False, self_polarization_timer: int = 0): 
         """
         Cell constructor.
         
@@ -42,17 +43,21 @@ class Cell:
         self.neighbours = []
         self.charge = 0
 
-        self.cell_data = cell_data
+        self.config = cell_config
 
-        self.period = self.cell_data.get("range")
+        self.cell_data = self.config["cell_data"]
 
-        self.charges, self.charge_max = ChargeUpdate.get_func(self.cell_data)
+        self.period = self.config["period"]
+        self.n_range = self.config["range"]
 
+        self.charges, self.charge_max, self.ref_threshold = ChargeUpdate.get_func(
+            self.config)
+    
     def reset_timer(self):
         self.state_timer = 0
 
     def update_timer(self):
-        self.state_timer = (self.state_timer + 1) % self.period
+        self.state_timer = (self.state_timer + 1) % self.n_range
 
     def reset_self_polar_timer(self):
         self.self_polar_timer = 0
@@ -155,10 +160,10 @@ class Cell:
         copied_cell = Cell(
             position=self.position,
             cell_type=self.cell_type,
-            cell_data=self.cell_data,
+            cell_data=self.config,
             init_state=self.state,
             self_polarization=self.self_polarization,
-            self_polarization_timer=self.self_polar_timer
+            self_polarization_timer=self.self_polar_timer,
         )
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied

@@ -42,7 +42,7 @@ class CellType(Enum):
         return Cell(
             position = position,
             cell_type = cell_type,
-            cell_data = config["cell_data"],
+            cell_config = config,
             init_state=state,
-            self_polarization=config["self_polarization"]
+            self_polarization=config["self_polarization"],
         )

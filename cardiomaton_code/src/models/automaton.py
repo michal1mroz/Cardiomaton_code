@@ -98,24 +98,6 @@ class Automaton:
                 arr[i].add_neighbour(help_dict[pos])
         return arr
 
-    def _create_automaton_grid(self, binary_array: np.ndarray) -> np.ndarray:
-        """
-        Private method that creates an array of Cell instances.
-
-        Args:
-            binary_array (np.ndarray): Loaded binary array that was passed to constructor
-        
-        Returns:
-            np.ndarray: Numpy array with coresponding cells
-        """
-        value_to_state = {
-            0: CellState.DEAD,
-            1: CellState.POLARIZATION,
-        }
-        return np.array([
-            [Cell(value_to_state[val]) for val in row] for row in binary_array
-        ])    
-
     def update_grid(self) -> None:
         """
         Method to update the grid based on the current state.
