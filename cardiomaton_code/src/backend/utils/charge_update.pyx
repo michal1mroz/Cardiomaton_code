@@ -2,6 +2,8 @@ from src.backend.models.cell_state cimport CellStateC
 from src.backend.models.c_cell cimport CCell, is_neighbor_depolarized, is_relative_repolarization
 from src.backend.models.cell_type cimport CellTypeC
 
+cdef int eps = 1
+
 cdef void update_charge(CCell* cell_a, CCell* cell_b):
     """
     Update method. Mirrors update_charge_ms.py, but performes changes in place.
@@ -27,7 +29,7 @@ cdef void update_charge(CCell* cell_a, CCell* cell_b):
         cell_b.timer = new_timer
         charge = cell_a.charges[new_timer]
         cell_b.charge = charge
-        if charge <= cell_a.V_thresh:
+        if charge <= cell_a.ref_threshold:
             cell_b.c_state = CellStateC.REPOLARIZATION_RELATIVE_REFRACTION
         else:
             cell_b.c_state = cell_a.c_state
@@ -47,7 +49,7 @@ cdef void update_charge(CCell* cell_a, CCell* cell_b):
         cell_a.timer = new_timer
         cell_b.timer = new_timer
 
-        if new_charge <= cell_a.V_rest:
+        if (new_charge - cell_a.V_rest) <= eps:
             cell_b.charge = cell_a.V_rest
             if cell_a.self_polarization == 1:
                 cell_b.c_state = CellStateC.SLOW_DEPOLARIZATION
@@ -83,6 +85,14 @@ cdef void update_charge(CCell* cell_a, CCell* cell_b):
             return
 
     elif cell_a.c_state == CellStateC.SLOW_DEPOLARIZATION:
+        if is_neighbor_depolarized(cell_a) == 1:
+            cell_b.timer = cell_b.charge_max
+            cell_a.timer = cell_a.charge_max
+            new_charge = cell_b.charges[cell_b.charge_max]
+            cell_b.charge = new_charge
+            cell_b.c_state = CellStateC.RAPID_DEPOLARIZATION
+            return
+        
         if cell_a.charge >= cell_a.V_peak:
             cell_b.charge = cell_a.V_peak
             cell_b.timer = cell_a.timer

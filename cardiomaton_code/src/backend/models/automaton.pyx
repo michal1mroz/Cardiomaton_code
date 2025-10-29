@@ -127,7 +127,7 @@ cdef class Automaton:
             grid[i].c_type = type_to_cenum(py_cell.cell_type)
             grid[i].self_polarization = 1 if py_cell.self_polarization else 0
 
-            grid[i].period = <int> py_cell.period
+            grid[i].period = <int> py_cell.n_range
             grid[i].timer = <int> py_cell.timer
             grid[i].charge_max = <int> py_cell.max_charge
             
@@ -137,7 +137,8 @@ cdef class Automaton:
             # automaton will only free its memory
             grid[i].V_peak = <double> py_cell.cell_data.get("V_peak")
             grid[i].V_rest = <double> py_cell.cell_data.get("V_rest")
-            grid[i].V_thresh = <double> py_cell.cell_data.get("V_thresh")
+            grid[i].V_thresh = <double> py_cell.cell_data.get("V_thresh", 0) # Default since some cells don't have this value
+            grid[i].ref_threshold = <double> py_cell.ref_threshold
             grid[i].charge = 0
             
             if py_cell.charges is not None:
@@ -222,7 +223,7 @@ cdef class Automaton:
         for pos, cell_dict in serialized_cells.items():
             data_dict = self.cell_data[cell_dict["position"]].cell_data
             py_cell = Cell(position = cell_dict["position"], cell_type=CellType[cell_dict["cell_type"]],
-                            cell_state = CellState[cell_dict["state_name"].upper()], 
+                            init_state = CellState[cell_dict["state_name"].upper()], 
                             self_polarization=cell_dict["auto_polarization"])
             py_cell.charge = cell_dict["charge"]
             cells.update({pos: py_cell})

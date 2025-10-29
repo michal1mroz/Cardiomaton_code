@@ -18,20 +18,22 @@ class Cell:
     """
     Helper class used to store the cell before it can be loaded to the automaton
     """
-    def __init__(self, position: Tuple[int, int], cell_type: CellType, cell_state: CellState = CellState.POLARIZATION,
-                 cell_data: Dict[str, float] = None, self_polarization: bool = None):
-        
+    def __init__(self, position: Tuple[int, int], cell_type: CellType, cell_config: Dict = None, init_state: CellState = CellState.POLARIZATION,
+                 self_polarization: bool = None, self_polarization_timer: int = 0):
+
+        self.config = cell_config if cell_config is not None else cell_type.config 
         self.pos_x, self.pos_y = position
         self.cell_type = cell_type
-        cfg = cell_type.config
-        self.cell_data = cfg["cell_data"] if cell_data is None else cell_data
-        self.self_polarization = bool(cfg.get("self_polarization", False)) if self_polarization is None else self_polarization
-        self.state = cell_state
+
+        self.cell_data = self.config["cell_data"]
+        self.self_polarization = self_polarization if self_polarization is not None else self.config.get("self_polarization", False)
+        self.state = init_state
         self.timer = 0
         self.charge = 0.0
         self.neighbors = []
-        self.period = int(self.cell_data.get("range", 200))
-        self.charges, self.max_charge = ChargeUpdate.get_func(self.cell_data)
+        self.period = self.config["period"]
+        self.n_range = self.config["range"]
+        self.charges, self.max_charge, self.ref_threshold = ChargeUpdate.get_func(self.config)
 
     def __repr__(self) -> str:
         return f"<Cell>: position: ({self.pos_x}, {self.pos_y}), charge: {self.charge}, state: {self.state}, self_polar: {self.self_polarization}, type: {self.cell_type}"

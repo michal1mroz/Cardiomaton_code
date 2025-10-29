@@ -39,6 +39,7 @@ cdef struct CCell:
     double V_thresh
     double V_rest
     double V_peak
+    double ref_threshold
 
 #####################################
 # Function signatures
