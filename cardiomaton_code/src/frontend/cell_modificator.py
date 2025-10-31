@@ -1,5 +1,7 @@
 from PyQt6.QtGui import QColor
 
+
+
 class CellModificator:
     def __init__(self, name : str = "martwica", color: QColor = QColor(0, 0, 0, 127)):
         self.name = name

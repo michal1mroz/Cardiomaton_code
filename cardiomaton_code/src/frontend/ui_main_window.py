@@ -1,7 +1,7 @@
 import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QFontDatabase, QColor
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow
+from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow, QVBoxLayout
 from src.frontend.cell_modificator import CellModificator
 
 
@@ -21,7 +21,7 @@ class UiMainWindow(object):
         Args:
             main_window (QMainWindow): The main window instance to set up the UI in.
         """
-        self.load_fonts()
+        self._load_fonts()
 
         # Main window
         main_window.resize(1100, 600)
@@ -43,14 +43,14 @@ class UiMainWindow(object):
         )
 
         # Central widget
-        self.centralwidget = self.create_widget(main_window)
+        self.centralwidget = self._create_widget(main_window)
 
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_4.setSpacing(0)
 
         # Main layout container
-        self.layout = self.create_widget(self.centralwidget)
+        self.layout = self._create_widget(self.centralwidget)
 
         self.verticalLayout = QtWidgets.QVBoxLayout(self.layout)
 
@@ -84,14 +84,14 @@ class UiMainWindow(object):
                                 "color: white;\n"
                                 "font-size: 24px;\n"
                                 "")
-        self.add_shadow(self.logo)
+        self._add_shadow(self.logo)
         self.horizontalLayout.addWidget(self.logo)
 
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.logo)
         self.horizontalLayout.addWidget(self.logo)
 
         # Project name label
-        self.project_name = self.create_label(self.upper_layout, "Cardiomaton", "Mulish ExtraBold", 22)
+        self.project_name = self._create_label(self.upper_layout, "Cardiomaton", "Mulish ExtraBold", 22)
         self.horizontalLayout.addWidget(self.project_name)
 
         spacer_item = QtWidgets.QSpacerItem(
@@ -102,13 +102,13 @@ class UiMainWindow(object):
         self.horizontalLayout.addItem(spacer_item)
 
         # Upper buttons
-        self.pushButton_app = self.create_pushbutton(self.upper_layout, font_family= "Mulish ExtraBold")
+        self.pushButton_app = self._create_pushbutton(self.upper_layout, font_family="Mulish ExtraBold")
         self.horizontalLayout.addWidget(self.pushButton_app)
 
-        self.pushButton_help = self.create_pushbutton(self.upper_layout)
+        self.pushButton_help = self._create_pushbutton(self.upper_layout)
         self.horizontalLayout.addWidget(self.pushButton_help)
 
-        self.pushButton_about_us = self.create_pushbutton(self.upper_layout)
+        self.pushButton_about_us = self._create_pushbutton(self.upper_layout)
         self.horizontalLayout.addWidget(self.pushButton_about_us)
 
         self.horizontalLayout.setStretch(0, 1)
@@ -121,13 +121,13 @@ class UiMainWindow(object):
         self.verticalLayout.addWidget(self.upper_layout)
 
         # Bottom layout
-        self.bottom_layout = self.create_widget(self.layout)
+        self.bottom_layout = self._create_widget(self.layout)
 
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.bottom_layout)
         self.horizontalLayout_3.setSpacing(40)
 
         # Settings layout
-        self.settings_layout = self.create_widget(self.bottom_layout)
+        self.settings_layout = self._create_widget(self.bottom_layout)
 
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.settings_layout)
         self.verticalLayout_2.setContentsMargins(20, 0, 12, 10)
@@ -139,7 +139,7 @@ class UiMainWindow(object):
             "background-color: white;\n"
             "border-radius: 20px;\n"
         )
-        self.add_shadow(self.presets_layout)
+        self._add_shadow(self.presets_layout)
         self.verticalLayout_2.addWidget(self.presets_layout)
 
         self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
@@ -147,7 +147,8 @@ class UiMainWindow(object):
             "background-color: black;\n"
             "border-radius: 20px;\n"
         )
-        self.add_shadow(self.parameters_layout)
+        self.parameters_layout.setLayout(QVBoxLayout())
+        self._add_shadow(self.parameters_layout)
         self.verticalLayout_2.addWidget(self.parameters_layout)
 
         # --- Parameters layout widgets --- EXPERIMENTAL
@@ -175,99 +176,141 @@ class UiMainWindow(object):
         self.brush_layout.addStretch()
 
         #  --- Parameters layout widgets --- EXPERIMENTAL
+        # self.cell_inspector_container= QWidget()
+        # self.cell_inspector_container.setStyleSheet("""
+        #             background-color: white;
+        #             border-radius: 20px;
+        #         """)
+        # self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
+        # self.cell_inspector_layout.setContentsMargins(20, 0, 12, 10)
+        # self.cell_inspector_layout.setSpacing(20)
 
         self.players_layout = QtWidgets.QWidget(parent=self.settings_layout)
         self.players_layout.setStyleSheet(
             "background-color: white;\n"
             "border-radius: 20px;\n"
         )
-        self.add_shadow(self.players_layout)
+        self._add_shadow(self.players_layout)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.players_layout)
 
+        #Player controls layout
+        self.player_controls_layout = QtWidgets.QHBoxLayout()
+        self.player_controls_layout.setSpacing(40)
+        self.player_controls_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
-        # Buttons layout
-        self.buttons_layout = QtWidgets.QWidget(parent=self.players_layout)
-        self.buttons_layout.setStyleSheet("")
+        self.speed_dropdown = QtWidgets.QComboBox(parent=self.players_layout)
+        self.speed_dropdown.addItems(["1x", "2x", "3x"])
+        self.speed_dropdown.setCurrentText("1x")
+        self.speed_dropdown.setStyleSheet("""
+            QComboBox {
+                font-family: Mulish;
+                font-size: 25px;
+                font-weight: bold;
+                color: #EF8481;
+            }
+            QComboBox:hover {
+                color: #E74440;
+            }
+            QComboBox QAbstractItemView {
+                background: white;
+                border-radius: 5px;
+                color: #EF8481;
+                font-size: 12px;
+            }
+            
+            QComboBox::drop-down {
+                width: 0px; 
+                border: none; 
+            }
+            
+            QComboBox::down-arrow {
+                image: none;
+                width: 0px;
+                height: 0px;
+                border: none;
+            }
+        """)
 
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.buttons_layout)
-        self.horizontalLayout_5.setContentsMargins(55, -1, 55, -1)
-        self.horizontalLayout_5.setSpacing(40)
+        view = QtWidgets.QListView()
+        font_popup = QtGui.QFont("Mulish", 12)
+        font_popup.setBold(True)
+        view.setFont(font_popup)
 
-        self.play_button = QtWidgets.QPushButton(parent=self.buttons_layout)
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Expanding
-        )
-        size_policy.setHeightForWidth(self.play_button.sizePolicy().hasHeightForWidth())
-        self.play_button.setSizePolicy(size_policy)
-        self.play_button.setMinimumSize(QtCore.QSize(40, 40))
-        self.play_button.setMaximumSize(QtCore.QSize(40, 40))
-        self.play_button.setStyleSheet(
-            "border-radius: 20px;\n"
-            "background-color: #EF8481;\n"
-            "color: white;\n"
-            "font-size: 35px;\n"
-            "padding-bottom: 2px;\n"
-        )
-        self.add_shadow(self.play_button)
-        self.horizontalLayout_5.addWidget(self.play_button)
+        view.setSpacing(0)
+        view.setUniformItemSizes(True)
+        view.setMaximumWidth(40)
+        view.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
 
-        self.toggle_render_button = QtWidgets.QPushButton(parent=self.buttons_layout)
-        font = QtGui.QFont()
-        font.setFamily("Mulish")
-        font.setPointSize(12)
-        font.setBold(True)
-        self.toggle_render_button.setFont(font)
-        self.toggle_render_button.setStyleSheet(
-            "color: white;\n"
-            "background-color: #6D98F4;\n"
-            "border: 4px solid #6D98F4;\n"
-            "border-radius: 12px;\n"
-        )
-        self.toggle_render_button.setCheckable(True)
-        self.toggle_render_button.setChecked(False)
-        self.add_shadow(self.toggle_render_button)
-        self.horizontalLayout_5.addWidget(self.toggle_render_button)
+        self.speed_dropdown.setView(view)
+        self.player_controls_layout.addWidget(self.speed_dropdown)
 
-        self.verticalLayout_3.addWidget(self.buttons_layout)
+        self.prev_button = QtWidgets.QPushButton("❮❮", parent=self.players_layout)
+        self.prev_button.setStyleSheet("""
+            QPushButton {
+                font-size: 30px;
+                font-weight: bold;
+                color: #EF8481;
+                background: none;  
+                border: none;
+            }
+            QPushButton:hover {
+                color: #E74440;  
+            }
+        """)
+        self.player_controls_layout.addWidget(self.prev_button)
 
-        # Speed slider
-        self.speed_slider_layout = QtWidgets.QWidget(parent=self.players_layout)
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.speed_slider_layout)
+        self.play_button = QtWidgets.QPushButton("▶", parent=self.players_layout)
+        self.play_button.setFixedSize(40, 40)
+        self.play_button.setStyleSheet("""
+            QPushButton {
+                font-size: 30px;
+                font-weight: bold;
+                border-radius: 20px;
+                background-color: #EF8481;
+                color: white;
+            }
+            QPushButton:hover {
+                background-color: #E74440;
+            }
+        """)
+        self.player_controls_layout.addWidget(self.play_button)
+        self._add_shadow(self.play_button)
 
-        self.speed_slider_label = self.create_label(self.speed_slider_layout, "Speed")
-        self.horizontalLayout_6.addWidget(self.speed_slider_label)
+        self.next_button = QtWidgets.QPushButton("❯❯", parent=self.players_layout)
+        self.next_button.setStyleSheet("""
+            QPushButton {
+                font-size: 30px;
+                font-weight: bold;
+                color: #EF8481;
+                background: none;   
+                border: none;
+            }
+            QPushButton:hover {
+                color: #E74440; 
+            }
+        """)
 
-        self.speed_slider = self.create_slider(self.speed_slider_layout)
-        self.speed_slider.setRange(1, 500)
-        self.speed_slider.setValue(100)
+        self.player_controls_layout.addWidget(self.next_button)
 
-        self.horizontalLayout_6.addWidget(self.speed_slider)
+        self.toggle_render_button = QtWidgets.QPushButton("↯", parent=self.players_layout)
+        self.toggle_render_button.setStyleSheet("""
+            QPushButton {
+                font-size: 40px;
+                font-weight: bold;
+                color: #EF8481;
+            }
+            QPushButton:hover {
+                color: #E74440;  
+            }
+        """)
+        self.player_controls_layout.addWidget(self.toggle_render_button)
 
-        self.horizontalLayout_6.setStretch(0, 1)
-        self.horizontalLayout_6.setStretch(1, 4)
-        self.verticalLayout_3.addWidget(self.speed_slider_layout)
-
-        # Playback slider
-        self.playback_slider_layout = QtWidgets.QWidget(parent=self.players_layout)
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.playback_slider_layout)
-
-        self.playback_slider_label = self.create_label(self.playback_slider_layout, "Playback")
-        self.horizontalLayout_7.addWidget(self.playback_slider_label)
-
-        self.playback_slider = self.create_slider(self.playback_slider_layout)
-        self.playback_slider.setRange(0, 0)
-        self.playback_slider.setValue(0)
-        self.horizontalLayout_7.addWidget(self.playback_slider)
-
-        self.horizontalLayout_7.setStretch(0, 1)
-        self.horizontalLayout_7.setStretch(1, 4)
-        self.verticalLayout_3.addWidget(self.playback_slider_layout)
+        self.verticalLayout_3.addLayout(self.player_controls_layout)
 
         self.verticalLayout_2.addWidget(self.players_layout)
         self.verticalLayout_2.setStretch(0, 1)
-        self.verticalLayout_2.setStretch(1, 4)
-        self.verticalLayout_2.setStretch(2, 3)
+        self.verticalLayout_2.setStretch(1, 6)
+        self.verticalLayout_2.setStretch(2, 1)
 
         self.horizontalLayout_3.addWidget(self.settings_layout)
 
@@ -286,8 +329,8 @@ class UiMainWindow(object):
         self.horizontalLayout_3.setStretch(1, 13)
 
         # Frame counter label
-        self.frame_counter_label = self.create_label(self.simulation_widget, "Frame: 0", font_size= 14)
-        self.frame_counter_label.setGeometry(10, 10, 150, 40)
+        self.frame_counter_label = self._create_label(self.simulation_widget, "Frame: 0", font_size=14)
+        self.frame_counter_label.setGeometry(40, 400, 150, 40)
 
         self.verticalLayout.addWidget(self.bottom_layout)
         self.verticalLayout.setStretch(0, 1)
@@ -298,6 +341,8 @@ class UiMainWindow(object):
 
         self.retranslate_ui(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
+
+        QtCore.QTimer.singleShot(0, self._resize_layouts)
 
     def retranslate_ui(self, main_window: QMainWindow):
         """
@@ -313,13 +358,9 @@ class UiMainWindow(object):
         self.pushButton_app.setText(_translate("MainWindow", "App"))
         self.pushButton_help.setText(_translate("MainWindow", "Help"))
         self.pushButton_about_us.setText(_translate("MainWindow", "About us"))
-        self.play_button.setText(_translate("MainWindow", "▶"))
-        self.toggle_render_button.setText(_translate("MainWindow", "Colored by charge"))
-        self.speed_slider_label.setText(_translate("MainWindow", "Speed"))
-        self.playback_slider_label.setText(_translate("MainWindow", "Playback"))
 
     @staticmethod
-    def load_fonts():
+    def _load_fonts():
         """
         Load all TrueType fonts from the resources/fonts directory into the application.
         """
@@ -329,7 +370,7 @@ class UiMainWindow(object):
                 QFontDatabase.addApplicationFont(os.path.join(fonts_dir, filename))
 
     @staticmethod
-    def add_shadow(widget: QWidget, blur: int = 30, offset_x: int = 2, offset_y: int = 2,
+    def _add_shadow(widget: QWidget, blur: int = 30, offset_x: int = 2, offset_y: int = 2,
                    color: QColor = QColor(150, 150, 150, 100)) -> None:
         """
         Adds a drop shadow effect to the given widget.
@@ -349,7 +390,7 @@ class UiMainWindow(object):
         widget.setGraphicsEffect(shadow)
 
     @staticmethod
-    def create_label(parent: QWidget, text: str = "", font_family: str = "Mulish",
+    def _create_label(parent: QWidget, text: str = "", font_family: str = "Mulish",
                      font_size: int = 12, bold: bool = True, color: str = "#233348") -> QtWidgets.QLabel:
         """
         Creates a QLabel with specified font, size, color, and parent.
@@ -378,7 +419,7 @@ class UiMainWindow(object):
         return label
 
     @staticmethod
-    def create_pushbutton(parent: QWidget, font_family: str = "Mulish",
+    def _create_pushbutton(parent: QWidget, font_family: str = "Mulish",
                           font_size:int = 13, bold: bool = True, color: str = "#233348",
                           hover_color: str = "#6D98F4") -> QtWidgets.QPushButton:
         """
@@ -415,7 +456,7 @@ class UiMainWindow(object):
         return pushbutton
 
     @staticmethod
-    def create_widget(parent: QWidget) -> QWidget:
+    def _create_widget(parent: QWidget) -> QWidget:
         """
         Creates a transparent QWidget with expanding size policy.
 
@@ -439,7 +480,7 @@ class UiMainWindow(object):
         return widget
 
     @staticmethod
-    def create_slider(parent: QWidget) -> QtWidgets.QSlider:
+    def _create_slider(parent: QWidget) -> QtWidgets.QSlider:
         """
         Creates a horizontal QSlider with customized style.
 
@@ -475,3 +516,10 @@ class UiMainWindow(object):
             """)
 
         return slider
+
+    def _resize_layouts(self):
+        height = self.settings_layout.height() // 8
+        self.presets_layout.setMinimumHeight(height)
+        self.presets_layout.setMaximumHeight(height)
+        self.players_layout.setMinimumHeight(height)
+        self.players_layout.setMaximumHeight(height)

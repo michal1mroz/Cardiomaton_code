@@ -21,7 +21,7 @@ class FrameRenderer:
             controller : The simulation controller that provides the next simulation frame as a NumPy array.
         """
         self.ctrl = controller
-        self.cmap = ListedColormap(['white', '#8787af', 'yellow', 'red', 'blue', 'green', 'black'])
+        self.cmap = ListedColormap(['white', '#f4f8ff', 'yellow', 'red', 'blue', 'green', 'black'])
         self.norm = BoundaryNorm(np.arange(-0.5, 7.5, 1), self.cmap.N)
         self.last_data = None
         self.current_data = None
@@ -41,7 +41,6 @@ class FrameRenderer:
         frame, data = self.ctrl.step()
         self.last_data = data
         self.ctrl.recorder.record((frame, data))
-        shape = self.ctrl.shape
 
         return frame, self.render_frame(target_size, self.last_data, if_charged)
 
@@ -94,7 +93,7 @@ class FrameRenderer:
     def _cell_to_hsv(self, cell: CellDict) -> Tuple[int, int, int]:
         # Got to think of a better way to get the gray color
         if not cell["auto_polarization"] and cell["state_name"] == "Polarization":
-            return 120, 58, 175
+            return 108, 11, 255
         # Naive linear cast from range -90...30 to 30...0
         h = max(-cell["charge"] * 0.25 + 7.5, 0)
         return int(h), 255,255
