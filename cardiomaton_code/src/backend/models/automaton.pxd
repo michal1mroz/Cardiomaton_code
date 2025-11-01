@@ -1,5 +1,6 @@
 from src.backend.models.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors
 from src.models.cell import Cell
+from src.backend.utils.draw_functions cimport DrawFunc
 
 cdef class Automaton:
     # C exclusive attributes
@@ -20,7 +21,7 @@ cdef class Automaton:
 
     # Public python API
     cpdef void recreate_from_dict(self, tuple)
-    cpdef void update_grid(self)
+    cpdef void update_grid(self, object is_charged)
     cpdef tuple to_cell_data(self)
 
     cpdef float get_frame_time(self)
@@ -34,7 +35,7 @@ cdef class Automaton:
     # C exclusive methods
     cdef void _dealloc_grid(self, CCell**)    
     cdef void _generate_grid(self, CCell**, list)
-    cdef void _update_grid_nogil(self) nogil
+    cdef void _update_grid_nogil(self, DrawFunc)
     cdef void _init_img(self)
     cdef void _clear_img(self)
 

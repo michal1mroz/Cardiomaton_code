@@ -7,7 +7,7 @@ from src.backend.models.c_cell cimport CCell, create_c_cell, add_cell_charges, f
 from src.backend.models.cell_state cimport CellStateC, state_to_cenum
 from src.backend.models.cell_type cimport CellTypeC, type_to_cenum
 from src.backend.utils.charge_update cimport update_charge
-from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge
+from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc
 
 import numpy as np
 from dataclasses import dataclass
@@ -190,32 +190,37 @@ cdef class Automaton:
         cdef size_t total_bytes = self.bytes_per_line * <int>self.size[0]
         memset(self.img_buffer, 0, total_bytes)
 
-    cdef void _update_grid_nogil(self) nogil:
+    cdef void _update_grid_nogil(self, DrawFunc draw_function):
         """
         %ToDo
         For now this function already has a great increase in time efficiency.
         Requires that all the underlying functions are nogil compatible.
         """
-        ...
-
-    cpdef void update_grid(self):
-        """
-        Simple update method for the python API. The logic should be moved to the nogil pure C implementation.
-        """
+        cdef CCell** tmp = self.grid_a
         cdef CCell* cell_a
         cdef CCell* cell_b
         cdef int i
+        
         self.frame_counter += 1
         for i in range(self.n_nodes):
             cell_a = self.grid_a[i]
             cell_b = self.grid_b[i]
             update_charge(cell_a, cell_b)
-            # draw_from_state(self.img_buffer, self.bytes_per_line, cell_b)
-            draw_from_charge(self.img_buffer, self.bytes_per_line, cell_b)
+            draw_function(self.img_buffer, self.bytes_per_line, cell_b)
 
-        cdef CCell** tmp = self.grid_a
         self.grid_a = self.grid_b
         self.grid_b = tmp
+
+    cpdef void update_grid(self, show_charge: bool):
+        """
+        Simple update method for the python API. The logic should be moved to the nogil pure C implementation.
+        """
+        cdef DrawFunc func
+        if show_charge:
+            func = draw_from_charge
+        else:
+            func = draw_from_state
+        self._update_grid_nogil(func)
 
     cpdef dict _cells_to_dict(self):
         """

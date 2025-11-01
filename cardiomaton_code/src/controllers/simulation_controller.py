@@ -15,7 +15,7 @@ class SimulationController:
         self.service = SimulationService(frame_time, image)
         self.recorder = FrameRecorder(capacity=200)
 
-    def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
+    def step(self, if_charged: bool) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Alternative step method. Advances the simulation by one frame.
 
@@ -23,7 +23,7 @@ class SimulationController:
            Tuple[int, Dict[Tuple[int, int], CellDict]]: First value is a frame number, the dict is a
            mapping of the cell position to the cell state
         """
-        return self.service.step()
+        return self.service.step(if_charged)
 
     def update_cell(self, data: CellDict) -> None:
         """
