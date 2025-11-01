@@ -3,7 +3,7 @@ from src.update_strategies.base import UpdateBaseCharge
 from src.backend.models.cell import Cell
 
 #from src.models.cell_state import CellState
-from src.backend.models.cell_state import CellState, state_to_pyenum
+from cardiomaton_code.src.backend.enums.cell_state import CellState, state_to_pyenum
 
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 

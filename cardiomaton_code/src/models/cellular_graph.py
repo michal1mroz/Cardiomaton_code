@@ -5,9 +5,9 @@ from scipy.spatial import cKDTree # type: ignore
 from scipy.sparse.csgraph import minimum_spanning_tree # type: ignore
 
 #from src.models.cell_state import CellState
-from src.backend.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 from src.backend.models.cell import Cell
-from src.backend.models.cell_type import CellType
+from cardiomaton_code.src.backend.enums.cell_type import CellType
 # from src.models.cell_type import CellType
 
 class Space: #, the final frontier

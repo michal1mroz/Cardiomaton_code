@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from src.backend.models.cell import Cell, CellDict
 #from src.models.cell_state import CellState
-from src.backend.models.cell_state import CellState, state_to_cenum
+from cardiomaton_code.src.backend.enums.cell_state import CellState, state_to_cenum
 
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate

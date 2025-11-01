@@ -3,9 +3,9 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memset
 from libc.stdint cimport uintptr_t
 
-from src.backend.models.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict
-from src.backend.models.cell_state cimport CellStateC, state_to_cenum
-from src.backend.models.cell_type cimport CellTypeC, type_to_cenum
+from src.backend.structs.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict
+from src.backend.enums.cell_state cimport state_to_cenum
+from src.backend.enums.cell_type cimport type_to_cenum
 from src.backend.utils.charge_update cimport update_charge
 from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc
 from src.backend.structs.cell_wrapper cimport CellWrapper
@@ -16,9 +16,8 @@ from typing import Tuple, Dict
 from PyQt6.QtGui import QImage
 
 from src.backend.models.cell import Cell, CellDict
-from src.backend.models.cell_type import CellType
-from src.backend.models.cell_state import CellState
-from src.backend.structs.cell_wrapper import CellWrapper
+from src.backend.enums.cell_type import CellType
+from src.backend.enums.cell_state import CellState
 
 @dataclass
 class CellData:

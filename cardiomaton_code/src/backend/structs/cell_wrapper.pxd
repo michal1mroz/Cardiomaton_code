@@ -1,4 +1,4 @@
-from src.backend.models.c_cell cimport CCell
+from src.backend.structs.c_cell cimport CCell
 
 cdef class CellWrapper:
     cdef CCell* cell_a

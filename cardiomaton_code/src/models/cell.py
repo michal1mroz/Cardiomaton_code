@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, TypedDict
 
 #from src.models.cell_state import CellState
-from src.backend.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 

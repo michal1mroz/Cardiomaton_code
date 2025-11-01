@@ -1,5 +1,5 @@
-from src.backend.models.cell_state cimport CellStateC
-from src.backend.models.c_cell cimport CCell
+from src.backend.enums.cell_state cimport CellStateC
+from src.backend.structs.c_cell cimport CCell
 
 """
 Function pointer type. Used to select the draw function without branching in the loop

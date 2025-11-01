@@ -1,6 +1,6 @@
-from src.backend.models.cell_state cimport CellStateC
-from src.backend.models.c_cell cimport CCell, is_neighbor_depolarized, is_relative_repolarization
-from src.backend.models.cell_type cimport CellTypeC
+from src.backend.structs.c_cell cimport CCell, is_neighbor_depolarized, is_relative_repolarization
+from src.backend.enums.cell_state cimport CellStateC
+from src.backend.enums.cell_type cimport CellTypeC
 
 cdef int eps = 1
 

@@ -1,7 +1,7 @@
 from libc.stdlib cimport malloc, free
 
-from src.backend.models.cell_state cimport CellStateC
-from src.backend.models.cell_type cimport CellTypeC
+from src.backend.enums.cell_state cimport CellStateC
+from src.backend.enums.cell_type cimport CellTypeC
 
 """
 This module contains the definition of the CCell struct - representation of the Cell object 

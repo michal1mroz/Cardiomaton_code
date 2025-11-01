@@ -1,7 +1,7 @@
 from libc.stdint cimport uint8_t
 
-from src.backend.models.cell_state cimport CellStateC
-from src.backend.models.c_cell cimport CCell
+from src.backend.enums.cell_state cimport CellStateC
+from src.backend.structs.c_cell cimport CCell
 
 """
     Mapping CellStateC -> color in 8-bit RGBA, where first index

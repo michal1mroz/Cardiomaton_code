@@ -1,4 +1,4 @@
-from src.backend.models.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors
+from src.backend.structs.c_cell cimport CCell
 from src.models.cell import Cell
 from src.backend.utils.draw_functions cimport DrawFunc
 

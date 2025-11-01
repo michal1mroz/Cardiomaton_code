@@ -1,6 +1,6 @@
-from src.backend.models.c_cell cimport CCell
-from src.backend.models.cell_state cimport CellStateC, cell_state_name
-from src.backend.models.cell_type cimport CellTypeC, type_to_pyenum
+from src.backend.structs.c_cell cimport CCell
+from src.backend.enums.cell_state cimport CellStateC, cell_state_name
+from src.backend.enums.cell_type cimport CellTypeC, type_to_pyenum
 
 from src.backend.models.cell import CellDict
 

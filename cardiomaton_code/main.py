@@ -1,10 +1,10 @@
 from src.utils.image_loader import *
-from src.backend.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 
 from src.backend.models.cell import Cell
 from src.backend.models.automaton import Automaton
-from src.backend.models.cell_type import CellType, ConfigLoader, type_to_cenum, type_to_pyenum
-from src.backend.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_type import CellType, ConfigLoader, type_to_cenum, type_to_pyenum
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

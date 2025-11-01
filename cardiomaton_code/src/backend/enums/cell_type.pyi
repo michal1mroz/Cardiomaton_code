@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Dict, Any, Tuple
-from src.backend.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 
 class ConfigLoader:
     _config: Dict[str, Any]
