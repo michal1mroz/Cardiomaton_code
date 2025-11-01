@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 import numpy as np
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from PyQt6.QtGui import QImage, QPixmap
@@ -46,4 +46,7 @@ class FrameRenderer:
 
     def _to_pixmap(self, target_size: QSize) -> QPixmap:
         return QPixmap.fromImage(self.image).scaled(target_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+    
+    def get_cell_data(self, position: Tuple[int, int]) -> Optional[Dict]:
+        return self.ctrl.get_cell_data(position)
 

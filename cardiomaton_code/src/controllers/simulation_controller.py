@@ -1,4 +1,4 @@
-from typing import Tuple, Dict
+from typing import Optional, Tuple, Dict
 from src.models.cell import CellDict
 from src.frontend.frame_recorder import FrameRecorder
 from src.services.simulation_service import SimulationService
@@ -70,3 +70,6 @@ class SimulationController:
     def shape(self) -> Tuple[int, int]:
         """ """
         return self.service.get_shape()
+
+    def get_cell_data(self, position: Tuple[int, int]) -> Optional[Dict]:
+        return self.service.get_cell_data(position)

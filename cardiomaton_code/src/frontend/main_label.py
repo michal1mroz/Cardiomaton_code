@@ -90,10 +90,8 @@ class MainLabel(QLabel):
             QToolTip.hideText()
             self.last_tooltip = None
 
-
-        data = self.renderer.current_data
-        if data is not None and self.last_tooltip != pos:
-            cell_info = data.get(pos)
+        if self.last_tooltip != pos:
+            cell_info = self.renderer.get_cell_data(pos)
             if cell_info is not None:
                 self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
                 self.last_tooltip = pos

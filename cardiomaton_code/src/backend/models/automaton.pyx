@@ -8,6 +8,7 @@ from src.backend.models.cell_state cimport CellStateC, state_to_cenum
 from src.backend.models.cell_type cimport CellTypeC, type_to_cenum
 from src.backend.utils.charge_update cimport update_charge
 from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc
+from src.backend.structs.cell_wrapper cimport CellWrapper
 
 import numpy as np
 from dataclasses import dataclass
@@ -17,6 +18,7 @@ from PyQt6.QtGui import QImage
 from src.backend.models.cell import Cell, CellDict
 from src.backend.models.cell_type import CellType
 from src.backend.models.cell_state import CellState
+from src.backend.structs.cell_wrapper import CellWrapper
 
 @dataclass
 class CellData:
@@ -69,11 +71,11 @@ cdef class Automaton:
             for pos, cell in cells.items()
         }
 
-        self.cell_data = self._create_data_map(cells)
-
+        self.cell_data = dict()
         self._generate_grid(self.grid_a, cell_list)
         self._generate_grid(self.grid_b, cell_list)
 
+        # Img setup
         addr_val = <uintptr_t> img_ptr
         self.img_buffer = <unsigned char*> addr_val
         self.bytes_per_line = <int> img_bytes
@@ -152,6 +154,10 @@ cdef class Automaton:
             grid[i].V_thresh = <double> py_cell.cell_data.get("V_thresh", 0) # Default since some cells don't have this value
             grid[i].ref_threshold = <double> py_cell.ref_threshold
             grid[i].charge = 0
+
+            self.cell_data[(py_cell.pos_x, py_cell.pos_y)] = CellWrapper(<unsigned long>grid[i], 
+                                        [(nei.pos_x, nei.pos_y) for nei in py_cell.neighbors],
+                                        py_cell.config)
             
             if py_cell.charges is not None:
                 add_cell_charges(grid[i], np.asarray(py_cell.charges, dtype=np.float64))
@@ -293,3 +299,9 @@ cdef class Automaton:
 
     cpdef tuple get_shape(self):
         return self.size
+
+    cpdef dict get_cell_data(self, tuple position):
+        data = self.cell_data.get(position, None)
+        if data is not None:
+            return data.get_cell_dict()
+        return None

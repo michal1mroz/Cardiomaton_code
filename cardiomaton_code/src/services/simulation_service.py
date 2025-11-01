@@ -1,5 +1,5 @@
 from time import time
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 from src.models.cell import CellDict
 from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
@@ -79,3 +79,9 @@ class SimulationService:
 
     def get_shape(self) -> Tuple[int, int]: 
         return self.automaton.get_shape()
+
+    def get_cell_data(self, position: Tuple[int, int]) -> Optional[Dict]:
+        """
+        Returns the serialized cell under specified position, None if there's no cell
+        """
+        return self.automaton.get_cell_data(position)

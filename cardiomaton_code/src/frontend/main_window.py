@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
         
         # Maybe let's think of some observers or other callbacks to update widgets. MM
         if self.cell_inspector:
-            self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
+            self.cell_inspector.update(self.renderer.get_cell_data(self.cell_inspector.position))
 
     def _start_playback_hold(self):
         self._on_playback()

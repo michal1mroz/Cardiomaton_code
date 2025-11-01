@@ -27,6 +27,7 @@ cdef class Automaton:
     cpdef float get_frame_time(self)
     cpdef void set_frame_time(self, double)
     cpdef tuple get_shape(self)
+    cpdef dict get_cell_data(self, tuple)
 
     # Private python compatible methods
     cpdef dict _create_data_map(self, dict)
