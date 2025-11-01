@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QImage
 from src.frontend.cell_inspector import CellInspector
 from src.models.cell import CellDict
 from src.controllers.simulation_controller import SimulationController
@@ -23,8 +24,12 @@ class MainWindow(QMainWindow):
 
         self.base_frame_time = 0.05
 
-        self.sim = SimulationController(frame_time=self.base_frame_time)
-        self.renderer = FrameRenderer(self.sim)
+        automaton_size = (220, 250)
+        self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
+
+        self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
+        self.renderer = FrameRenderer(self.sim, self.image)
+
         self.render_label = MainLabel(self.renderer)
 
         self.render_charged = True # flag telling how simulation is rendered : True - showing charge; False - showing state

@@ -1,3 +1,4 @@
+import time
 from typing import Dict, Tuple
 import numpy as np
 from matplotlib.colors import ListedColormap, BoundaryNorm
@@ -13,7 +14,7 @@ class FrameRenderer:
     """
     Handles conversion of simulation data into visual frames.
     """
-    def __init__(self, controller: SimulationController):
+    def __init__(self, controller: SimulationController, image: QImage):
         """
         Initialize the FrameRenderer.
 
@@ -23,9 +24,11 @@ class FrameRenderer:
         self.ctrl = controller
         self.cmap = ListedColormap(['white', '#f4f8ff', 'yellow', 'red', 'blue', 'green', 'black'])
         self.norm = BoundaryNorm(np.arange(-0.5, 7.5, 1), self.cmap.N)
+
         self.last_data = None
         self.current_data = None
-
+        self.image = image
+        
     def render_next_frame(self, target_size, if_charged: bool = False) -> Tuple[int, QPixmap]:
         """
         Renders the next simulation frame and converts it to a QPixmap.
@@ -41,17 +44,16 @@ class FrameRenderer:
         frame, data = self.ctrl.step()
         self.last_data = data
         self.ctrl.recorder.record((frame, data))
-
         return frame, self.render_frame(target_size, self.last_data, if_charged)
 
     def render_frame(self, target_size, data: Dict[Tuple[int, int], CellDict], show_charge=False) -> QImage:
         self.current_data = data
         shape = self.ctrl.shape
-
-        if show_charge:
-            return self._render_charge(data, shape, target_size)
-        else:
-            return self._render_state(data, shape, target_size)
+        return self._to_pixmap(data, target_size)
+        # if show_charge:
+        #     return self._render_charge(data, shape, target_size)
+        # else:
+        #     return self._render_state(data, shape, target_size)
 
     def _render_charge(self, data: Dict[Tuple[int, int], CellDict], shape: Tuple[int, int], target_size: QSize) -> QPixmap:
         rgba = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
@@ -85,10 +87,11 @@ class FrameRenderer:
         return self._to_pixmap(rgba, target_size)
 
     def _to_pixmap(self, img_array: np.ndarray, target_size: QSize) -> QPixmap:
-        h, w, _ = img_array.shape
-        bytes_per_line = 4 * w
-        qimage = QImage(img_array.data, w, h, bytes_per_line, QImage.Format.Format_RGBA8888)
-        return QPixmap.fromImage(qimage).scaled(target_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+        # h, w, _ = img_array.shape
+        # bytes_per_line = 4 * w
+        # qimage = QImage(img_array.data, w, h, bytes_per_line, QImage.Format.Format_RGBA8888)
+        # return QPixmap.fromImage(qimage).scaled(target_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+        return QPixmap.fromImage(self.image).scaled(target_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
 
     def _cell_to_hsv(self, cell: CellDict) -> Tuple[int, int, int]:
         # Got to think of a better way to get the gray color

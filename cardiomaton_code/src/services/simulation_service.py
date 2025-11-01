@@ -5,13 +5,14 @@ from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
 #from src.models.automaton import Automaton
 from src.backend.models.automaton import Automaton
+from PyQt6.QtGui import QImage
 
 class SimulationService:
     """
     Handles the core logic of the cellular automaton simulation.
     """
 
-    def __init__(self, frame_time: float):
+    def __init__(self, frame_time: float, image: QImage):
         """
         Initialize the simulation service.
 
@@ -21,7 +22,11 @@ class SimulationService:
         graph, A, B = extract_conduction_pixels()
         space = Space(graph)
         _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
-        self.automaton = Automaton(graph.shape, cell_map, frame_time=frame_time)
+        ptr = image.bits()
+        if hasattr(ptr, "setsize"):
+            ptr.setsize(image.bytesPerLine() * image.height())
+
+        self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
 
     def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """

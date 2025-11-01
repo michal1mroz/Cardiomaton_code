@@ -1,15 +1,18 @@
 from libc.stdio cimport printf
 from libc.stdlib cimport malloc, free
+from libc.string cimport memset
 from libc.stdint cimport uintptr_t
 
 from src.backend.models.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict
 from src.backend.models.cell_state cimport CellStateC, state_to_cenum
 from src.backend.models.cell_type cimport CellTypeC, type_to_cenum
 from src.backend.utils.charge_update cimport update_charge
+from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge
 
 import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, Dict
+from PyQt6.QtGui import QImage
 
 from src.backend.models.cell import Cell, CellDict
 from src.backend.models.cell_type import CellType
@@ -22,11 +25,15 @@ class CellData:
 
 cdef class Automaton:
 
-    def __init__(self, size: Tuple[int, int], cells: dict[Tuple[int, int], Cell], frame_time: float = 0.2):
+    def __init__(self, size: Tuple[int, int], cells: dict[Tuple[int, int], Cell], img_ptr,
+            int img_bytes, frame_time: float = 0.2):
         """
         Constructor. Assumes size is the size of the image on which the grid is projected. Uses the same values
         as the previous version, but stores as much data as possible in c containers.
         """
+        cdef int i
+        cdef uintptr_t addr_val
+
         self.size = size
         self.frame_time = <double> frame_time
         cell_list = list(cells.values())
@@ -36,7 +43,6 @@ cdef class Automaton:
         grid_size = len(cell_list) * sizeof(CCell*)
         self.grid_a = <CCell**> malloc(grid_size)
         
-        cdef int i
         if self.grid_a == NULL:
             raise MemoryError("Failed to allocate CCell** array - grid_a")
         for i in range(len(cell_list)):
@@ -67,6 +73,12 @@ cdef class Automaton:
 
         self._generate_grid(self.grid_a, cell_list)
         self._generate_grid(self.grid_b, cell_list)
+
+        addr_val = <uintptr_t> img_ptr
+        self.img_buffer = <unsigned char*> addr_val
+        self.bytes_per_line = <int> img_bytes
+
+        self._init_img()
 
     def __dealloc__(self):
         """
@@ -164,6 +176,20 @@ cdef class Automaton:
                 this_c.neighbors = NULL
                 this_c.n_neighbors = 0
 
+
+    cdef void _init_img(self):
+        cdef CCell* cell
+        cdef int i
+        self._clear_img()
+        for i in range(self.n_nodes):
+            cell = self.grid_a[i]
+            # draw_from_state(self.img_buffer, self.bytes_per_line, cell)
+            draw_from_charge(self.img_buffer, self.bytes_per_line, cell)
+    
+    cdef void _clear_img(self):
+        cdef size_t total_bytes = self.bytes_per_line * <int>self.size[0]
+        memset(self.img_buffer, 0, total_bytes)
+
     cdef void _update_grid_nogil(self) nogil:
         """
         %ToDo
@@ -184,6 +210,9 @@ cdef class Automaton:
             cell_a = self.grid_a[i]
             cell_b = self.grid_b[i]
             update_charge(cell_a, cell_b)
+            # draw_from_state(self.img_buffer, self.bytes_per_line, cell_b)
+            draw_from_charge(self.img_buffer, self.bytes_per_line, cell_b)
+
         cdef CCell** tmp = self.grid_a
         self.grid_a = self.grid_b
         self.grid_b = tmp

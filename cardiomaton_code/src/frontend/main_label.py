@@ -110,7 +110,6 @@ class MainLabel(QLabel):
         voltage = info["charge"]
         cell_type = "(placeholder)"
         ccs_part = info["ccs_part"]
-
         if debug: # I leave the old version because it may be useful for debugging, especially the position (MS)
             text = (
                 f"<b>Pozycja:<b> {pos}<br><br>"

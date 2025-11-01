@@ -2,17 +2,17 @@ from typing import Tuple, Dict
 from src.models.cell import CellDict
 from src.frontend.frame_recorder import FrameRecorder
 from src.services.simulation_service import SimulationService
-
+from PyQt6.QtGui import QImage
 
 class SimulationController:
-    def __init__(self, frame_time: float):
+    def __init__(self, frame_time: float, image: QImage = None):
         """
         Initialize the simulation controller.
 
         Args:
             frame_time (float): Time between frames in seconds.
         """
-        self.service = SimulationService(frame_time)
+        self.service = SimulationService(frame_time, image)
         self.recorder = FrameRecorder(capacity=200)
 
     def step(self) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:

@@ -10,6 +10,9 @@ cdef class Automaton:
     cdef int n_nodes
     cdef double frame_time
 
+    cdef unsigned char* img_buffer
+    cdef int bytes_per_line 
+
     # Python helping attributes
     cdef public tuple size
     cdef public dict cell_data
@@ -32,6 +35,7 @@ cdef class Automaton:
     cdef void _dealloc_grid(self, CCell**)    
     cdef void _generate_grid(self, CCell**, list)
     cdef void _update_grid_nogil(self) nogil
-
+    cdef void _init_img(self)
+    cdef void _clear_img(self)
 
 
