@@ -103,6 +103,7 @@ class MainWindow(QMainWindow):
             self.running = False
         else:
             self.sim.set_frame_counter(self.current_playback_buffer_index)
+            self.current_playback_buffer_index = -1
             self.timer.start(int(self.sim.frame_time * 1000))
             self.ui.play_button.setText("▪")
             self.running = True

@@ -56,12 +56,10 @@ cdef class FrameRecorder:
         self.current_idx = (self.current_idx + 1) % self.buff_size
         if self.count < self.buff_size:
             self.count += 1
-        
         return self.frames[self.current_idx]
 
     cdef CellSnapshot* get_buffer(self, int idx):
         idx = self._normalize_index(idx)
-        
         if idx == -1:
             return NULL
         return self.frames[idx]
