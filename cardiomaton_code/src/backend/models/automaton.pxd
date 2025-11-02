@@ -1,6 +1,7 @@
 from src.backend.structs.c_cell cimport CCell
 from src.models.cell import Cell
 from src.backend.utils.draw_functions cimport DrawFunc
+from src.backend.models.frame_recorder cimport FrameRecorder
 
 cdef class Automaton:
     # C exclusive attributes
@@ -10,6 +11,8 @@ cdef class Automaton:
     cdef int is_running
     cdef int n_nodes
     cdef double frame_time
+
+    cdef FrameRecorder frame_recorder
 
     cdef unsigned char* img_buffer
     cdef int bytes_per_line 

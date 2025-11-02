@@ -9,11 +9,12 @@ from src.backend.enums.cell_type cimport type_to_cenum
 from src.backend.utils.charge_update cimport update_charge
 from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc
 from src.backend.structs.cell_wrapper cimport CellWrapper
+from src.backend.structs.cell_snapshot cimport CellSnapshot
+from src.backend.models.frame_recorder cimport FrameRecorder
 
 import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, Dict
-from PyQt6.QtGui import QImage
 
 from src.backend.models.cell import Cell, CellDict
 from src.backend.enums.cell_type import CellType
@@ -73,6 +74,8 @@ cdef class Automaton:
         self.cell_data = dict()
         self._generate_grid(self.grid_a, cell_list)
         self._generate_grid(self.grid_b, cell_list)
+
+        self.frame_recorder = FrameRecorder(len(cells), 200)
 
         # Img setup
         addr_val = <uintptr_t> img_ptr
@@ -205,6 +208,7 @@ cdef class Automaton:
         cdef CCell* cell_a
         cdef CCell* cell_b
         cdef int i
+        cdef CellSnapshot* snapshot = self.frame_recorder.get_next_buffer()
         
         self.frame_counter += 1
         for i in range(self.n_nodes):
@@ -212,6 +216,13 @@ cdef class Automaton:
             cell_b = self.grid_b[i]
             update_charge(cell_a, cell_b)
             draw_function(self.img_buffer, self.bytes_per_line, cell_b)
+            
+            # Inline write to the buffer
+            snapshot[i].pos_x = cell_b.pos_x
+            snapshot[i].pos_y = cell_b.pos_y
+            snapshot[i].c_state = cell_b.c_state
+            snapshot[i].charge = cell_b.charge
+            snapshot[i].timer = cell_b.timer
 
         self.grid_a = self.grid_b
         self.grid_b = tmp
