@@ -28,7 +28,7 @@ class SimulationService:
 
         self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
 
-    def step(self, if_charged: bool) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
+    def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Advances the simulation by one frame.
         Returns:

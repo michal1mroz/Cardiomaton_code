@@ -15,7 +15,7 @@ class SimulationController:
         self.service = SimulationService(frame_time, image)
         self.recorder = FrameRecorder(capacity=200)
 
-    def step(self, if_charged: bool) -> Tuple[int, Dict[Tuple[int, int], CellDict]]:
+    def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Alternative step method. Advances the simulation by one frame.
 

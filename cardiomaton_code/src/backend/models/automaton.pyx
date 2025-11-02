@@ -271,12 +271,12 @@ cdef class Automaton:
             cell = self.grid_a[i]
             self.dict_mapping[(cell.pos_x, cell.pos_y)] = cell_to_dict(cell, self.dict_mapping[(cell.pos_x, cell.pos_y)])
     
-    cpdef tuple to_cell_data(self):
+    cpdef int to_cell_data(self):
         """
         Getter for the serialized data. Returns the Tuple with the current frame and the serialized cells.
         """
-        self._cells_to_dict()
-        return tuple((int(self.frame_counter), self.dict_mapping))
+        # self._cells_to_dict()
+        return int(self.frame_counter)#tuple((int(self.frame_counter), self.dict_mapping))
 
 
     """

@@ -71,8 +71,8 @@ class MainLabel(QLabel):
             return
 
         pos = self._mouse_position(event)
-        if pos and self.renderer.current_data:
-            cell_info = self.renderer.current_data.get(pos)
+        if pos:
+            cell_info = self.renderer.get_cell_data(pos)
             if cell_info:
                 self.cellClicked.emit(cell_info)
 

@@ -39,9 +39,7 @@ class FrameRenderer:
             Tuple[int, QPixmap]: A pixmap representation of the simulation frame, scaled to the given target size and
                 int value of the frame counter
         """
-        frame, data = self.ctrl.step(if_charged)
-        self.current_data = data
-        self.ctrl.recorder.record((frame, data))
+        frame = self.ctrl.step(if_charged)
         return frame, self._to_pixmap(target_size)
 
     def render_frame(self, target_size: QSize, idx: int, if_charged: bool, drop_newer: bool) -> Tuple[int, QPixmap]:

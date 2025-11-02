@@ -24,7 +24,7 @@ cdef class Automaton:
 
     # Public python API
     cpdef void update_grid(self, object is_charged)
-    cpdef tuple to_cell_data(self)
+    cpdef int to_cell_data(self)
 
     cpdef float get_frame_time(self)
     cpdef void set_frame_time(self, double)
