@@ -238,6 +238,29 @@ cdef class Automaton:
             func = draw_from_state
         self._update_grid_nogil(func)
 
+    cpdef int render_frame(self, int idx, object if_charged, object drop_newer):
+        cdef int i
+        cdef CellSnapshot* snapshots = self.frame_recorder.get_buffer(idx)
+        cdef DrawFunc func
+        cdef CCell* cell
+        if if_charged:
+            func = draw_from_charge
+        else:
+            func = draw_from_state
+        
+        for i in range(self.n_nodes):
+            cell = self.grid_a[i]
+            cell.c_state = snapshots[i].c_state
+            cell.charge = snapshots[i].charge
+            cell.timer = snapshots[i].timer 
+            func(self.img_buffer, self.bytes_per_line, cell)
+
+        if drop_newer:
+            self.frame_recorder.remove_newer(idx)
+            self.frame_recorder.remove_older(idx)
+
+        return self.frame_counter + idx
+
     cpdef dict _cells_to_dict(self):
         """
         Helper method to map the cell objects to the cached dictionary. Performed in-place
@@ -255,48 +278,6 @@ cdef class Automaton:
         self._cells_to_dict()
         return tuple((int(self.frame_counter), self.dict_mapping))
 
-    cpdef void recreate_from_dict(self, tuple vals):
-        """
-        Code here works, but the serialization relies on resuage of a single dict.
-        In result frame recorder needs a deepcopy to save the data which
-        is prohibitively slow
-        """
-        # Remove the old grid objects
-        self._dealloc_grid(self.grid_a)
-        self._dealloc_grid(self.grid_b)
-        self.grid_a = NULL
-        self.grid_b = NULL
-
-        # Generate cell mapping on python objects:
-        cells = {}
-        frame, serialized_cells = vals
-        for pos, cell_dict in serialized_cells.items():
-            data_dict = self.cell_data[cell_dict["position"]].cell_data
-            py_cell = Cell(position = cell_dict["position"], cell_type=CellType[cell_dict["cell_type"]],
-                            init_state = CellState[cell_dict["state_name"].upper()], 
-                            self_polarization=cell_dict["auto_polarization"])
-            py_cell.charge = cell_dict["charge"]
-            cells.update({pos: py_cell})
-
-        for pos, cell_dict in self.cell_data.items():
-            for nei in cell_dict.neighbors:
-                cells[pos].add_neighbor(cells[nei])
-
-        cell_list = list(cells.values())
-        self.n_nodes = <int> len(cell_list)
-
-        grid_size = len(cell_list) * sizeof(CCell*)
-        self.grid_a = <CCell**> malloc(grid_size)
-        if self.grid_a is NULL:
-            raise MemoryError()
-        self.grid_b = <CCell**> malloc(grid_size)
-        if self.grid_b is NULL:
-            free(self.grid_a)
-            raise MemoryError()
-
-        self.frame_counter = <int> frame
-        self._generate_grid(self.grid_a, cell_list)
-        self._generate_grid(self.grid_b, cell_list)
 
     """
     Set of getters and setters for the python API
@@ -310,8 +291,15 @@ cdef class Automaton:
     cpdef tuple get_shape(self):
         return self.size
 
+    cpdef void set_frame_counter(self, int idx):
+        self.frame_recorder.remove_newer(idx)
+        self.frame_counter += idx
+
     cpdef dict get_cell_data(self, tuple position):
         data = self.cell_data.get(position, None)
         if data is not None:
             return data.get_cell_dict()
         return None
+
+    cpdef int get_buffer_size(self):
+        return self.frame_recorder.get_count()

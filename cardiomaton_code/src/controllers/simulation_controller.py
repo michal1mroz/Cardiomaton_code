@@ -34,17 +34,8 @@ class SimulationController:
         """
         self.service.update_cell(data)
 
-    def update_automaton(self, ix: int) -> None:
-        """
-        Updates the automaton by setting the state to that from the index ix in the recorders buffer.
-        Also modifies the recorder to remove newer entries.
-
-        Args:
-            ix (int): index of the selected frame.
-        """
-        frame = self.recorder.get_frame(ix)
-        self.service.recreate_from_frame(frame)
-        self.recorder.drop_newer(ix)
+    def render_frame(self, idx, if_charged, drop_newer) -> int:
+        return self.service.render_frame(idx, if_charged, drop_newer)
 
     @property
     def frame_time(self) -> float:
@@ -73,3 +64,9 @@ class SimulationController:
 
     def get_cell_data(self, position: Tuple[int, int]) -> Optional[Dict]:
         return self.service.get_cell_data(position)
+    
+    def get_buffer_size(self) -> int:
+        return self.service.get_buffer_size()
+    
+    def set_frame_counter(self, idx: int):
+        self.service.set_frame_counter(idx)

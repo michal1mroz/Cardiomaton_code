@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
             self.ui.play_button.setText("▸")
             self.running = False
         else:
-            self.sim.update_automaton(self.current_playback_buffer_index)
+            self.sim.set_frame_counter(self.current_playback_buffer_index)
             self.timer.start(int(self.sim.frame_time * 1000))
             self.ui.play_button.setText("▪")
             self.running = True
@@ -119,6 +119,7 @@ class MainWindow(QMainWindow):
         self.render_label.set_running(running)
         if not running:
             self.timer.stop()
+
     def _change_speed(self):
         """
         Updates the simulation speed based on slider value.
@@ -168,8 +169,8 @@ class MainWindow(QMainWindow):
 
         try:
             new_index = self.current_playback_buffer_index - self.frames_per_click
-            if new_index < -self.sim.recorder.get_buffer_size():
-                new_index = -self.sim.recorder.get_buffer_size()
+            if new_index < -self.sim.get_buffer_size():
+                new_index = -self.sim.get_buffer_size()
 
             self._render_buffer_frame(new_index)
         except Exception:
@@ -188,13 +189,13 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
 
-    def _render_buffer_frame(self, index: int) -> None:
+    def _render_buffer_frame(self, index: int, drop_newer: bool = False) -> None:
         """Load and render a frame from the simulation recorder buffer."""
         self.current_playback_buffer_index = index
         self._remove_inspector()
-        frame, data = self.sim.recorder.get_frame(index)
+        frame, pixmap = self.renderer.render_frame(self.render_label.size(), index, self.render_charged, drop_newer)
         self._update_frame_counter(frame)
-        pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
+       
         self.render_label.setPixmap(pixmap)
 
     def _show_cell_inspector(self, cell_data: CellDict) -> None:

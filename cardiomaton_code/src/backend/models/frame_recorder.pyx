@@ -36,6 +36,22 @@ cdef class FrameRecorder:
             free(self.frames)
             self.frames = NULL
 
+    cdef inline int _normalize_index(self, int idx):
+        if self.count == 0:
+            return -1
+        if idx < 0:
+            idx = self.current_idx + idx + 1
+        
+        if idx < 0:
+            idx += self.buff_size
+        elif idx >= self.buff_size:
+            idx %= self.buff_size
+        
+        if idx < 0 or idx >= self.count:
+            return -1
+        
+        return idx
+
     cdef CellSnapshot* get_next_buffer(self):
         self.current_idx = (self.current_idx + 1) % self.buff_size
         if self.count < self.buff_size:
@@ -44,20 +60,38 @@ cdef class FrameRecorder:
         return self.frames[self.current_idx]
 
     cdef CellSnapshot* get_buffer(self, int idx):
-        if idx < 0 or idx >= self.count:
+        idx = self._normalize_index(idx)
+        
+        if idx == -1:
             return NULL
         return self.frames[idx]
 
     cdef void remove_newer(self, int idx):
+        idx = self._normalize_index(idx)
         if idx < 0:
             self.current_idx = -1
             self.count = 0
-        elif idx < self.count:
+            return
+
+        if self.count < self.buff_size:
             self.current_idx = idx
             self.count = idx + 1
+        else:
+            self.current_idx = idx
 
     cdef void remove_older(self, int idx):
-        if idx <= 0:
+        idx = self._normalize_index(idx)
+        
+        if idx == -1:
             return
-        elif idx < self.count:
-            self.count -= idx
+
+        if self.count < self.buff_size:
+            if idx < self.count:
+                self.count -= idx
+            else:
+                self.count = 0
+        else:
+            self.count = self.buff_size - idx
+
+    cdef int get_count(self):
+        return self.count

@@ -48,15 +48,6 @@ class SimulationService:
         ... 
         #self.automaton.update_cell_from_dict(data)
 
-    def recreate_from_frame(self, frame: Dict[Tuple[int, int], CellDict]) -> None:
-        """
-        Restores the simulation state from a given frame.
-
-        Args
-            frame (Dict[Tuple[int, int], CellDict]): Mapping of the cell position to the cell state.
-        """
-        self.automaton.recreate_from_dict(frame)
-
     @property
     def frame_time(self) -> float:
         """
@@ -85,3 +76,12 @@ class SimulationService:
         Returns the serialized cell under specified position, None if there's no cell
         """
         return self.automaton.get_cell_data(position)
+    
+    def get_buffer_size(self) -> int:
+        return self.automaton.get_buffer_size()
+    
+    def render_frame(self, idx, if_charged, drop_newer) -> int:
+        return self.automaton.render_frame(idx, if_charged, drop_newer)
+
+    def set_frame_counter(self, idx: int) -> None:
+        self.automaton.set_frame_counter(idx)

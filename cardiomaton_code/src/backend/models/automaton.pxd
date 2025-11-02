@@ -23,7 +23,6 @@ cdef class Automaton:
     cdef public dict dict_mapping
 
     # Public python API
-    cpdef void recreate_from_dict(self, tuple)
     cpdef void update_grid(self, object is_charged)
     cpdef tuple to_cell_data(self)
 
@@ -31,6 +30,10 @@ cdef class Automaton:
     cpdef void set_frame_time(self, double)
     cpdef tuple get_shape(self)
     cpdef dict get_cell_data(self, tuple)
+
+    cpdef int get_buffer_size(self)
+    cpdef int render_frame(self, int idx, object if_charged, object drop_newer)
+    cpdef void set_frame_counter(self, int)
 
     # Private python compatible methods
     cpdef dict _create_data_map(self, dict)
