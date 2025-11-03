@@ -14,6 +14,7 @@ class CellDict(TypedDict):
     cell_type: str
     auto_polarization: bool
 
+
 class Cell:
     """
     Class to store information about specific cell.
@@ -42,7 +43,7 @@ class Cell:
 
         self.config = cell_config
 
-        self.cell_data = self.config["cell_data"]
+        self.cell_data = self.config["cell_data"].copy()
 
         self.period = self.config["period"]
         self.n_range = self.config["range"]

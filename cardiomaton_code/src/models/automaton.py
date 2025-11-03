@@ -5,6 +5,9 @@ from src.update_strategies.test_update import TestUpdate
 from src.models.cell_type import CellType
 from src.update_strategies.update_charge import UpdateCharge
 from src.update_strategies.update_charge_ms_copy import UpdateChargeMSCopy
+from copy import deepcopy
+
+from cardiomaton_code.src.frontend.cell_modificator import CellModification
 
 import copy
 from typing import Dict, List, Tuple
@@ -42,6 +45,8 @@ class Automaton:
         self.neighbour_map = self._create_neighbour_map()
         self.update_method = UpdateChargeMSCopy()
         self.fig = self.ax = self.img = None
+
+        self.modification_snapshots = []
 
     def _create_neighbour_map(self):
         return {
@@ -259,25 +264,23 @@ class Automaton:
         self.grid_a = tmp_grid
         return max_depth, frame_counter
 
-    def modify_cells(self, modification, necrosis):
-        cells, dicts = modification
+    def modify_cells(self, modification):
+        cells = modification.cells
+        dicts = modification.parameters
+        # self.modification_snapshots.append(deepcopy(self.grid_a))
         for i, cell in enumerate(self.grid_a):
             if cell.position in cells:
-                if necrosis:
+                if modification.necrosis_enabled:
                     cell.state = CellState.NECROSIS
                     self.grid_b[i].state = CellState.NECROSIS
-                    # cell_dict = cell.to_dict()
-                    # cell_dict["state_value"] = 5
-                    #
-                    # cell.update_data(cell_dict)
-                    # self.grid_b[i].update_data(cell_dict)
-                    # print(cell.state)
                 for key, val in dicts.items():
-                    if key in cell.cell_data:
-                        # print("JESTKURWA_dict")
+                    if key in cell.cell_data.keys():
                         cell.cell_data[key] *= val/100
                         self.grid_b[i].cell_data[key] *= val/100
-                # cell.cell_data.update(dicts)
-                # cell.update_data(data_dict)
 
-        return
+    def undo_modification(self):
+        if self.modification_snapshots:
+            grid_c = self.modification_snapshots.pop(-1)
+            self.grid_a = grid_c
+            self.grid_b = grid_c
+

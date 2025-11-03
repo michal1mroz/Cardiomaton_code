@@ -3,6 +3,7 @@ from src.models.cell import CellDict
 from src.frontend.frame_recorder import FrameRecorder
 from src.services.simulation_service import SimulationService
 
+from cardiomaton_code.src.frontend.cell_modificator import CellModification
 
 class SimulationController:
     def __init__(self, frame_time: float):
@@ -46,8 +47,11 @@ class SimulationController:
         self.service.recreate_from_frame(frame)
         self.recorder.drop_newer(ix)
 
-    def modify_cells(self, modification, necrosis = False):
-        self.service.modify_cells(modification, necrosis)
+    def modify_cells(self, modification):
+        self.service.modify_cells(modification)
+
+    def undo_modification(self):
+        self.service.undo_modification()
 
     @property
     def frame_time(self) -> float:

@@ -4,6 +4,8 @@ from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
 from src.models.automaton import Automaton
 
+from cardiomaton_code.src.frontend.cell_modificator import CellModification
+
 
 class SimulationService:
     """
@@ -51,8 +53,11 @@ class SimulationService:
         """
         self.automaton.recreate_from_dict(frame)
 
-    def modify_cells(self, modification, necrosis = False):
-        self.automaton.modify_cells(modification, necrosis)
+    def modify_cells(self, modification):
+        self.automaton.modify_cells(modification)
+
+    def undo_modification(self):
+        self.automaton.undo_modification()
 
     @property
     def frame_time(self) -> float:

@@ -1,6 +1,13 @@
 from PyQt6.QtGui import QColor
+from dataclasses import dataclass
 
-
+@dataclass
+class CellModification:
+    cells: list[tuple[int, int]]
+    parameters: dict[str, float]
+    necrosis_enabled: bool = False
+    modifier_name: str | None = None
+    metadata: dict | None = None
 
 class CellModificator:
     def __init__(self, name : str = "martwica", color: QColor = QColor(0, 0, 0, 127)):

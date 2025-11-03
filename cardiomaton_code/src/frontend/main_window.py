@@ -8,7 +8,7 @@ from src.frontend.main_label import MainLabel
 from src.frontend.ui_main_window import UiMainWindow
 
 
-from cardiomaton_code.src.frontend.cell_modificator import CellModificator
+from cardiomaton_code.src.frontend.cell_modificator import CellModificator, CellModification
 
 
 class MainWindow(QMainWindow):
@@ -251,14 +251,22 @@ class MainWindow(QMainWindow):
             self.ui.presets_layout.setVisible(True)
             self.cell_inspector.deleteLater()
             self.cell_inspector = None
-    def _modify_cells(self):
-        cells = self.cell_modificator.commit_change()
-        values = {name: slider.value() for name, slider in self.ui.parameter_sliders.items()}
 
+
+    def _modify_cells(self):
+        modification = CellModification(
+            cells=self.cell_modificator.commit_change(),
+            parameters={name: slider.value() for name, slider in self.ui.parameter_sliders.items()},
+            necrosis_enabled=self.ui.necrosis_switch.isChecked(),
+            modifier_name="user_slider",
+        )
+        print(modification.parameters)
         for slider in self.ui.parameter_sliders.values():
             slider.setValue(100)
-        self.sim.modify_cells((cells, values), self.ui.necrosis_switch.isChecked())
+        self.ui.necrosis_switch.setChecked(False)
+        self.sim.modify_cells(modification)
         self.render_label.new_highlight()
 
     def _undo_cell_modification(self):
         self.render_label.undo_highlight()
+        self.sim.undo_modification()
