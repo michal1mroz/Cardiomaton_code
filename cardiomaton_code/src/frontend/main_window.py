@@ -7,7 +7,9 @@ from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
 from src.frontend.ui_main_window import UiMainWindow
 
-from PyQt6.QtGui import QPainter, QColor
+
+from cardiomaton_code.src.frontend.cell_modificator import CellModificator
+
 
 class MainWindow(QMainWindow):
     """
@@ -27,7 +29,8 @@ class MainWindow(QMainWindow):
 
         self.sim = SimulationController(frame_time=self.base_frame_time)
         self.renderer = FrameRenderer(self.sim)
-        self.render_label = MainLabel(self.renderer, self.ui.brush_size_slider, self.ui.brush_type_combobox)
+        self.cell_modificator = CellModificator()
+        self.render_label = MainLabel(self.renderer, 5, self.cell_modificator)
 
         self.render_charged = True # flag telling how simulation is rendered : True - showing charge; False - showing state
         self.running = False
@@ -39,6 +42,7 @@ class MainWindow(QMainWindow):
 
         self._init_ui()
         self._init_timer()
+
 
     def _init_ui(self):
         """
@@ -68,6 +72,10 @@ class MainWindow(QMainWindow):
         # Timers for playback and forward buttons
         self.playback_timer = QTimer(self)
         self.playback_timer.timeout.connect(self._on_playback)
+
+        self.ui.commit_button.clicked.connect(self._modify_cells)
+
+        self.ui.undo_button.clicked.connect(self._undo_cell_modification)
 
         self.forward_timer = QTimer(self)
         self.forward_timer.timeout.connect(self._on_forward)
@@ -141,28 +149,25 @@ class MainWindow(QMainWindow):
 
         # -- EXPERIMENTAL
 
-        painter = QPainter(pixmap)
-
-        for i in range(self.ui.brush_type_combobox.count()):
-            brush_obj = self.ui.brush_type_combobox.itemData(i)
-            if brush_obj is None:
-                continue
-
-            color = brush_obj.color
-            painter.setBrush(color)
-            painter.setPen(QColor(0, 0, 0, 0))
-            cell_size = 2
-            pixmap_size = pixmap.size()
-            label_size = self.render_label.size()
-            # cell_size = int((label_size.width() / pixmap_size.width()))
-
-            offset_x = int((label_size.width() - pixmap_size.width()) / 2)
-            offset_y = int( (label_size.height() - pixmap_size.height()) / 2)
-
-            for row, col in brush_obj.selected_cells:
-                painter.drawRect(col * cell_size + 2, row * cell_size + 2, cell_size, cell_size)
-
-        painter.end()
+        # painter = QPainter(pixmap)
+        #
+        # brush_obj = self.cell_modificator
+        #
+        # color = brush_obj.color
+        # painter.setBrush(color)
+        # painter.setPen(QColor(0, 0, 0, 0))
+        # cell_size = 2
+        # pixmap_size = pixmap.size()
+        # label_size = self.render_label.size()
+        # # cell_size = int((label_size.width() / pixmap_size.width()))
+        #
+        # offset_x = int((label_size.width() - pixmap_size.width()) / 2)
+        # offset_y = int( (label_size.height() - pixmap_size.height()) / 2)
+        #
+        # for row, col in brush_obj.selected_cells:
+        #     painter.drawRect(col * cell_size + 2, row * cell_size + 2, cell_size, cell_size)
+        #
+        # painter.end()
 
         # -- EXPERIMENTAL
 
@@ -231,7 +236,8 @@ class MainWindow(QMainWindow):
             running=self.running, ctrl=self.sim
         )
         self.ui.cell_inspector_layout.addWidget(self.cell_inspector)
-        self.ui.parameters_layout.setVisible(False)
+        # self.ui.parameters_layout.setVisible(False)
+        self.ui.parameters_scroll.setVisible(False)
         self.ui.presets_layout.setVisible(False)
         self.ui.cell_inspector_container.setParent(self.ui.settings_layout)
 
@@ -240,7 +246,19 @@ class MainWindow(QMainWindow):
     def _remove_inspector(self) -> None:
         if self.cell_inspector:
             self.ui.cell_inspector_container.setParent(None)
-            self.ui.parameters_layout.setVisible(True)
+            # self.ui.parameters_layout.setVisible(True)
+            self.ui.parameters_scroll.setVisible(True)
             self.ui.presets_layout.setVisible(True)
             self.cell_inspector.deleteLater()
             self.cell_inspector = None
+    def _modify_cells(self):
+        cells = self.cell_modificator.commit_change()
+        values = {name: slider.value() for name, slider in self.ui.parameter_sliders.items()}
+
+        for slider in self.ui.parameter_sliders.values():
+            slider.setValue(100)
+        self.sim.modify_cells((cells, values), self.ui.necrosis_switch.isChecked())
+        self.render_label.new_highlight()
+
+    def _undo_cell_modification(self):
+        self.render_label.undo_highlight()

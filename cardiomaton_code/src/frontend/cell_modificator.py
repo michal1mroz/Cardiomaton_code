@@ -7,6 +7,7 @@ class CellModificator:
         self.name = name
         self.color = color
         self.selected_cells = []
+        self.current_changes = {}
 
     def add_cells(self, cells):
         if isinstance(cells, tuple):
@@ -26,5 +27,10 @@ class CellModificator:
                 if cell in self.selected_cells:
                     self.selected_cells.remove(cell)
 
-    def apply_change(self):
-        ...
+    def add_changes(self, name, value):
+        self.current_changes[name] = value
+
+    def commit_change(self):
+        cells = self.selected_cells
+        self.selected_cells = []
+        return cells

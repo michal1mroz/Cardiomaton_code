@@ -46,6 +46,9 @@ class SimulationController:
         self.service.recreate_from_frame(frame)
         self.recorder.drop_newer(ix)
 
+    def modify_cells(self, modification, necrosis = False):
+        self.service.modify_cells(modification, necrosis)
+
     @property
     def frame_time(self) -> float:
         """

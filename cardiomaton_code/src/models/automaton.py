@@ -258,3 +258,26 @@ class Automaton:
 
         self.grid_a = tmp_grid
         return max_depth, frame_counter
+
+    def modify_cells(self, modification, necrosis):
+        cells, dicts = modification
+        for i, cell in enumerate(self.grid_a):
+            if cell.position in cells:
+                if necrosis:
+                    cell.state = CellState.NECROSIS
+                    self.grid_b[i].state = CellState.NECROSIS
+                    # cell_dict = cell.to_dict()
+                    # cell_dict["state_value"] = 5
+                    #
+                    # cell.update_data(cell_dict)
+                    # self.grid_b[i].update_data(cell_dict)
+                    # print(cell.state)
+                for key, val in dicts.items():
+                    if key in cell.cell_data:
+                        # print("JESTKURWA_dict")
+                        cell.cell_data[key] *= val/100
+                        self.grid_b[i].cell_data[key] *= val/100
+                # cell.cell_data.update(dicts)
+                # cell.update_data(data_dict)
+
+        return

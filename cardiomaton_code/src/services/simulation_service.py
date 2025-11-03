@@ -51,6 +51,9 @@ class SimulationService:
         """
         self.automaton.recreate_from_dict(frame)
 
+    def modify_cells(self, modification, necrosis = False):
+        self.automaton.modify_cells(modification, necrosis)
+
     @property
     def frame_time(self) -> float:
         """

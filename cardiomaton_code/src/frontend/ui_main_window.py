@@ -142,48 +142,209 @@ class UiMainWindow(object):
         self._add_shadow(self.presets_layout)
         self.verticalLayout_2.addWidget(self.presets_layout)
 
-        self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
-        self.parameters_layout.setStyleSheet(
-            "background-color: black;\n"
-            "border-radius: 20px;\n"
-        )
-        self.parameters_layout.setLayout(QVBoxLayout())
-        self._add_shadow(self.parameters_layout)
-        self.verticalLayout_2.addWidget(self.parameters_layout)
+        # self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
+        # self.parameters_layout.setStyleSheet(
+        #     "background-color: black;\n"
+        #     "border-radius: 20px;\n"
+        # )
+        # self.parameters_layout.setLayout(QVBoxLayout())
+        # self._add_shadow(self.parameters_layout)
+        # self.verticalLayout_2.addWidget(self.parameters_layout)
 
         # --- Parameters layout widgets --- EXPERIMENTAL
+        self.parameters_scroll = QtWidgets.QScrollArea(parent=self.settings_layout)
+        self.parameters_scroll.setWidgetResizable(True)
+        self.parameters_scroll.setStyleSheet("""
+                    QScrollArea {
+                        border: none;
+                        background-color: black;
+                        border-radius: 20px;
+                    }
+                    QScrollBar:vertical {
+                        background: #1e1e1e;
+                        width: 10px;
+                        margin: 4px 0 4px 0;
+                        border-radius: 5px;
+                    }
+                    QScrollBar::handle:vertical {
+                        background: #6D98F4;
+                        border-radius: 5px;
+                        min-height: 20px;
+                    }
+                    QScrollBar::handle:vertical:hover {
+                        background: #89B0FF;
+                    }
+                    QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                        background: none;
+                        height: 0px;
+                    }
+                """)
+        self._add_shadow(self.parameters_scroll)
 
-        self.brush_layout = QtWidgets.QVBoxLayout(self.parameters_layout)
-        self.brush_layout.setContentsMargins(20, 20, 20, 20)
-        self.brush_layout.setSpacing(15)
+        # Kontener wewnętrzny (to będzie "treść" scroll area)
+        self.parameters_container = QtWidgets.QWidget()
+        self.parameters_container.setStyleSheet("background-color: black; border-radius: 20px;")
 
-        self.brush_size_label = self.create_label(self.parameters_layout, "Brush Size", font_size=14)
-        self.brush_layout.addWidget(self.brush_size_label)
+        self.parameters_layout = QtWidgets.QVBoxLayout(self.parameters_container)
+        self.parameters_layout.setContentsMargins(20, 20, 20, 20)
+        self.parameters_layout.setSpacing(15)
 
-        self.brush_size_slider = self.create_slider(self.parameters_layout)
-        self.brush_size_slider.setRange(1, 15)
-        self.brush_size_slider.setValue(5)
-        self.brush_layout.addWidget(self.brush_size_slider)
+        top_row = QtWidgets.QWidget(self.parameters_container)
+        top_layout = QtWidgets.QHBoxLayout(top_row)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(15)
 
-        self.brush_type_label = self.create_label(self.parameters_layout, "Brush Type", font_size=14)
-        self.brush_layout.addWidget(self.brush_type_label)
+        # 🔹 Przycisk Commit
+        self.commit_button = QtWidgets.QPushButton("Commit", parent=top_row)
+        self.commit_button.setStyleSheet("""
+            QPushButton {
+                font-family: 'Mulish ExtraBold';
+                font-size: 14px;
+                background-color: #6D98F4;
+                color: white;
+                border-radius: 10px;
+                padding: 6px 10px;
+            }
+            QPushButton:hover {
+                background-color: #89B0FF;
+            }
+        """)
+        self.commit_button.setFixedHeight(32)
+        self._add_shadow(self.commit_button)
+        top_layout.addWidget(self.commit_button)
 
-        self.brush_type_combobox = QtWidgets.QComboBox(self.parameters_layout)
-        deff = CellModificator()
-        self.brush_type_combobox.addItem(deff.name, deff)
-        self.brush_layout.addWidget(self.brush_type_combobox)
+        # 🔹 Przycisk Cofnij
 
-        self.brush_layout.addStretch()
+        self.undo_button = QtWidgets.QPushButton("Cofnij", parent=top_row)
+        self.undo_button.setStyleSheet("""
+            QPushButton {
+                font-family: 'Mulish ExtraBold';
+                font-size: 14px;
+                background-color: #FF6D6D;
+                color: white;
+                border-radius: 10px;
+                padding: 6px 10px;
+            }
+            QPushButton:hover {
+                background-color: #FF8989;
+            }
+        """)
+        self.undo_button.setFixedHeight(32)
+        self._add_shadow(self.undo_button)
+        top_layout.addWidget(self.undo_button)
+
+        # 🔹 Przełącznik Necrosis
+        self.necrosis_switch = QtWidgets.QCheckBox("Necrosis", parent=top_row)
+        self.necrosis_switch.setStyleSheet("""
+            QCheckBox {
+                font-family: 'Mulish';
+                font-size: 13px;
+                color: white;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 20px;
+                height: 20px;
+                border-radius: 10px;
+                border: 2px solid #6D98F4;
+                background-color: transparent;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #6D98F4;
+            }
+        """)
+        top_layout.addWidget(self.necrosis_switch, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
+
+        # 🔹 Dodaj cały wiersz do layoutu parametrów
+        self.parameters_layout.addWidget(top_row)
+
+        stats = ["V_rest", "V_thresh", "V_peak", "V12", "V23",
+                 "t01", "t12", "t23", "t34", "t40", "t03"]
+
+        self.parameter_sliders = {}
+
+        for stat_name in stats:
+            row = QtWidgets.QWidget(self.parameters_container)
+            row_layout = QtWidgets.QHBoxLayout(row)
+            row_layout.setContentsMargins(0, 0, 0, 0)
+            row_layout.setSpacing(10)
+
+            label = self._create_label(
+                row, stat_name, font_family="Mulish", font_size=13, color="white"
+            )
+            label.setFixedWidth(80)
+            row_layout.addWidget(label)
+
+            slider = self._create_slider(row)
+            slider.setRange(0, 200)
+            slider.setValue(100)
+            row_layout.addWidget(slider)
+
+            self.parameter_sliders[stat_name] = slider
+            self.parameters_layout.addWidget(row)
+
+        self.parameters_layout.addStretch()
+
+        # Powiązanie kontenera z obszarem przewijania
+        self.parameters_scroll.setWidget(self.parameters_container)
+        self.verticalLayout_2.addWidget(self.parameters_scroll)
+
+        # Parameters layout
+        # self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
+        # self.parameters_layout.setStyleSheet(
+        #     "background-color: black;\n"
+        #     "border-radius: 20px;\n"
+        # )
+        # self._add_shadow(self.parameters_layout)
+        #
+        # # Layout główny wewnątrz parameters_layout
+        # self.parameters_layout_main = QtWidgets.QVBoxLayout(self.parameters_layout)
+        # self.parameters_layout_main.setContentsMargins(20, 20, 20, 20)
+        # self.parameters_layout_main.setSpacing(15)
+        #
+        # # Lista statystyk
+        # stats = ["V_rest", "V_thresh", "V_peak", "V12", "V23",
+        #          "t01", "t12", "t23", "t34", "t40", "t03"]
+        #
+        # # Tworzenie sliderów i etykiet
+        # self.parameter_sliders = {}  # dla ewentualnego późniejszego dostępu
+        #
+        # for stat_name in stats:
+        #     row = QtWidgets.QWidget(self.parameters_layout)
+        #     row_layout = QtWidgets.QHBoxLayout(row)
+        #     row_layout.setContentsMargins(0, 0, 0, 0)
+        #     row_layout.setSpacing(10)
+        #
+        #     # Etykieta po lewej
+        #     label = self._create_label(
+        #         row, stat_name, font_family="Mulish", font_size=13, color="white"
+        #     )
+        #     label.setFixedWidth(80)
+        #     row_layout.addWidget(label)
+        #
+        #     # Slider po prawej
+        #     slider = self._create_slider(row)
+        #     slider.setRange(0, 200)
+        #     slider.setValue(100)
+        #     row_layout.addWidget(slider)
+        #
+        #     self.parameter_sliders[stat_name] = slider
+        #     self.parameters_layout_main.addWidget(row)
+        #
+        # self.parameters_layout_main.addStretch()
+        # self.verticalLayout_2.addWidget(self.parameters_layout)
 
         #  --- Parameters layout widgets --- EXPERIMENTAL
-        # self.cell_inspector_container= QWidget()
-        # self.cell_inspector_container.setStyleSheet("""
-        #             background-color: white;
-        #             border-radius: 20px;
-        #         """)
-        # self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
-        # self.cell_inspector_layout.setContentsMargins(20, 0, 12, 10)
-        # self.cell_inspector_layout.setSpacing(20)
+
+
+        self.cell_inspector_container= QWidget()
+        self.cell_inspector_container.setStyleSheet("""
+                    background-color: white;
+                    border-radius: 20px;
+                """)
+        self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
+        self.cell_inspector_layout.setContentsMargins(20, 0, 12, 10)
+        self.cell_inspector_layout.setSpacing(20)
 
         self.players_layout = QtWidgets.QWidget(parent=self.settings_layout)
         self.players_layout.setStyleSheet(
