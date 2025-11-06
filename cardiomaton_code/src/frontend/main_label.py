@@ -34,8 +34,6 @@ class MainLabel(QLabel):
         self.setScaledContents(False)
         self.setMinimumSize(1, 1)
 
-        self.highlighted_cells = [set()]
-
         self.setStyleSheet("""
             QToolTip {
                 background-color: #cfe3fc;
@@ -44,16 +42,15 @@ class MainLabel(QLabel):
         """)
 
     def paintEvent(self, event):
-        """Rysuje podstawowy pixmap, a następnie półprzezroczyste podświetlenie."""
+        """Draws automaton pixmap and then cell modification highlights"""
         super().paintEvent(event)
-        if not self.highlighted_cells or self.pixmap() is None:
+        if self.pixmap() is None:
             return
 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # kolor półprzezroczysty (np. jasnoniebieski)
-        brush = QBrush(QColor(109, 152, 244, 100))  # RGBA — 100 to przezroczystość
+        brush = QBrush(QColor(109, 152, 244, 100))  # deafult color
         painter.setBrush(brush)
         painter.setPen(Qt.PenStyle.NoPen)
 
@@ -62,18 +59,15 @@ class MainLabel(QLabel):
         pixmap_size = pixmap.size()
         label_size = self.size()
 
-        # dopasowanie rozmiaru komórki do aktualnego wyświetlenia
         cell_width = pixmap_size.width() / cols
         cell_height = pixmap_size.height() / rows
 
         offset_x = (label_size.width() - pixmap_size.width()) / 2
         offset_y = (label_size.height() - pixmap_size.height()) / 2
 
-        # narysuj wszystkie zaznaczone komórki
-        for i, h in enumerate(self.highlighted_cells):
+        for i, h in enumerate(self.cell_modificator.get_highlights()):
             for (r, c) in h:
-                color = self.get_color(i)
-                color.setAlpha(55)
+                color = self.cell_modificator.get_color(i)
                 brush = QBrush(color)
                 painter.setBrush(brush)
                 x = offset_x + c * cell_width
@@ -174,52 +168,21 @@ class MainLabel(QLabel):
         #         QToolTip.hideText()
         #         self.last_tooltip = None
 
-    # def _paint_cells(self, pos, add = True):
-    #     if pos is None:
-    #         return
-    #     radius = self.brush_size_slider
-    #     brush_obj = self.cell_modificator
-    #     row, col = pos
-    #     pixmap = self.pixmap()
-    #     pixmap_size = pixmap.size()
-    #
-    #     if brush_obj is None:
-    #         return
-    #
-    #     for i in range(row - radius, row + radius + 1):
-    #         for j in range(col - radius, col + radius + 1):
-    #             if 0 <= i < pixmap_size.width() and 0 <= j < pixmap_size.height():
-    #                 if (i - row) ** 2 + (j - col) ** 2 <= radius ** 2:
-    #
-    #                     if add:
-    #                         brush_obj.add_cells((i, j))
-    #                         payload = self.renderer.current_data.get((i,j))
-    #                         if payload is not None:
-    #                             payload["state_value"] = 5
-    #                             self.renderer.ctrl.update_cell(payload)
-    #                     else:
-    #                         brush_obj.remove_cells((i, j))
     def _paint_cells(self, pos, add=True):
         if pos is None:
             return
         radius = self.brush_size_slider
-        brush_obj = self.cell_modificator
         row, col = pos
         rows, cols = self.renderer.ctrl.shape
-
-        if brush_obj is None:
-            return
 
         for i in range(row - radius, row + radius + 1):
             for j in range(col - radius, col + radius + 1):
                 if 0 <= i < rows and 0 <= j < cols:
                     if (i - row) ** 2 + (j - col) ** 2 <= radius ** 2:
                         if add:
-                            brush_obj.add_cells((i, j))
-                            self.highlighted_cells[-1].add((i, j))
+                            self.cell_modificator.add_cells((i, j))
                         else:
-                            brush_obj.remove_cells((i, j))
-                            self.highlighted_cells[-1].discard((i, j))
+                            self.cell_modificator.remove_cells((i, j))
 
         self.update()
     def _show_cell_info(self, info, global_pos, pos, debug = False):
@@ -262,14 +225,4 @@ class MainLabel(QLabel):
     def set_running(self, state):
         self.running = state
 
-    def new_highlight(self):
-        self.highlighted_cells.append(set())
 
-    def undo_highlight(self):
-        self.highlighted_cells.pop(-1)
-        if len(self.highlighted_cells) == 0: self.highlighted_cells.append(set())
-        self.update()
-
-    def get_color(self, index, total=10):
-        hue = int((index % total) * 360 / total)
-        return QColor.fromHsv(hue, 255, 255, 128)

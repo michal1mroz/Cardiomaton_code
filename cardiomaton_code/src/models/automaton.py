@@ -266,7 +266,7 @@ class Automaton:
 
     def modify_cells(self, modification):
         cells = modification.cells
-        dicts = modification.parameters
+        dicts = modification.purkinje_charge_parameters
         # self.modification_snapshots.append(deepcopy(self.grid_a))
         for i, cell in enumerate(self.grid_a):
             if cell.position in cells:

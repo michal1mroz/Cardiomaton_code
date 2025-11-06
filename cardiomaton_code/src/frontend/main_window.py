@@ -256,17 +256,18 @@ class MainWindow(QMainWindow):
     def _modify_cells(self):
         modification = CellModification(
             cells=self.cell_modificator.commit_change(),
-            parameters={name: slider.value() for name, slider in self.ui.parameter_sliders.items()},
+            purkinje_charge_parameters= {name: slider.value() for name, slider in
+                                                             self.ui.parameter_sliders.items()},
+            atrial_charge_parameters={},
+            pacemaker_charge_parameters={},
             necrosis_enabled=self.ui.necrosis_switch.isChecked(),
-            modifier_name="user_slider",
+            modifier_name="user_slider"
         )
-        print(modification.parameters)
         for slider in self.ui.parameter_sliders.values():
             slider.setValue(100)
         self.ui.necrosis_switch.setChecked(False)
         self.sim.modify_cells(modification)
-        self.render_label.new_highlight()
 
     def _undo_cell_modification(self):
-        self.render_label.undo_highlight()
+        self.cell_modificator.undo_change()
         self.sim.undo_modification()
