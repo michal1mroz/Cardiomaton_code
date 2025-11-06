@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.pyd
 
 # Distribution / packaging
 .Python
@@ -174,3 +175,5 @@ cython_debug/
 .pypirc
 .vscode/
 *.db
+*.c
+*.cpp
