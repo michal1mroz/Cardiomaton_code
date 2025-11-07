@@ -1,11 +1,12 @@
 from src.backend.structs.c_cell cimport CCell
 from src.backend.enums.cell_state cimport CellStateC, cell_state_name
 from src.backend.enums.cell_type cimport CellTypeC, type_to_pyenum
+from libc.stdint cimport uintptr_t
 
 from src.backend.models.cell import CellDict
 
 cdef class CellWrapper:
-    def __cinit__(self, unsigned long cell_a, list neighbors, dict cell_data):
+    def __cinit__(self, uintptr_t cell_a, list neighbors, dict cell_data):
         self.cell_a = <CCell*> cell_a
         self.neighbors = neighbors
         self.cell_data = cell_data

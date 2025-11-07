@@ -183,7 +183,7 @@ class MainWindow(QMainWindow):
         
         # Maybe let's think of some observers or other callbacks to update widgets. MM
         if self.cell_inspector:
-            self.cell_inspector.update(self.renderer.get_cell_data(self.cell_inspector.position))
+            self.cell_inspector.update(self.sim.get_cell_data(self.cell_inspector.position))
 
     def _start_playback_hold(self):
         self._on_playback()
@@ -243,7 +243,6 @@ class MainWindow(QMainWindow):
             running=self.running, ctrl=self.sim
         )
         self.ui.cell_inspector_layout.addWidget(self.cell_inspector)
-        # self.ui.parameters_layout.setVisible(False)
         self.ui.parameters_scroll.setVisible(False)
         self.ui.presets_layout.setVisible(False)
         self.ui.cell_inspector_container.setParent(self.ui.settings_layout)
@@ -259,22 +258,27 @@ class MainWindow(QMainWindow):
             self.cell_inspector.deleteLater()
             self.cell_inspector = None
 
-
     def _modify_cells(self):
+        panel = self.ui.parameter_panel
+
+        all_params = panel.get_current_values()
+
         modification = CellModification(
             cells=self.cell_modificator.commit_change(),
-            purkinje_charge_parameters= {name: slider.value() for name, slider in
-                                                             self.ui.parameter_sliders.items()},
-            atrial_charge_parameters={name: slider.value() for name, slider in
-                                                             self.ui.parameter_sliders.items()},
-            pacemaker_charge_parameters={name: slider.value() for name, slider in
-                                                             self.ui.parameter_sliders.items()},
+            purkinje_charge_parameters=all_params["PURKINJE"],
+            atrial_charge_parameters=all_params["ATRIAL"],
+            pacemaker_charge_parameters=all_params["PACEMAKER"],
             necrosis_enabled=self.ui.necrosis_switch.isChecked(),
-            modifier_name="user_slider"
+            modifier_name="user_slider",
         )
-        for slider in self.ui.parameter_sliders.values():
-            slider.setValue(100)
+
+        for cell_type, params in panel.parameter_sliders.items():
+            for name, (slider, _) in params.items():
+                default = panel.cell_defaults[cell_type][name]["default"]
+                slider.setValue(int(default * 1000) if abs(default) < 1 else int(default))
+
         self.ui.necrosis_switch.setChecked(False)
+
         self.sim.modify_cells(modification)
 
     def _undo_cell_modification(self):

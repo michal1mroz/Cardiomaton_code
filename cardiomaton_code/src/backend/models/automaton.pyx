@@ -3,6 +3,7 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memset
 from libc.stdint cimport uintptr_t
 
+
 from src.backend.structs.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict
 from src.backend.enums.cell_state cimport CellStateC,state_to_cenum
 from src.backend.enums.cell_type cimport type_to_cenum
@@ -13,6 +14,7 @@ from src.backend.structs.cell_wrapper cimport CellWrapper
 from src.backend.structs.cell_snapshot cimport CellSnapshot
 from src.backend.models.frame_recorder cimport FrameRecorder
 
+
 import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, Dict
@@ -20,6 +22,8 @@ from typing import Tuple, Dict
 from src.backend.models.cell import Cell, CellDict
 from src.backend.enums.cell_type import CellType
 from src.backend.enums.cell_state import CellState
+from src.update_strategies.charge_approx.charge_update import ChargeUpdate
+
 
 @dataclass
 class CellData:
@@ -158,7 +162,7 @@ cdef class Automaton:
             grid[i].ref_threshold = <double> py_cell.ref_threshold
             grid[i].charge = 0
 
-            self.cell_data[(py_cell.pos_x, py_cell.pos_y)] = CellWrapper(<unsigned long>grid[i], 
+            self.cell_data[(py_cell.pos_x, py_cell.pos_y)] = CellWrapper(<uintptr_t> grid[i],
                                         [(nei.pos_x, nei.pos_y) for nei in py_cell.neighbors],
                                         py_cell.config)
             
@@ -297,26 +301,54 @@ cdef class Automaton:
             if (x, y) in coords:
                 cell.c_state = c_state_val
 
-    cpdef void modify_charge_data(self, set coords, dict atrial_charge_parameters, dict pacemaker_charge_parameters, dict purkinje_charge_parameters):
+    cpdef void modify_charge_data(self, set coords, dict atrial_charge_parameters, dict pacemaker_charge_parameters,
+    dict purkinje_charge_parameters):
+        """
+        Modyfikuje zarówno struktury CCell (C), jak i konfiguracje Pythonowe (config)
+        dla komórek o współrzędnych z 'coords'.
+        """
         cdef int i
         cdef CCell* cell
         cdef int x, y
+        cdef dict charge_params
+        cdef dict cell_config
+        cdef dict cell_data
+
         for i in range(self.n_nodes):
             cell = self.grid_a[i]
             x, y = cell.pos_x, cell.pos_y
 
-            if (x, y) in coords:
-                if cell.c_type in {CellTypeC.HIS_LEFT, CellTypeC.HIS_RIGHT, CellTypeC.HIS_BUNDLE}:      # PRUKINJE
-                    cell.V_rest = purkinje_charge_parameters["V_rest"]
-                    cell.V_peak = purkinje_charge_parameters["V_peak"]
-                elif cell.c_type in {CellTypeC.SA_NODE, CellTypeC.AV_NODE}:                             #PACEMAKERS
-                    cell.V_rest = pacemaker_charge_parameters["V_rest"]
-                    cell.V_thresh = pacemaker_charge_parameters["V_thresh"]
-                    cell.V_peak = pacemaker_charge_parameters["V_peak"]
-                else:                                                          # ATRIAL
-                    cell.V_rest = atrial_charge_parameters["V_rest"]
-                    cell.V_peak = atrial_charge_parameters["V_peak"]
+            if (x, y) not in coords:
+                continue
 
+            wrapper = self.cell_data.get((x, y), None)
+            if wrapper is None:
+                continue
+
+            config = wrapper.cell_data
+
+            if cell.c_type in {CellTypeC.HIS_LEFT, CellTypeC.HIS_RIGHT, CellTypeC.HIS_BUNDLE}:
+                # PURKINJE
+                config["cell_data"].update(purkinje_charge_parameters)
+            elif cell.c_type in {CellTypeC.SA_NODE, CellTypeC.AV_NODE}:
+                # PACEMAKERS
+                config["cell_data"].update(pacemaker_charge_parameters)
+            else:
+                # ATRIAL CELLS
+                config["cell_data"].update(atrial_charge_parameters)
+
+            charges, max_charge, ref_threshold = ChargeUpdate.get_func(config)
+
+            cell.charge_max = <int> max_charge
+            cell.V_peak = <double> config["cell_data"].get("V_peak")
+            cell.V_rest = <double> config["cell_data"].get("V_rest")
+            cell.V_thresh = <double> config["cell_data"].get("V_thresh", 0)
+            cell.ref_threshold = <double> ref_threshold
+
+            if charges is not None:
+                add_cell_charges(cell, np.asarray(charges, dtype=np.float64))
+            else:
+                raise RuntimeError("Attempted construction of a cell with no charge function")
 
     """
     Set of getters and setters for the python API

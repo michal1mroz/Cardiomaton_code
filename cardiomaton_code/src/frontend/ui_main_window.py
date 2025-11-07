@@ -2,6 +2,7 @@ import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QFontDatabase, QColor
 from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow, QVBoxLayout
+from src.frontend.parameter_panel import ParameterPanel
 from src.frontend.cell_modificator import CellModificator
 
 
@@ -142,15 +143,6 @@ class UiMainWindow(object):
         self._add_shadow(self.presets_layout)
         self.verticalLayout_2.addWidget(self.presets_layout)
 
-        # self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
-        # self.parameters_layout.setStyleSheet(
-        #     "background-color: black;\n"
-        #     "border-radius: 20px;\n"
-        # )
-        # self.parameters_layout.setLayout(QVBoxLayout())
-        # self._add_shadow(self.parameters_layout)
-        # self.verticalLayout_2.addWidget(self.parameters_layout)
-
         # --- Parameters layout widgets --- EXPERIMENTAL
         self.parameters_scroll = QtWidgets.QScrollArea(parent=self.settings_layout)
         self.parameters_scroll.setWidgetResizable(True)
@@ -183,7 +175,7 @@ class UiMainWindow(object):
 
         # Kontener wewnętrzny (to będzie "treść" scroll area)
         self.parameters_container = QtWidgets.QWidget()
-        self.parameters_container.setStyleSheet("background-color: black; border-radius: 20px;")
+        self.parameters_container.setStyleSheet("background-color: white; border-radius: 20px;")
 
         self.parameters_layout = QtWidgets.QVBoxLayout(self.parameters_container)
         self.parameters_layout.setContentsMargins(20, 20, 20, 20)
@@ -239,7 +231,7 @@ class UiMainWindow(object):
             QCheckBox {
                 font-family: 'Mulish';
                 font-size: 13px;
-                color: white;
+                color: black;
                 spacing: 8px;
             }
             QCheckBox::indicator {
@@ -258,84 +250,18 @@ class UiMainWindow(object):
         # 🔹 Dodaj cały wiersz do layoutu parametrów
         self.parameters_layout.addWidget(top_row)
 
-        stats = ["V_rest", "V_thresh", "V_peak", "V12", "V23",
-                 "t01", "t12", "t23", "t34", "t40", "t03"]
+        # 🔹 Panel parametrów – dodajemy go do środka kontenera scrolla
+        self.parameter_panel = ParameterPanel(self.parameters_container)
+        self.parameters_layout.addWidget(self.parameter_panel)
 
-        self.parameter_sliders = {}
-
-        for stat_name in stats:
-            row = QtWidgets.QWidget(self.parameters_container)
-            row_layout = QtWidgets.QHBoxLayout(row)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            row_layout.setSpacing(10)
-
-            label = self._create_label(
-                row, stat_name, font_family="Mulish", font_size=13, color="white"
-            )
-            label.setFixedWidth(80)
-            row_layout.addWidget(label)
-
-            slider = self._create_slider(row)
-            slider.setRange(0, 200)
-            slider.setValue(100)
-            row_layout.addWidget(slider)
-
-            self.parameter_sliders[stat_name] = slider
-            self.parameters_layout.addWidget(row)
-
+        # 🔹 Na dole odrobina przestrzeni
         self.parameters_layout.addStretch()
 
-        # Powiązanie kontenera z obszarem przewijania
+        # 🔹 Ustaw kontener jako zawartość scrolla
         self.parameters_scroll.setWidget(self.parameters_container)
+
+        # 🔹 I dopiero cały scroll do głównego layoutu
         self.verticalLayout_2.addWidget(self.parameters_scroll)
-
-        # Parameters layout
-        # self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
-        # self.parameters_layout.setStyleSheet(
-        #     "background-color: black;\n"
-        #     "border-radius: 20px;\n"
-        # )
-        # self._add_shadow(self.parameters_layout)
-        #
-        # # Layout główny wewnątrz parameters_layout
-        # self.parameters_layout_main = QtWidgets.QVBoxLayout(self.parameters_layout)
-        # self.parameters_layout_main.setContentsMargins(20, 20, 20, 20)
-        # self.parameters_layout_main.setSpacing(15)
-        #
-        # # Lista statystyk
-        # stats = ["V_rest", "V_thresh", "V_peak", "V12", "V23",
-        #          "t01", "t12", "t23", "t34", "t40", "t03"]
-        #
-        # # Tworzenie sliderów i etykiet
-        # self.parameter_sliders = {}  # dla ewentualnego późniejszego dostępu
-        #
-        # for stat_name in stats:
-        #     row = QtWidgets.QWidget(self.parameters_layout)
-        #     row_layout = QtWidgets.QHBoxLayout(row)
-        #     row_layout.setContentsMargins(0, 0, 0, 0)
-        #     row_layout.setSpacing(10)
-        #
-        #     # Etykieta po lewej
-        #     label = self._create_label(
-        #         row, stat_name, font_family="Mulish", font_size=13, color="white"
-        #     )
-        #     label.setFixedWidth(80)
-        #     row_layout.addWidget(label)
-        #
-        #     # Slider po prawej
-        #     slider = self._create_slider(row)
-        #     slider.setRange(0, 200)
-        #     slider.setValue(100)
-        #     row_layout.addWidget(slider)
-        #
-        #     self.parameter_sliders[stat_name] = slider
-        #     self.parameters_layout_main.addWidget(row)
-        #
-        # self.parameters_layout_main.addStretch()
-        # self.verticalLayout_2.addWidget(self.parameters_layout)
-
-        #  --- Parameters layout widgets --- EXPERIMENTAL
-
 
         self.cell_inspector_container= QWidget()
         self.cell_inspector_container.setStyleSheet("""

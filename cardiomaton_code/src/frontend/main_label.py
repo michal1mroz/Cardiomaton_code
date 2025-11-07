@@ -114,12 +114,12 @@ class MainLabel(QLabel):
                 return
             else:
                 pos = self._mouse_position(event)
-                if pos and self.renderer.current_data:
-                    cell_info = self.renderer.current_data.get(pos)
+                if pos:
+                    cell_info = self.renderer.ctrl.get_cell_data(pos)
                     if cell_info:
                         self.cellClicked.emit(cell_info)
         else:
-            self._paint_cells(self._mouse_position(event))
+            # self._paint_cells(self._mouse_position(event))
 
             pos = self._mouse_position(event)
             if event.button() == Qt.MouseButton.LeftButton:
@@ -138,35 +138,37 @@ class MainLabel(QLabel):
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if self.running or self.pixmap() is None:
-            return
+            if self.pixmap() is not None:
+                """
+                Show tooltip only if the mouse moves to a new cell.
+                Tooltip remains visible as long as the mouse stays over the same cell.
+                """
+                if self.running or self.pixmap() is None:
+                    return
 
-        pos = self._mouse_position(event)
-        if event.buttons() & Qt.MouseButton.LeftButton:
-            self._paint_cells(pos, add=True)
-        elif event.buttons() & Qt.MouseButton.RightButton:
-            self._paint_cells(pos, add=False)
-        # """
-        # Show tooltip only if the mouse moves to a new cell.
-        # Tooltip remains visible as long as the mouse stays over the same cell.
-        # """
-        # if self.running or self.pixmap() is None:
-        #     return
-        #
-        # pos = self._mouse_position(event)
-        # if pos is None and self.last_tooltip is not None:
-        #     QToolTip.hideText()
-        #     self.last_tooltip = None
-        #
-        #
-        # data = self.renderer.current_data
-        # if data is not None and self.last_tooltip != pos:
-        #     cell_info = data.get(pos)
-        #     if cell_info is not None:
-        #         self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
-        #         self.last_tooltip = pos
-        #     else:
-        #         QToolTip.hideText()
-        #         self.last_tooltip = None
+                pos = self._mouse_position(event)
+                if pos is None and self.last_tooltip is not None:
+                    QToolTip.hideText()
+                    self.last_tooltip = None
+
+
+                data = self.renderer.current_data
+                if data is not None and self.last_tooltip != pos:
+                    cell_info = data.get(pos)
+                    if cell_info is not None:
+                        self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
+                        self.last_tooltip = pos
+                    else:
+                        QToolTip.hideText()
+                        self.last_tooltip = None
+            return
+        else:
+            pos = self._mouse_position(event)
+            if event.buttons() & Qt.MouseButton.LeftButton:
+                self._paint_cells(pos, add=True)
+            elif event.buttons() & Qt.MouseButton.RightButton:
+                self._paint_cells(pos, add=False)
+
 
     def _paint_cells(self, pos, add=True):
         if pos is None:

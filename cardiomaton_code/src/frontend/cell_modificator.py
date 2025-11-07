@@ -18,20 +18,20 @@ class CellModificator:
 
     def add_cells(self, cells):
         if isinstance(cells, tuple):
-            if cells not in self.selected_cells:
+            if cells not in self.selected_cells[-1]:
                 self.selected_cells[-1].add(cells)
         elif isinstance(cells, list):
             for cell in cells:
-                if cell not in self.selected_cells:
+                if cell not in self.selected_cells[-1]:
                     self.selected_cells[-1].add(cell)
 
     def remove_cells(self, cells):
         if isinstance(cells, tuple):
-            if cells in self.selected_cells:
+            if cells in self.selected_cells[-1]:
                 self.selected_cells[-1].remove(cells)
         elif isinstance(cells, list):
             for cell in cells:
-                if cell in self.selected_cells:
+                if cell in self.selected_cells[-1]:
                     self.selected_cells[-1].remove(cell)
 
     def commit_change(self):
