@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.renderer = FrameRenderer(self.sim, self.image)
         self.cell_modificator = CellModificator()
 
-        self.render_label = MainLabel(self.renderer, 5, self.cell_modificator)
+        self.render_label = MainLabel(self.renderer, self.ui.brush_size_slider, self.cell_modificator)
 
         self.render_charged = True # flag telling how simulation is rendered : True - showing charge; False - showing state
         self.running = False

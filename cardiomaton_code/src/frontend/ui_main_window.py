@@ -143,7 +143,7 @@ class UiMainWindow(object):
         self._add_shadow(self.presets_layout)
         self.verticalLayout_2.addWidget(self.presets_layout)
 
-        # --- Parameters layout widgets --- EXPERIMENTAL
+        # --- Parameters layout widgets ---
         self.parameters_scroll = QtWidgets.QScrollArea(parent=self.settings_layout)
         self.parameters_scroll.setWidgetResizable(True)
         self.parameters_scroll.setStyleSheet("""
@@ -173,7 +173,7 @@ class UiMainWindow(object):
                 """)
         self._add_shadow(self.parameters_scroll)
 
-        # Kontener wewnętrzny (to będzie "treść" scroll area)
+        # Parameters menu container
         self.parameters_container = QtWidgets.QWidget()
         self.parameters_container.setStyleSheet("background-color: white; border-radius: 20px;")
 
@@ -186,7 +186,7 @@ class UiMainWindow(object):
         top_layout.setContentsMargins(0, 0, 0, 0)
         top_layout.setSpacing(15)
 
-        # 🔹 Przycisk Commit
+        # Commit button
         self.commit_button = QtWidgets.QPushButton("Commit", parent=top_row)
         self.commit_button.setStyleSheet("""
             QPushButton {
@@ -205,9 +205,9 @@ class UiMainWindow(object):
         self._add_shadow(self.commit_button)
         top_layout.addWidget(self.commit_button)
 
-        # 🔹 Przycisk Cofnij
+        # Undo button
 
-        self.undo_button = QtWidgets.QPushButton("Cofnij", parent=top_row)
+        self.undo_button = QtWidgets.QPushButton("Undo", parent=top_row)
         self.undo_button.setStyleSheet("""
             QPushButton {
                 font-family: 'Mulish ExtraBold';
@@ -225,7 +225,32 @@ class UiMainWindow(object):
         self._add_shadow(self.undo_button)
         top_layout.addWidget(self.undo_button)
 
-        # 🔹 Przełącznik Necrosis
+        self.brush_size_slider = self._create_slider(parent=top_row)
+        self.brush_size_slider.setRange(1, 8)
+        self.brush_size_slider.setValue(3)
+        self.brush_size_slider.setFixedWidth(100)
+
+        self.brush_value_label = self._create_label(
+            parent=top_row,
+            text=str(self.brush_size_slider.value()),
+            font_size=13,
+            bold=True,
+            color="#6D98F4"
+        )
+
+        self.brush_size_slider.valueChanged.connect(
+            lambda v: self.brush_value_label.setText(str(v))
+        )
+
+        brush_layout = QtWidgets.QHBoxLayout()
+        brush_layout.setSpacing(6)
+        brush_layout.addWidget(self.brush_size_slider)
+        brush_layout.addWidget(self.brush_value_label)
+
+        top_layout.addLayout(brush_layout)
+
+
+        # Necrosis switch
         self.necrosis_switch = QtWidgets.QCheckBox("Necrosis", parent=top_row)
         self.necrosis_switch.setStyleSheet("""
             QCheckBox {
@@ -247,20 +272,15 @@ class UiMainWindow(object):
         """)
         top_layout.addWidget(self.necrosis_switch, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
 
-        # 🔹 Dodaj cały wiersz do layoutu parametrów
         self.parameters_layout.addWidget(top_row)
 
-        # 🔹 Panel parametrów – dodajemy go do środka kontenera scrolla
         self.parameter_panel = ParameterPanel(self.parameters_container)
         self.parameters_layout.addWidget(self.parameter_panel)
 
-        # 🔹 Na dole odrobina przestrzeni
         self.parameters_layout.addStretch()
 
-        # 🔹 Ustaw kontener jako zawartość scrolla
         self.parameters_scroll.setWidget(self.parameters_container)
 
-        # 🔹 I dopiero cały scroll do głównego layoutu
         self.verticalLayout_2.addWidget(self.parameters_scroll)
 
         self.cell_inspector_container= QWidget()

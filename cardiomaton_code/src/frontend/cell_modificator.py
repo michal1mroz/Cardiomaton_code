@@ -7,7 +7,6 @@ class CellModification:
     purkinje_charge_parameters: dict[str, float]
     atrial_charge_parameters: dict[str, float]
     pacemaker_charge_parameters: dict[str, float]
-    purkinje_charge_parameters: dict[str, float]
     necrosis_enabled: bool = False
     modifier_name: str | None = None
     metadata: dict | None = None

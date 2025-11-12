@@ -119,21 +119,11 @@ class MainLabel(QLabel):
                     if cell_info:
                         self.cellClicked.emit(cell_info)
         else:
-            # self._paint_cells(self._mouse_position(event))
-
             pos = self._mouse_position(event)
             if event.button() == Qt.MouseButton.LeftButton:
                 self._paint_cells(pos, add=True)
             elif event.button() == Qt.MouseButton.RightButton:
                 self._paint_cells(pos, add=False)
-        # if self.pixmap() is None:
-        #     return
-        #
-        # pos = self._mouse_position(event)
-        # if pos and self.renderer.current_data:
-        #     cell_info = self.renderer.current_data.get(pos)
-        #     if cell_info:
-        #         self.cellClicked.emit(cell_info)
 
 
     def mouseMoveEvent(self, event: QMouseEvent):
@@ -143,7 +133,7 @@ class MainLabel(QLabel):
                 Show tooltip only if the mouse moves to a new cell.
                 Tooltip remains visible as long as the mouse stays over the same cell.
                 """
-                if self.running or self.pixmap() is None:
+                if self.pixmap() is None:
                     return
 
                 pos = self._mouse_position(event)
@@ -151,10 +141,8 @@ class MainLabel(QLabel):
                     QToolTip.hideText()
                     self.last_tooltip = None
 
-
-                data = self.renderer.current_data
-                if data is not None and self.last_tooltip != pos:
-                    cell_info = data.get(pos)
+                if self.last_tooltip != pos:
+                    cell_info = self.renderer.ctrl.get_cell_data(pos)
                     if cell_info is not None:
                         self._show_cell_info(cell_info, event.globalPosition().toPoint(), pos, False)
                         self.last_tooltip = pos
@@ -173,7 +161,7 @@ class MainLabel(QLabel):
     def _paint_cells(self, pos, add=True):
         if pos is None:
             return
-        radius = self.brush_size_slider
+        radius = self.brush_size_slider.value() - 1
         row, col = pos
         rows, cols = self.renderer.ctrl.shape
 
@@ -212,7 +200,8 @@ class MainLabel(QLabel):
                 <b>Current state:</b> {polarization_state.replace('_', ' ')}<br><br>
                 <b>Current voltage:</b> {voltage:.0f} mV<br>
             </div>
-            """
+            <b style='font-family:Mulish;font-size:1pt;color:#ffffff;'>{pos}</b> 
+            """# ^ refreshes the position of tooltip
 
         QToolTip.showText(global_pos, text, self)
 
