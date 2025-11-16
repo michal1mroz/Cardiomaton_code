@@ -23,7 +23,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 "t12": {"default": 0.008, "min": 0.0056, "max": 0.0104},
                 "t23": {"default": 0.158, "min": 0.110, "max": 0.205},
                 "t34": {"default": 0.238, "min": 0.167, "max": 0.309},
-                "t40": {"default": 0.268, "min": 0.188, "max": 0.348},
+                # "t40": {"default": 0.268, "min": 0.188, "max": 0.348},
             },
             "PURKINJE": {
                 "V_rest": {"default": -90.0, "min": -117.0, "max": -63.0},
@@ -138,6 +138,19 @@ class ParameterPanel(QtWidgets.QWidget):
             result[c_type] = _extract_for_type(c_type)
 
         return result
+
+    def reset_all_sliders(self):
+        for cell_type, params in self.cell_defaults.items():
+            for name, data in params.items():
+                default = data["default"]
+                slider, value_label = self.parameter_sliders[cell_type][name]
+
+                if abs(default) < 1:
+                    slider.setValue(int(default * 1000))
+                    value_label.setText(f"{default:.3f}")
+                else:
+                    slider.setValue(int(default))
+                    value_label.setText(str(default))
 
     def _update_label(self, cell_type, param_name, value):
         slider, label = self.parameter_sliders[cell_type][param_name]

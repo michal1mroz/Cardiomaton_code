@@ -154,30 +154,6 @@ class MainWindow(QMainWindow):
         """
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
 
-        # -- EXPERIMENTAL
-
-        # painter = QPainter(pixmap)
-        #
-        # brush_obj = self.cell_modificator
-        #
-        # color = brush_obj.color
-        # painter.setBrush(color)
-        # painter.setPen(QColor(0, 0, 0, 0))
-        # cell_size = 2
-        # pixmap_size = pixmap.size()
-        # label_size = self.render_label.size()
-        # # cell_size = int((label_size.width() / pixmap_size.width()))
-        #
-        # offset_x = int((label_size.width() - pixmap_size.width()) / 2)
-        # offset_y = int( (label_size.height() - pixmap_size.height()) / 2)
-        #
-        # for row, col in brush_obj.selected_cells:
-        #     painter.drawRect(col * cell_size + 2, row * cell_size + 2, cell_size, cell_size)
-        #
-        # painter.end()
-
-        # -- EXPERIMENTAL
-
         self.render_label.setPixmap(pixmap)
         self.ui.frame_counter_label.setText(f"Frame: {frame}")
         
@@ -259,9 +235,7 @@ class MainWindow(QMainWindow):
             self.cell_inspector = None
 
     def _modify_cells(self):
-        panel = self.ui.parameter_panel
-
-        all_params = panel.get_current_values()
+        all_params = self.ui.parameter_panel.get_current_values()
 
         modification = CellModification(
             cells=self.cell_modificator.commit_change(),
@@ -272,13 +246,8 @@ class MainWindow(QMainWindow):
             modifier_name="user_slider",
         )
 
-        for cell_type, params in panel.parameter_sliders.items():
-            for name, (slider, _) in params.items():
-                default = panel.cell_defaults[cell_type][name]["default"]
-                slider.setValue(int(default * 1000) if abs(default) < 1 else int(default))
-
+        self.ui.parameter_panel.reset_all_sliders()
         self.ui.necrosis_switch.setChecked(False)
-
         self.sim.modify_cells(modification)
 
     def _undo_cell_modification(self):
