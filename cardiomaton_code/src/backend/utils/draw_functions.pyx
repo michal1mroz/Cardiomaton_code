@@ -57,6 +57,10 @@ cdef void draw_from_charge(unsigned char* img, int bytes_per_line, CCell* cell):
         h = 0
         s = 0
         v = 255.0 / 255.0
+    elif cell.c_state == CellStateC.NECROSIS:
+        h = 0
+        s = 0
+        v = 0
     else:
         h = -cell.charge * 0.25 + 7.5
         if h < 0:
