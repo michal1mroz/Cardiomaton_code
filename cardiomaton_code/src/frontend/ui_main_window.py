@@ -2,6 +2,8 @@ import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QFontDatabase, QColor
 from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow, QVBoxLayout
+from src.frontend.parameter_panel import ParameterPanel
+from src.frontend.cell_modificator import CellModificator
 
 
 class UiMainWindow(object):
@@ -141,14 +143,145 @@ class UiMainWindow(object):
         self._add_shadow(self.presets_layout)
         self.verticalLayout_2.addWidget(self.presets_layout)
 
-        self.parameters_layout = QtWidgets.QWidget(parent=self.settings_layout)
-        self.parameters_layout.setStyleSheet(
-            "background-color: white;\n"
-            "border-radius: 20px;\n"
+        # --- Parameters layout widgets ---
+        self.parameters_scroll = QtWidgets.QScrollArea(parent=self.settings_layout)
+        self.parameters_scroll.setWidgetResizable(True)
+        self.parameters_scroll.setStyleSheet("""
+                    QScrollArea {
+                        border: none;
+                        background-color: black;
+                        border-radius: 20px;
+                    }
+                    QScrollBar:vertical {
+                        background: #1e1e1e;
+                        width: 10px;
+                        margin: 4px 0 4px 0;
+                        border-radius: 5px;
+                    }
+                    QScrollBar::handle:vertical {
+                        background: #6D98F4;
+                        border-radius: 5px;
+                        min-height: 20px;
+                    }
+                    QScrollBar::handle:vertical:hover {
+                        background: #89B0FF;
+                    }
+                    QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                        background: none;
+                        height: 0px;
+                    }
+                """)
+        self._add_shadow(self.parameters_scroll)
+
+        # Parameters menu container
+        self.parameters_container = QtWidgets.QWidget()
+        self.parameters_container.setStyleSheet("background-color: white; border-radius: 20px;")
+
+        self.parameters_layout = QtWidgets.QVBoxLayout(self.parameters_container)
+        self.parameters_layout.setContentsMargins(20, 20, 20, 20)
+        self.parameters_layout.setSpacing(15)
+
+        top_row = QtWidgets.QWidget(self.parameters_container)
+        top_layout = QtWidgets.QHBoxLayout(top_row)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(15)
+
+        # Commit button
+        self.commit_button = QtWidgets.QPushButton("Commit", parent=top_row)
+        self.commit_button.setStyleSheet("""
+            QPushButton {
+                font-family: 'Mulish ExtraBold';
+                font-size: 14px;
+                background-color: #6D98F4;
+                color: white;
+                border-radius: 10px;
+                padding: 6px 10px;
+            }
+            QPushButton:hover {
+                background-color: #89B0FF;
+            }
+        """)
+        self.commit_button.setFixedHeight(32)
+        self._add_shadow(self.commit_button)
+        top_layout.addWidget(self.commit_button)
+
+        # Undo button
+
+        self.undo_button = QtWidgets.QPushButton("Undo", parent=top_row)
+        self.undo_button.setStyleSheet("""
+            QPushButton {
+                font-family: 'Mulish ExtraBold';
+                font-size: 14px;
+                background-color: #FF6D6D;
+                color: white;
+                border-radius: 10px;
+                padding: 6px 10px;
+            }
+            QPushButton:hover {
+                background-color: #FF8989;
+            }
+        """)
+        self.undo_button.setFixedHeight(32)
+        self._add_shadow(self.undo_button)
+        top_layout.addWidget(self.undo_button)
+
+        self.brush_size_slider = self._create_slider(parent=top_row)
+        self.brush_size_slider.setRange(1, 8)
+        self.brush_size_slider.setValue(3)
+        self.brush_size_slider.setFixedWidth(100)
+
+        self.brush_value_label = self._create_label(
+            parent=top_row,
+            text=str(self.brush_size_slider.value()),
+            font_size=13,
+            bold=True,
+            color="#6D98F4"
         )
-        self.parameters_layout.setLayout(QVBoxLayout())
-        self._add_shadow(self.parameters_layout)
-        self.verticalLayout_2.addWidget(self.parameters_layout)
+
+        self.brush_size_slider.valueChanged.connect(
+            lambda v: self.brush_value_label.setText(str(v))
+        )
+
+        brush_layout = QtWidgets.QHBoxLayout()
+        brush_layout.setSpacing(6)
+        brush_layout.addWidget(self.brush_size_slider)
+        brush_layout.addWidget(self.brush_value_label)
+
+        top_layout.addLayout(brush_layout)
+
+
+        # Necrosis switch
+        self.necrosis_switch = QtWidgets.QCheckBox("Necrosis", parent=top_row)
+        self.necrosis_switch.setStyleSheet("""
+            QCheckBox {
+                font-family: 'Mulish';
+                font-size: 13px;
+                color: black;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 20px;
+                height: 20px;
+                border-radius: 10px;
+                border: 2px solid #6D98F4;
+                background-color: transparent;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #6D98F4;
+            }
+        """)
+        top_layout.addWidget(self.necrosis_switch, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
+
+        self.parameters_layout.addWidget(top_row)
+
+        self.parameter_panel = ParameterPanel(self.parameters_container)
+        self.parameters_layout.addWidget(self.parameter_panel)
+
+        self.parameters_layout.addStretch()
+
+        self.parameters_scroll.setWidget(self.parameters_container)
+
+        self.verticalLayout_2.addWidget(self.parameters_scroll)
 
         self.cell_inspector_container= QWidget()
         self.cell_inspector_container.setStyleSheet("""

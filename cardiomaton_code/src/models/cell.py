@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import List, Tuple, Dict, TypedDict
-from src.models.cell_state import CellState
+
+#from src.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
+
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
 # from src.models.cell_type import CellType
@@ -13,6 +16,7 @@ class CellDict(TypedDict):
     ccs_part: str 
     cell_type: str
     auto_polarization: bool
+
 
 class Cell:
     """
@@ -42,7 +46,7 @@ class Cell:
 
         self.config = cell_config
 
-        self.cell_data = self.config["cell_data"]
+        self.cell_data = self.config["cell_data"].copy()
 
         self.period = self.config["period"]
         self.n_range = self.config["range"]
@@ -142,7 +146,7 @@ class Cell:
         Args:
             data_dict (CellDict): Dict with new values for the cell
         """
-        self.state = CellState(int(data_dict['state_value'])) 
+        self.state = CellState(int(data_dict['state_value']))
         if self.state == CellState.RAPID_DEPOLARIZATION:
             self.charge = self.cell_data.get('V_peak', 0)
 

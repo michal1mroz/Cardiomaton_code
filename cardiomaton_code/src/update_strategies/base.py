@@ -1,6 +1,9 @@
 from typing import Tuple
-from src.models.cell import Cell
-from src.models.cell_state import CellState
+# from src.models.cell import Cell
+from src.backend.models.cell import Cell
+#from src.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
+
 from abc import ABC, abstractmethod
 
 class UpdateStrategy(ABC):

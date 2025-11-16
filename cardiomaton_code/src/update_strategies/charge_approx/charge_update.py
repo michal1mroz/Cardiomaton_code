@@ -55,6 +55,12 @@ class ChargeUpdate():
                 Dict[int, float] - map of time in frames (modulo range) -> charge values
                 int - time % range for the greatest argument
         """
+        # period = cell_data["range"]
+        # a = cell_data['period'] / period
+        # func = lambda t: pacemaker_AP_full((t % period) * a, **cell_data)
+        # args = list(range(int(period)))
+        # m = [func(t) for t in args]
+        # return m, ChargeUpdate._get_max_arg(func, period)
         cell_data = dict(cell_data)
         a = period / n_range
         func = lambda t: fun((t % n_range) * a, **cell_data)

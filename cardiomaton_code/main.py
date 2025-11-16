@@ -1,21 +1,21 @@
 from src.utils.image_loader import *
-import numpy as np
-from src.update_strategies.charge_approx.pacemakers import pacemaker_AP
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 
-cell_data =  {
-            "V_rest":-60,
-            "V_thresh":-40,
-            "V_peak":10,
-            "t40":120 / 1000,
-            "t03":128 / 1000,
-            "t34":308 / 1000,
-            "eps":0.01
-        }
+from src.backend.models.cell import Cell
+from src.backend.models.automaton import Automaton
+from cardiomaton_code.src.backend.enums.cell_type import CellType, ConfigLoader, type_to_cenum, type_to_pyenum
+from cardiomaton_code.src.backend.enums.cell_state import CellState
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    tab = np.linspace(0, 0.278, 200)
-    print(tab)
-    n_range = 600
-    a = 0.279 / n_range
-    V = [pacemaker_AP((t % n_range) * a, **cell_data) for t in list(range(n_range))]
-    print(V)
+    print(CellState.POLARIZATION.value)
+    ConfigLoader.loadConfig()
+    # cell = Cell((123,321), CellType.SA_NODE)
+    # print(cell)
+    # print(cell.charges)
+    py_type = CellType.BACHMANN
+    print(py_type.name, py_type.value)
+    c_type = type_to_cenum(py_type)
+    print(c_type)
+    py_rev = type_to_pyenum(c_type)
+    print(py_rev, py_rev.name, py_rev.value)

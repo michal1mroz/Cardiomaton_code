@@ -187,7 +187,7 @@
         },
         "period":0.41,
         "range": 500,
-        "self_polarization": true,
+        "self_polarization": false,
         "charge_function": "PACEMAKER",
         "name": "Atrioventricular node"
     }

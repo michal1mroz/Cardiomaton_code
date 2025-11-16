@@ -1,6 +1,8 @@
 from src.update_strategies.base import UpdateStrategy
 from src.models.cell import Cell
-from src.models.cell_state import CellState
+
+#from src.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState
 
 class UpdateWithTiming(UpdateStrategy):
     def update(self, cell, current_frame):
