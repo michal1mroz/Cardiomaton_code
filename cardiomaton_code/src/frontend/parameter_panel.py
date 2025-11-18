@@ -39,6 +39,39 @@ class ParameterPanel(QtWidgets.QWidget):
             },
         }
 
+        self.param_labels = {
+            "PACEMAKER": {
+                "V_rest": "Maximum Diastolic Potential (mV)",
+                "V_thresh": "Threshold Potential (mv)",
+                "V_peak": "Peak Membrane Potential (mV)",
+                "t40": "Slow Depolarization Duration (ms)",
+                "t03": "Rapid Depolarization Duration (ms)",
+                "t34": "Repolarizarion Duration (ms)",
+            },
+            "ATRIAL": {
+                "V_rest": "Resting Membrane Potential (mV)",
+                "V_peak": "Peak Membrane Potential (mv)",
+                "V12": "Plateau Potential (mv)",
+                "V23": "Late Repolarization Potential (mV)",
+                "t01": "Rapid Depolarization Duration (ms)",
+                "t12": "Early Rapid Repolarization Duration (ms)",
+                "t23": "Plateau Duration (ms)",
+                "t34": "Final Repolarizarion Duration (ms)",
+            },
+            "PURKINJE": {
+                "V_rest": "Maximum Diastolic Potential (mV)",
+                "V40": "Threshold Potential (mV)",
+                "V_peak": "Peak Membrane Potential (mV)",
+                "V12": "Plateau Potential (mV)",
+                "V23": "Late Repolarization Potential (mV)",
+                "t01": "Rapid Depolarization Duration (ms)",
+                "t12": "Early Rapid Repolarization Duration (ms)",
+                "t23": "Plateau Duration (ms)",
+                "t34": "Final Repolarizarion Duration (ms)",
+                "t40": "Slow Depolarization Duration (ms)",
+            },
+        }
+
         main_layout = QtWidgets.QVBoxLayout(self)
         scroll = QtWidgets.QScrollArea()
         scroll.setWidgetResizable(True)
@@ -62,14 +95,18 @@ class ParameterPanel(QtWidgets.QWidget):
                 max_val = data["max"]
 
                 row = QtWidgets.QWidget()
-                row_layout = QtWidgets.QHBoxLayout(row)
+                row_layout = QtWidgets.QVBoxLayout(row)
                 row_layout.setContentsMargins(0, 0, 0, 0)
-                row_layout.setSpacing(10)
+                row_layout.setSpacing(5)
 
-                label = QtWidgets.QLabel(name)
-                label.setFixedWidth(80)
+                label = QtWidgets.QLabel(f"{self.param_labels[cell_type][name]}:")
                 label.setStyleSheet("color: black; font-family: 'Mulish'; font-size: 13px;")
                 row_layout.addWidget(label)
+
+                bottom_row = QtWidgets.QWidget()
+                bottom_layout = QtWidgets.QHBoxLayout(bottom_row)
+                bottom_layout.setContentsMargins(0, 0, 0, 0)
+                bottom_layout.setSpacing(10)
 
                 slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
                 slider.setStyleSheet("""
@@ -106,8 +143,10 @@ class ParameterPanel(QtWidgets.QWidget):
                 value_label.setFixedWidth(60)
                 value_label.setStyleSheet("color: black; font-family: 'Mulish'; font-size: 13px;")
 
-                row_layout.addWidget(slider)
-                row_layout.addWidget(value_label)
+                bottom_layout.addWidget(slider)
+                bottom_layout.addWidget(value_label)
+                row_layout.addWidget(bottom_row)
+
                 section_layout.addWidget(row)
 
                 self.parameter_sliders[cell_type][name] = (slider, value_label)
