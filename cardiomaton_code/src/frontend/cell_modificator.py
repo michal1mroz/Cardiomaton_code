@@ -13,40 +13,64 @@ class CellModification:
 
 class CellModificator:
     def __init__(self):
-        self.selected_cells = [set()]
+        self.selected_cells: dict[tuple[int, int], list[int]] = {}
+        self.current_modification = 0
 
-    def add_cells(self, cells):
-        if isinstance(cells, tuple):
-            if cells not in self.selected_cells[-1]:
-                self.selected_cells[-1].add(cells)
-        elif isinstance(cells, list):
-            for cell in cells:
-                if cell not in self.selected_cells[-1]:
-                    self.selected_cells[-1].add(cell)
+    def add_cell(self, cell):
+        if cell not in self.selected_cells:
+            self.selected_cells[cell] = [self.current_modification]
+        else:
+            if len(self.selected_cells[cell]) == 0 or self.selected_cells[cell][-1] != self.current_modification:
+                self.selected_cells[cell].append(self.current_modification)
 
-    def remove_cells(self, cells):
-        if isinstance(cells, tuple):
-            if cells in self.selected_cells[-1]:
-                self.selected_cells[-1].remove(cells)
-        elif isinstance(cells, list):
-            for cell in cells:
-                if cell in self.selected_cells[-1]:
-                    self.selected_cells[-1].remove(cell)
+    def remove_cell(self, cell):
+        if cell not in self.selected_cells:
+            return
+
+        history = self.selected_cells[cell]
+        if self.current_modification in history:
+            history.remove(self.current_modification)
+
+        if len(history) == 0:
+            del self.selected_cells[cell]
 
     def commit_change(self):
-        cells = self.selected_cells[-1]
-        self.selected_cells.append(set())
-        return cells
+        committed = set()
+
+        for cell, history in self.selected_cells.items():
+            if len(history) > 0 and history[-1] == self.current_modification:
+                committed.add(cell)
+
+        self.current_modification += 1
+        return committed
 
     def undo_change(self):
-        if len(self.selected_cells) > 1:
-            self.selected_cells.pop(-2)
+        if self.current_modification == 0:
+            return
 
-    def get_color(self, index, total=10):
+        last = self.current_modification - 1
+        to_delete = []
+
+        for cell, history in self.selected_cells.items():
+            if last in history:
+                history.remove(last)
+                if len(history) == 0:
+                    to_delete.append(cell)
+
+        for cell in to_delete:
+            del self.selected_cells[cell]
+
+        self.current_modification -= 1
+
+    def get_color(self, x, y, total=10):
+        cell = (x, y)
+        if cell not in self.selected_cells or len(self.selected_cells[cell]) == 0:
+            return None
+
+        index = self.selected_cells[cell][-1]
         hue = int((index % total) * 360 / total)
         color = QColor.fromHsv(hue, 255, 255, 128)
-        color.setAlpha(55)
+        color.setAlpha(0)
         return color
-
     def get_highlights(self):
         return self.selected_cells
