@@ -34,7 +34,7 @@ class MainLabel(QLabel):
         self.setScaledContents(False)
         self.setMinimumSize(1, 1)
 
-        self._cell_highlights_brush = QBrush()
+        self.brushes = [QBrush(self._get_color(i)) for i in range(10)]
 
         self.setStyleSheet("""
             QToolTip {
@@ -43,6 +43,7 @@ class MainLabel(QLabel):
             }
         """)
 
+
     def paintEvent(self, event):
         super().paintEvent(event)
         if self.pixmap() is None:
@@ -50,8 +51,6 @@ class MainLabel(QLabel):
 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        brush = self._cell_highlights_brush
-        painter.setBrush(brush)
         painter.setPen(Qt.PenStyle.NoPen)
 
         rows, cols = self.renderer.ctrl.shape
@@ -67,23 +66,17 @@ class MainLabel(QLabel):
 
         highlights = self.cell_modificator.get_highlights()
 
-        print(len(highlights.items()))
-
         for (r, c), history in highlights.items():
             if not history:
                 continue
-            color = self.cell_modificator.get_color(r, c)
-
-            if color is None:
-                continue
-
-            brush.setColor(color)
+            painter.setBrush(self.brushes[history[-1]%10])
 
             x = offset_x + c * cell_width
             y = offset_y + r * cell_height
             painter.drawRect(QRectF(x, y, cell_width, cell_height))
 
         painter.end()
+
 
 
     def _mouse_position(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:
@@ -224,5 +217,11 @@ class MainLabel(QLabel):
         super().leaveEvent(event)
     def set_running(self, state):
         self.running = state
+
+    def _get_color(self, index, total=10):
+        hue = int((index % total) * 360 / total)
+        color = QColor.fromHsv(hue, 255, 255, 128)
+        color.setAlpha(55)
+        return color
 
 

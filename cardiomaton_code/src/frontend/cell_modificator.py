@@ -60,17 +60,5 @@ class CellModificator:
         for cell in to_delete:
             del self.selected_cells[cell]
 
-        self.current_modification -= 1
-
-    def get_color(self, x, y, total=10):
-        cell = (x, y)
-        if cell not in self.selected_cells or len(self.selected_cells[cell]) == 0:
-            return None
-
-        index = self.selected_cells[cell][-1]
-        hue = int((index % total) * 360 / total)
-        color = QColor.fromHsv(hue, 255, 255, 128)
-        color.setAlpha(0)
-        return color
     def get_highlights(self):
         return self.selected_cells
