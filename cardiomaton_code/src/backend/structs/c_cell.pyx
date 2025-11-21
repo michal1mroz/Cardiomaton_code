@@ -196,7 +196,8 @@ cdef int is_neighbor_depolarized(CCell* cell):
 
     for i in range(cell.n_neighbors):
         neighbor = cell.neighbors[i]
-        if neighbor != NULL and neighbor.c_state == CellStateC.RAPID_DEPOLARIZATION:
+        if neighbor != NULL and neighbor.can_propagate == 1 and neighbor.propagation_count > neighbor.propagation_time:
+        # if neighbor != NULL and neighbor.c_state == CellStateC.RAPID_DEPOLARIZATION:
             count += 1
             if count >= NEIGHBOR_DEPOLARIZATION_COUNT: # current models doesn't work for >= 2 or more
                 return 1

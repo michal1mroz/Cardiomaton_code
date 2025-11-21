@@ -63,6 +63,7 @@ def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,t
         "bachmann", "his_right", "sa_node", "internodal_ant",
         "internodal_post", "internodal_mid", "his_bundle", "av_node", "his_left"
     ]
+   
     region_dict = dict(zip(labels, region_components))
 
     region_pixels = set(chain.from_iterable(region_components))

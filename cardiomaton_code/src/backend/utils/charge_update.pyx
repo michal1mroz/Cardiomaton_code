@@ -36,6 +36,17 @@ cdef void update_charge(CCell* cell_a, CCell* cell_b):
     cdef int new_timer
     cdef double charge
 
+    # Update counter for cell polarization
+    if cell_a.can_propagate == 1:
+        if cell_a.propagation_count >= cell_a.propagation_time_max:
+            cell_b.can_propagate = 0
+            cell_a.can_propagate = 0
+            cell_a.propagation_count = 1
+            cell_b.propagation_count = 1
+        else:
+            cell_a.propagation_count += 1
+            cell_b.propagation_count += 1
+
     if cell_a.c_state == CellStateC.NECROSIS:
         cell_b.charge = 0
         cell_b.timer = cell_a.timer
@@ -98,6 +109,7 @@ cdef void update_charge(CCell* cell_a, CCell* cell_b):
         if cell_a.charge >= cell_a.V_peak:
             cell_b.charge = cell_a.V_peak
             cell_b.timer = cell_a.timer
+
             cell_b.c_state = CellStateC.RAPID_DEPOLARIZATION
             return
 
@@ -114,4 +126,7 @@ cdef void update_charge(CCell* cell_a, CCell* cell_b):
             update_cell(cell_a, cell_b)
         else:
             cell_b.charge = cell_a.charge
+        
+        cell_b.can_propagate = 1
+        cell_a.can_propagate = 1
         cell_b.c_state = CellStateC.REPOLARIZATION_ABSOLUTE_REFRACTION

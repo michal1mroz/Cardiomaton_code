@@ -12,6 +12,8 @@
         },
         "period":1.2,
         "range": 200,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "",
         "name": "Junction"
@@ -33,6 +35,8 @@
         },
         "period":0.507,
         "range": 100,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "PURKINJE",
         "name": "Left bundle branch"
@@ -53,6 +57,8 @@
         },
         "period":0.507,
         "range": 100,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "PURKINJE",
         "name": "Right bundle branch"
@@ -73,6 +79,8 @@
             },
         "period":0.268,
         "range": 200,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "ATRIAL",
         "name": "Bachmann's bundle"
@@ -93,6 +101,8 @@
         },
         "period":0.268,
         "range": 200,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "ATRIAL",
         "name": "Posterior internodal tract"
@@ -112,6 +122,8 @@
         },
         "period":0.268,
         "range": 200,
+        "propagation_time": 4,
+        "propagation_time_max": 7,
         "self_polarization": false,
         "charge_function": "ATRIAL",
         "name": "Anterior internodal tract"
@@ -132,6 +144,8 @@
         },
         "period":0.268,
         "range": 200,
+        "propagation_time": 5,
+        "propagation_time_max": 7,
         "self_polarization": false,
         "charge_function": "ATRIAL",
         "name": "Middle internodal tract"
@@ -153,6 +167,8 @@
         },
         "period":0.507,
         "range": 100,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "PURKINJE",
         "name": "Bundle of His"
@@ -170,6 +186,8 @@
         },
         "period":0.278,
         "range": 200,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": true,
         "charge_function": "PACEMAKER",
         "name": "Sinoatrial node"
@@ -187,6 +205,8 @@
         },
         "period":0.41,
         "range": 500,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
         "self_polarization": false,
         "charge_function": "PACEMAKER",
         "name": "Atrioventricular node"
