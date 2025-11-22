@@ -51,9 +51,12 @@ class SimulationService:
         #self.automaton.update_cell_from_dict(data)
 
     def modify_cells(self, modification):
-        self.automaton.commit_current_automaton()
-
         cells_positions = modification.cells
+        if modification.depolarize: # cell depolarization
+            self.automaton.modify_cell_state(cells_positions, CellState.RAPID_DEPOLARIZATION)
+            return
+
+        self.automaton.commit_current_automaton() # cell modification
         if modification.necrosis_enabled:
             self.automaton.modify_cell_state(cells_positions, CellState.NECROSIS)
         self.automaton.modify_charge_data(cells_positions,

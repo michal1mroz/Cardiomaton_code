@@ -1,13 +1,14 @@
 from PyQt6.QtGui import QColor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class CellModification:
     cells: list[tuple[int, int]]
-    purkinje_charge_parameters: dict[str, float]
-    atrial_charge_parameters: dict[str, float]
-    pacemaker_charge_parameters: dict[str, float]
+    purkinje_charge_parameters: dict[str, float] = field(default_factory=list)
+    atrial_charge_parameters: dict[str, float] = field(default_factory=list)
+    pacemaker_charge_parameters: dict[str, float] = field(default_factory=list)
     necrosis_enabled: bool = False
+    depolarize: bool = False
     modifier_name: str | None = None
     metadata: dict | None = None
 
