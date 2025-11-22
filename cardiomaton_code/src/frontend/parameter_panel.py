@@ -15,7 +15,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 "t34": {"default": 0.200, "min": 0.050, "max": 0.300},
             },
             "ATRIAL": {
-                "V_rest": {"default": -75.0, "min": -45.0, "max": -90.0},
+                "V_rest": {"default": -75.0, "min": -90.0, "max": -45.0},
                 "V_peak": {"default": 20.0, "min": -10.0, "max": 50.0},
                 "V12": {"default": 10, "min": -20.0, "max": 30.0},
                 "V23": {"default": -40.0, "min": -70.0, "max": -10.0},
@@ -29,7 +29,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 "V_rest": {"default": -90.0, "min": -100.0, "max": -70.0},
                 "V40": {"default": -75.0, "min": -85.0, "max": -60.0},
                 "V_peak": {"default": 30.0, "min": 0.0, "max": 50.0},
-                "V12": {"default": 0.0, "min": -30.0, "max": 20.0},
+                "V12": {"default": 5.0, "min": -30.0, "max": 20.0},
                 "V23": {"default": -20.0, "min": -50.0, "max": 0.0},
                 "t01": {"default": 0.002, "min": 0.001, "max": 0.010},
                 "t12": {"default": 0.007, "min": 0.002, "max": 0.020},
@@ -135,13 +135,13 @@ class ParameterPanel(QtWidgets.QWidget):
                 if abs(default) > 1:
                     slider.setRange(int(min_val), int(max_val))
                     slider.setValue(int(default))
-                    label = str(int(default))
+                    label_text = str(int(default))
                 else:
                     slider.setRange(int(min_val * 1000), int(max_val * 1000))
                     slider.setValue(int(default * 1000))
-                    label = str(int(default * 1000))
+                    label_text = str(int(default * 1000))
 
-                value_label = QtWidgets.QLabel(label)
+                value_label = QtWidgets.QLabel(label_text)
                 value_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
                 value_label.setFixedWidth(60)
                 value_label.setStyleSheet("color: black; font-family: 'Mulish'; font-size: 13px;")
@@ -162,7 +162,12 @@ class ParameterPanel(QtWidgets.QWidget):
         scroll.setWidget(container)
         main_layout.addWidget(scroll)
 
+        self._link_parameters("PACEMAKER", "V_rest", "V_thresh")
         self._link_parameters("ATRIAL", "V12", "V_peak")
+        self._link_parameters("PURKINJE", "V_rest", "V40")
+        self._link_parameters("PURKINJE", "V12", "V_peak")
+        self._link_parameters("PURKINJE", "V23", "V12")
+
 
     def get_current_values(self, cell_type: str | None = None) -> dict:
         result = {}
