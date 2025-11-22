@@ -1,7 +1,8 @@
 import sys
 from PyQt6.QtWidgets import QApplication
 from src.frontend.main_window import MainWindow
-from src.models.cell_type import ConfigLoader
+# from src.models.cell_type import ConfigLoader
+from cardiomaton_code.src.backend.enums.cell_type import ConfigLoader
 
 def main():
     """

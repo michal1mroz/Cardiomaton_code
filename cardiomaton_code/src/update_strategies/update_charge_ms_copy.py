@@ -1,6 +1,10 @@
 from src.update_strategies.base import UpdateBaseCharge
-from src.models.cell import Cell 
-from src.models.cell_state import CellState
+# from src.models.cell import Cell 
+from src.backend.models.cell import Cell
+
+#from src.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState, state_to_pyenum
+
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
 from typing import Tuple
@@ -11,6 +15,9 @@ from random import uniform
     Updates:
         - cells with self_polarize use ChargeUpdate class to update the value of the charge
 """
+
+# Approximated function may not achieve the threshold values, so we use small EPSILON
+EPSILON = 1.
 
 class UpdateChargeMSCopy(UpdateBaseCharge):
     def __init__(self):
@@ -36,15 +43,14 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
         # cell_data_dict = cell.cell_data[cell.type]
         cell_data_dict = cell.cell_data
         
-
-        match cell.state:
+        match state_to_pyenum(cell.state):
             case CellState.NECROSIS:
                 return 0, cell.state
 
             case CellState.REPOLARIZATION_ABSOLUTE_REFRACTION:
                 cell.update_timer()
                 charge = cell.update_charge()
-                if charge <= cell_data_dict["V_thresh"]:
+                if charge <= cell.ref_threshold:
                     return charge, CellState.REPOLARIZATION_RELATIVE_REFRACTION
                 return charge, cell.state
             
@@ -54,9 +60,9 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
 
                 cell.update_timer()
                 charge = cell.update_charge()
-                if charge <= cell_data_dict["V_rest"]:
+                if (charge - cell_data_dict["V_rest"]) <= EPSILON:
                     if cell.self_polarization:
-                        return cell_data_dict["V_rest"], CellState.SLOW_DEPOLARIZATION
+                        return charge, CellState.SLOW_DEPOLARIZATION
                     else:
                         return cell_data_dict["V_rest"], CellState.POLARIZATION
                 return charge, cell.state
@@ -74,6 +80,9 @@ class UpdateChargeMSCopy(UpdateBaseCharge):
 
             case CellState.SLOW_DEPOLARIZATION:
                 # only self-depolarizing cells have this state
+                if len(list(filter(lambda x: x.state == CellState.RAPID_DEPOLARIZATION, cell.neighbours))) >= 1:
+                    return cell.depolarize(), CellState.RAPID_DEPOLARIZATION
+
                 if cell.charge >= cell_data_dict["V_peak"]:
                     return cell_data_dict["V_peak"], CellState.RAPID_DEPOLARIZATION
                 cell.update_timer() 

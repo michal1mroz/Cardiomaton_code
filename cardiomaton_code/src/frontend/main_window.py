@@ -1,151 +1,99 @@
-from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy,
-    QPushButton, QLabel, QSlider
-)
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QImage
 from src.frontend.cell_inspector import CellInspector
 from src.models.cell import CellDict
 from src.controllers.simulation_controller import SimulationController
 from src.frontend.frame_renderer import FrameRenderer
 from src.frontend.main_label import MainLabel
-from src.utils.style_utils import get_qss_styling
+from src.frontend.ui_main_window import UiMainWindow
+
+
+from cardiomaton_code.src.frontend.cell_modificator import CellModificator, CellModification
 
 
 class MainWindow(QMainWindow):
     """
     Main application window for the Cardiomaton simulator.
 
-    This window initializes and manages the simulation rendering,
-    playback controls, and UI layout.
+    This window initializes and manages the simulation rendering, playback controls.
     """
-    QSS_PATH = "../../resources/style/main_window.qss"
 
     def __init__(self):
         """
         Initialize the main window and its components.
         """
         super().__init__()
-        self.setWindowTitle("Cardiomaton")
-        self.setGeometry(0, 0, 1000, 600)
-        self.setStyleSheet(get_qss_styling())
+        self.ui = UiMainWindow(self)
 
         self.base_frame_time = 0.05
 
-        self.sim = SimulationController(frame_time=self.base_frame_time)
-        self.renderer = FrameRenderer(self.sim)
-        self.render_label = MainLabel(self.renderer)
+        automaton_size = (220, 250)
+        self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
+
+        self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
+        self.renderer = FrameRenderer(self.sim, self.image)
+        self.cell_modificator = CellModificator()
+
+        self.render_label = MainLabel(self.renderer, self.ui.brush_size_slider, self.cell_modificator)
 
         self.render_charged = True # flag telling how simulation is rendered : True - showing charge; False - showing state
         self.running = False
 
         self.cell_inspector = None
 
+        self.frames_per_click = 10
+        self.current_playback_buffer_index = -1
+
         self._init_ui()
         self._init_timer()
+
 
     def _init_ui(self):
         """
         Builds the user interface layout and widgets.
         """
 
-        central = QWidget()
-        self.setCentralWidget(central)
-        main_layout = QVBoxLayout(central)
-
-        self.render_label.setMinimumSize(800, 600)
-
         # Simulation display
-        self.main_layout = QHBoxLayout()
-        self.main_layout.addWidget(self.render_label)
-        main_layout.addLayout(self.main_layout)
+        self.ui.simulation_layout.addWidget(self.render_label)
 
         self.cell_inspector = None
         self.render_label.cellClicked.connect(self._show_cell_inspector)
 
-        # Frame counter display
-        self._setup_frame_counter()
-        self.setStyleSheet(self.styleSheet())
-
         # Start/stop button
-        button_layout = self._setup_play_button()
-        main_layout.addLayout(button_layout)
+        self.ui.play_button.clicked.connect(self.toggle_simulation)
 
-        # Speed slider
-        slider_layout = self._setup_speed_slider()
-        main_layout.addLayout(slider_layout)
+        # Speed dropdown
+        self.ui.speed_dropdown.currentTextChanged.connect(self._change_speed)
 
-        # Playback slider
-        playback_slider_container = self._setup_playback_slider()
-        main_layout.addWidget(playback_slider_container, alignment=Qt.AlignmentFlag.AlignCenter)
+        # Playback hold
+        self.ui.prev_button.pressed.connect(self._start_playback_hold)
+        self.ui.prev_button.released.connect(self._stop_playback_hold)
+
+        # Forward hold
+        self.ui.next_button.pressed.connect(self._start_forward_hold)
+        self.ui.next_button.released.connect(self._stop_forward_hold)
+
+        # Timers for playback and forward buttons
+        self.playback_timer = QTimer(self)
+        self.playback_timer.timeout.connect(self._on_playback)
+
+        self.ui.commit_button.clicked.connect(self._modify_cells)
+
+        self.ui.undo_button.clicked.connect(self._undo_cell_modification)
+
+        self.forward_timer = QTimer(self)
+        self.forward_timer.timeout.connect(self._on_forward)
 
         # Color by charge / state option
-        self.toggle_render_button = self._setup_render_toggle_button()
-        main_layout.addWidget(self.toggle_render_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.ui.toggle_render_button.clicked.connect(self.toggle_render_mode)
 
-    def _setup_frame_counter(self):
-        self.frame_counter_label = QLabel(self.render_label)
-        self.frame_counter_label.move(10, 10)
-        self.frame_counter_label.setObjectName("counterLabel")
-        self.frame_counter_label.setFixedHeight(40)
-        self._update_frame_counter(0)
-        self.frame_counter_label.show()
-
-    def _setup_play_button(self) -> QHBoxLayout:
-        self.play_button = QPushButton("Play")
-        self.play_button.clicked.connect(self.toggle_simulation)
-        layout = QHBoxLayout()
-        layout.addWidget(self.play_button, alignment=Qt.AlignmentFlag.AlignCenter)
-        return layout
-
-    def _setup_speed_slider(self) -> QHBoxLayout:
-        self.speed_slider = QSlider(Qt.Orientation.Horizontal)
-        self.speed_slider.setRange(1, 500)
-        self.speed_slider.setValue(100)
-        self.speed_slider.setMinimumWidth(200)
-        self.speed_slider.valueChanged.connect(self._change_speed)
-
-        layout = QHBoxLayout()
-        layout.addWidget(self.speed_slider, alignment=Qt.AlignmentFlag.AlignCenter)
-        return layout
-
-    def _setup_playback_slider(self) -> QWidget:
-        container = QWidget()
-        container.setMaximumWidth(400)
-        container.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-
-        self.playback_slider = QSlider(Qt.Orientation.Horizontal)
-        self.playback_slider.setRange(0, 0)
-        self.playback_slider.setValue(0)
-        self.playback_slider.setMinimumWidth(200)
-        self.playback_slider.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.playback_slider.valueChanged.connect(self._on_slider_change)
-
-        label = QLabel("Playback:")
-        label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-
-        layout = QHBoxLayout(container)
-        layout.addWidget(label)
-        layout.addWidget(self.playback_slider)
-
-        return container
-
-    def _setup_render_toggle_button(self) -> QPushButton:
-        self.toggle_render_button = QPushButton("Color by state")
-        self.toggle_render_button.setCheckable(True)
-        self.toggle_render_button.setChecked(False)
-        self.toggle_render_button.setMaximumWidth(180)
-        self.toggle_render_button.toggled.connect(self.toggle_render_mode)
-        return self.toggle_render_button
-
-    def toggle_render_mode(self, checked: bool):
+    def toggle_render_mode(self):
         """
         Toggle between rendering modes: by charge or by state.
         """
-        self.render_charged = not checked
-        if checked:
-            self.toggle_render_button.setText("Color by charge")
-        else:
-            self.toggle_render_button.setText("Color by state")
+        self.render_charged = not self.render_charged
+        self.ui.toggle_render_button.setText("↯" if self.render_charged else "️⏣")
 
     def _init_timer(self):
         """
@@ -161,14 +109,13 @@ class MainWindow(QMainWindow):
         """
         if self.running:
             self.timer.stop()
-            self.play_button.setText("Start")
+            self.ui.play_button.setText("▶")
             self.running = False
         else:
-            # Checks if playback was changed and updates the automaton accordingly
-            if self.playback_slider.value() < len(self.sim.recorder) - 1:
-                self.sim.update_automaton(self.playback_slider.value())
+            self.sim.set_frame_counter(self.current_playback_buffer_index)
+            self.current_playback_buffer_index = -1
             self.timer.start(int(self.sim.frame_time * 1000))
-            self.play_button.setText("Stop")
+            self.ui.play_button.setText("▪")
             self.running = True
 
         if self.cell_inspector:
@@ -177,64 +124,93 @@ class MainWindow(QMainWindow):
 
     def _set_running_state(self, running: bool):
         self.running = running
-        self.play_button.setText("Stop" if running else "Start")
+        self.ui.play_button.setText("▪" if running else "▶")
         if self.cell_inspector:
             self.cell_inspector.set_running(running)
         self.render_label.set_running(running)
         if not running:
             self.timer.stop()
-    def _change_speed(self, percent: int):
+
+    def _change_speed(self):
         """
         Updates the simulation speed based on slider value.
-
-        Args:
-            prercent (int): % of change speed
         """
-        multiplier = percent / 100
+        current_speed = self.ui.speed_dropdown.currentText()
+        speed_int = int(current_speed[0])
+
+        multiplier = 2 ** (speed_int - 1)
+
         new_frame_time = self.base_frame_time / multiplier
         self.sim.frame_time = new_frame_time
         if self.timer.isActive():
             self.timer.start(int(new_frame_time * 1000))
 
     def _update_frame_counter(self, frame: int):
-        self.frame_counter_label.setText(f"Frame: {frame}")
-        self.frame_counter_label.adjustSize()
+        self.ui.frame_counter_label.setText(f"Frame: {frame}")
 
     def _update_frame(self):
         """
         Renders and displays the next frame of the simulation.
         """
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
+
         self.render_label.setPixmap(pixmap)
-        self.frame_counter_label.setText(f"Frame: {frame}")
-        self.frame_counter_label.adjustSize()
+        self.ui.frame_counter_label.setText(f"Frame: {frame}")
         
         # Maybe let's think of some observers or other callbacks to update widgets. MM
         if self.cell_inspector:
-            self.cell_inspector.update(self.renderer.current_data.get(self.cell_inspector.position))
+            self.cell_inspector.update(self.sim.get_cell_data(self.cell_inspector.position))
 
-        buf_len = len(self.sim.recorder)
-        if buf_len > 0:
-            self.playback_slider.blockSignals(True)
-            self.playback_slider.setRange(0, buf_len - 1)
-            self.playback_slider.setValue(buf_len - 1)
-            self.playback_slider.blockSignals(False)
+    def _start_playback_hold(self):
+        self._on_playback()
+        self.playback_timer.start(100)
 
-    def _on_slider_change(self, value: int):
+    def _stop_playback_hold(self):
+        self.playback_timer.stop()
+
+    def _start_forward_hold(self):
+        self._on_forward()
+        self.forward_timer.start(100)
+
+    def _stop_forward_hold(self):
+        self.forward_timer.stop()
+
+    def _on_playback(self) -> None:
         if self.running:
             self._set_running_state(False)
 
         try:
-            self._remove_inspector()
-            frame, data = self.sim.recorder.get_frame(value)
-            self._update_frame_counter(frame)
-            pixmap = self.renderer.render_frame(self.render_label.size(), data, self.render_charged)
-            self.render_label.setPixmap(pixmap)
+            new_index = self.current_playback_buffer_index - self.frames_per_click
+            if new_index < -self.sim.get_buffer_size():
+                new_index = -self.sim.get_buffer_size()
+
+            self._render_buffer_frame(new_index)
         except Exception:
             pass
 
+    def _on_forward(self) -> None:
+        if self.running:
+            self._set_running_state(False)
 
-    def _show_cell_inspector(self, cell_data: CellDict):
+        try:
+            new_index = self.current_playback_buffer_index + self.frames_per_click
+            if new_index > -1:
+                new_index = -1
+
+            self._render_buffer_frame(new_index)
+        except Exception:
+            pass
+
+    def _render_buffer_frame(self, index: int, drop_newer: bool = False) -> None:
+        """Load and render a frame from the simulation recorder buffer."""
+        self.current_playback_buffer_index = index
+        self._remove_inspector()
+        frame, pixmap = self.renderer.render_frame(self.render_label.size(), index, self.render_charged, drop_newer)
+        self._update_frame_counter(frame)
+       
+        self.render_label.setPixmap(pixmap)
+
+    def _show_cell_inspector(self, cell_data: CellDict) -> None:
         if self.cell_inspector:
             self._remove_inspector()
 
@@ -242,10 +218,38 @@ class MainWindow(QMainWindow):
             cell_data, on_close_callback=self._remove_inspector,
             running=self.running, ctrl=self.sim
         )
-        self.main_layout.addWidget(self.cell_inspector)
+        self.ui.cell_inspector_layout.addWidget(self.cell_inspector)
+        self.ui.parameters_scroll.setVisible(False)
+        self.ui.presets_layout.setVisible(False)
+        self.ui.cell_inspector_container.setParent(self.ui.settings_layout)
 
-    def _remove_inspector(self):
+        self.ui.verticalLayout_2.insertWidget(0, self.ui.cell_inspector_container, 7)
+
+    def _remove_inspector(self) -> None:
         if self.cell_inspector:
-            self.main_layout.removeWidget(self.cell_inspector)
+            self.ui.cell_inspector_container.setParent(None)
+            # self.ui.parameters_layout.setVisible(True)
+            self.ui.parameters_scroll.setVisible(True)
+            self.ui.presets_layout.setVisible(True)
             self.cell_inspector.deleteLater()
             self.cell_inspector = None
+
+    def _modify_cells(self):
+        all_params = self.ui.parameter_panel.get_current_values()
+
+        modification = CellModification(
+            cells=self.cell_modificator.commit_change(),
+            purkinje_charge_parameters=all_params["PURKINJE"],
+            atrial_charge_parameters=all_params["ATRIAL"],
+            pacemaker_charge_parameters=all_params["PACEMAKER"],
+            necrosis_enabled=self.ui.necrosis_switch.isChecked(),
+            modifier_name="user_slider",
+        )
+
+        self.ui.parameter_panel.reset_all_sliders()
+        self.ui.necrosis_switch.setChecked(False)
+        self.sim.modify_cells(modification)
+
+    def _undo_cell_modification(self):
+        self.cell_modificator.undo_change()
+        self.sim.undo_modification()

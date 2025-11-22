@@ -1,10 +1,17 @@
-from src.models.cell import Cell, CellDict
-from src.models.cell_state import CellState
+# from src.models.cell import Cell, CellDict
+from dataclasses import dataclass
+from src.backend.models.cell import Cell, CellDict
+#from src.models.cell_state import CellState
+from cardiomaton_code.src.backend.enums.cell_state import CellState, state_to_cenum
+
 from src.update_strategies.update_with_timing import UpdateWithTiming
 from src.update_strategies.test_update import TestUpdate
 from src.models.cell_type import CellType
 from src.update_strategies.update_charge import UpdateCharge
 from src.update_strategies.update_charge_ms_copy import UpdateChargeMSCopy
+from copy import deepcopy
+
+from cardiomaton_code.src.frontend.cell_modificator import CellModification
 
 import copy
 from typing import Dict, List, Tuple
@@ -14,6 +21,10 @@ import matplotlib.pyplot as plt # type: ignore
 from IPython.display import clear_output, display
 from time import sleep, time
 
+@dataclass
+class CellData:
+    neighbors: list[Tuple[int, int]]
+    cell_data: dict[str, float]
 
 class Automaton:
     """
@@ -40,13 +51,24 @@ class Automaton:
         self.frame_time = frame_time
         self.is_running = False
         self.frame_counter = frame
+        self.cell_data = self._create_data_map()
         self.neighbour_map = self._create_neighbour_map()
         self.update_method = UpdateChargeMSCopy()
         self.fig = self.ax = self.img = None
+        self.modification_snapshots = []
 
+
+    def _create_data_map(self) -> dict[Tuple[int, int], CellData]:
+        return {
+            (c.pos_x, c.pos_y): CellData(neighbors=
+                                         [(nei.pos_x, nei.pos_y) for nei in c.neighbours],
+                                         cell_data = c.cell_data) 
+            for c in self.grid_a
+        }
+    
     def _create_neighbour_map(self):
         return {
-            c.position: tuple([nei.position for nei in c.neighbours]) for c in self.grid_a
+            (c.pos_x, c.pos_y): tuple([(nei.pos_x, nei.pos_y) for nei in c.neighbours]) for c in self.grid_a
         }
 
     def _create_automaton(self) -> List[Cell]:
@@ -71,35 +93,16 @@ class Automaton:
         arr = []
         help_dict = {}
         for cell in cell_list:
-            new_cell = Cell(position=cell.position,cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type,
-                            self_polarization=cell.self_polarization,
-                            self_polarization_timer=cell.self_polar_timer)
-            help_dict[cell.position] = new_cell
+            new_cell = Cell(position=(cell.pos_x, cell.pos_y),cell_data = cell.cell_data, init_state=cell.state,cell_type = cell.cell_type_py,
+                            self_polarization=cell.self_polarization)
+            help_dict[(cell.pos_x, cell.pos_y)] = new_cell
             arr.append(new_cell)
 
         for i, cell in enumerate(cell_list):
             for nei in cell.neighbours:
-                pos = nei.position
+                pos = (nei.pos_x, nei.pos_y)
                 arr[i].add_neighbour(help_dict[pos])
         return arr
-
-    def _create_automaton_grid(self, binary_array: np.ndarray) -> np.ndarray:
-        """
-        Private method that creates an array of Cell instances.
-
-        Args:
-            binary_array (np.ndarray): Loaded binary array that was passed to constructor
-        
-        Returns:
-            np.ndarray: Numpy array with coresponding cells
-        """
-        value_to_state = {
-            0: CellState.DEAD,
-            1: CellState.POLARIZATION,
-        }
-        return np.array([
-            [Cell(value_to_state[val]) for val in row] for row in binary_array
-        ])    
 
     def update_grid(self) -> None:
         """
@@ -109,7 +112,7 @@ class Automaton:
         for ind, cell in enumerate(self.grid_a):
             new_charge, new_state = self.update_method.update(cell)
             
-            self.grid_b[ind].state = new_state
+            self.grid_b[ind].state = state_to_cenum(new_state)
             self.grid_b[ind].state_timer = cell.state_timer
             self.grid_b[ind].charge = new_charge
 
@@ -135,7 +138,7 @@ class Automaton:
                 first int represents the current frame, dict is a mapping of position to
                 a cell state serialized with CellDict.
         """
-        return self.frame_counter ,{cell.position: cell.to_dict() for cell in self.grid_a}
+        return self.frame_counter ,{(cell.pos_x, cell.pos_y): cell.to_dict() for cell in self.grid_a}
 
     def recreate_from_dict(self, data_tuple: Tuple[int, Dict[Tuple[int, int], CellDict]]) -> None:
         """
@@ -276,3 +279,24 @@ class Automaton:
 
         self.grid_a = tmp_grid
         return max_depth, frame_counter
+
+    def modify_cells(self, modification):
+        cells = modification.cells
+        dicts = modification.purkinje_charge_parameters
+        # self.modification_snapshots.append(deepcopy(self.grid_a))
+        for i, cell in enumerate(self.grid_a):
+            if cell.position in cells:
+                if modification.necrosis_enabled:
+                    cell.state = CellState.NECROSIS
+                    self.grid_b[i].state = CellState.NECROSIS
+                for key, val in dicts.items():
+                    if key in cell.cell_data.keys():
+                        cell.cell_data[key] *= val/100
+                        self.grid_b[i].cell_data[key] *= val/100
+
+    def undo_modification(self):
+        if self.modification_snapshots:
+            grid_c = self.modification_snapshots.pop(-1)
+            self.grid_a = grid_c
+            self.grid_b = grid_c
+

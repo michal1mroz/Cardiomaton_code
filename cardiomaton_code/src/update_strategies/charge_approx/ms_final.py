@@ -34,8 +34,6 @@ def pacemaker_AP_full(t,
                       t_thresh, # time after which the threshold potential is achieved
                       t0_phase0=None, k_phase0=None, # parameters for sigmoid function
                       eps=0.01, # blending width
-                      period=1, # Not used, but needed in the args dict
-                      duration=100
                     ) -> float:
     """
     Phase 4: linear

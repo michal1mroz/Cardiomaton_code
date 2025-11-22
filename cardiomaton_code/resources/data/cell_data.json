@@ -8,162 +8,187 @@
             "t_thresh":0.5, 
             "t_peak":0.45, 
             "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "eps":0.01
         },
+        "period":1.2,
+        "range": 200,
         "self_polarization": false,
+        "charge_function": "",
         "name": "Junction"
     },
 
     "HIS_LEFT": {
         "id": 2,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.002,
+            "t12": 0.007,
+            "t23": 0.207,
+            "t34": 0.307,
+            "t40": 0.507
         },
+        "period":0.507,
+        "range": 100,
         "self_polarization": false,
+        "charge_function": "PURKINJE",
         "name": "Left bundle branch"
     },
     "HIS_RIGHT": {
         "id": 3,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.002,
+            "t12": 0.007,
+            "t23": 0.207,
+            "t34": 0.307,
+            "t40": 0.507
         },
+        "period":0.507,
+        "range": 100,
         "self_polarization": false,
+        "charge_function": "PURKINJE",
         "name": "Right bundle branch"
     },
     
     "BACHMANN": {
         "id": 4,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
-        },
+            "V_rest":-85.0,
+            "V_peak":20.0,
+            "V12":5.0,
+            "V23":-15.0,
+            "t01":0.004,
+            "t12":0.008,
+            "t23":0.158,
+            "t34":0.238,
+            "t40":0.268         
+            },
+        "period":0.268,
+        "range": 200,
         "self_polarization": false,
+        "charge_function": "ATRIAL",
         "name": "Bachmann's bundle"
     },
 
     "INTERNODAL_POST": {
         "id": 5,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest":-85.0,
+            "V_peak":20.0,
+            "V12":5.0,
+            "V23":-15.0,
+            "t01":0.004,
+            "t12":0.008,
+            "t23":0.158,
+            "t34":0.238,
+            "t40":0.268
         },
+        "period":0.268,
+        "range": 200,
         "self_polarization": false,
+        "charge_function": "ATRIAL",
         "name": "Posterior internodal tract"
     },
     "INTERNODAL_ANT": {
         "id": 6,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest":-85.0,
+            "V_peak":20.0,
+            "V12":5.0,
+            "V23":-15.0,
+            "t01":0.004,
+            "t12":0.008,
+            "t23":0.158,
+            "t34":0.238,
+            "t40":0.268
         },
+        "period":0.268,
+        "range": 200,
         "self_polarization": false,
+        "charge_function": "ATRIAL",
         "name": "Anterior internodal tract"
     },
 
     "INTERNODAL_MID": { 
         "id": 7,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest":-85.0,
+            "V_peak":20.0,
+            "V12":5.0,
+            "V23":-15.0,
+            "t01":0.004,
+            "t12":0.008,
+            "t23":0.158,
+            "t34":0.238,
+            "t40":0.268
         },
+        "period":0.268,
+        "range": 200,
         "self_polarization": false,
+        "charge_function": "ATRIAL",
         "name": "Middle internodal tract"
     },
 
     "HIS_BUNDLE": {
         "id": 8,
         "cell_data": { 
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.002,
+            "t12": 0.007,
+            "t23": 0.207,
+            "t34": 0.307,
+            "t40": 0.507
         },
+        "period":0.507,
+        "range": 100,
         "self_polarization": false,
+        "charge_function": "PURKINJE",
         "name": "Bundle of His"
     },
     
     "SA_NODE": {
         "id": 9,
         "cell_data": {
-            "V_rest":-60.0, 
-            "V_thresh":-40.0, 
-            "V_peak":15.0,
-            "t_thresh":0.35, 
-            "t_peak":0.45, 
-            "t_end":0.80,
-            "eps":0.005,
-            "period":0.8,
-            "duration": 200
+            "V_rest":-60,
+            "V_thresh":-40,
+            "V_peak":10,
+            "t40":0.12,
+            "t03":0.128,
+            "t34":0.278
         },
+        "period":0.278,
+        "range": 200,
         "self_polarization": true,
+        "charge_function": "PACEMAKER",
         "name": "Sinoatrial node"
     },
 
     "AV_NODE": {
         "id": 10,
         "cell_data": { 
-            "V_rest":-60.0, 
-            "V_thresh":-60.0, 
-            "V_peak":15.0,
-            "t_thresh":0.5, 
-            "t_peak":0.45, 
-            "t_end":0.95,
-            "eps":0.01,
-            "period":1.2,
-            "duration": 200
+            "V_rest":-65,
+            "V_thresh":-45,
+            "V_peak":5,
+            "t40":0.22,
+            "t03":0.23,
+            "t34":0.41
         },
+        "period":0.41,
+        "range": 500,
         "self_polarization": false,
+        "charge_function": "PACEMAKER",
         "name": "Atrioventricular node"
     }
 }

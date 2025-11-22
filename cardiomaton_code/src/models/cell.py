@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import List, Tuple, Dict, TypedDict
-from src.models.cell_state import CellState
+
+#from src.models.cell_state import CellState
+from src.backend.enums.cell_state import CellState
+
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
 class CellDict(TypedDict):
@@ -12,13 +15,15 @@ class CellDict(TypedDict):
     cell_type: str
     auto_polarization: bool
 
+
 class Cell:
     """
     Class to store information about specific cell.
     """
     self_polar_threshold = 200
 
-    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_data : Dict, init_state: CellState = CellState.POLARIZATION, self_polarization: bool = False, self_polarization_timer: int = 0): # type: ignore
+    def __init__(self, position: Tuple[int, int],cell_type: "CellType", cell_config: Dict, init_state: CellState = CellState.POLARIZATION, # type: ignore
+                 self_polarization: bool = False, self_polarization_timer: int = 0): 
         """
         Cell constructor.
         
@@ -37,17 +42,21 @@ class Cell:
         self.neighbours = []
         self.charge = 0
 
-        self.cell_data = cell_data
+        self.config = cell_config
 
-        self.period = self.cell_data.get("duration")
+        self.cell_data = self.config["cell_data"].copy()
 
-        self.charges, self.charge_max = ChargeUpdate.get_func(self.cell_data)
+        self.period = self.config["period"]
+        self.n_range = self.config["range"]
 
+        self.charges, self.charge_max, self.ref_threshold = ChargeUpdate.get_func(
+            self.config)
+    
     def reset_timer(self):
         self.state_timer = 0
 
     def update_timer(self):
-        self.state_timer = (self.state_timer + 1) % self.period
+        self.state_timer = (self.state_timer + 1) % self.n_range
 
     def reset_self_polar_timer(self):
         self.self_polar_timer = 0
@@ -135,7 +144,7 @@ class Cell:
         Args:
             data_dict (CellDict): Dict with new values for the cell
         """
-        self.state = CellState(int(data_dict['state_value'])) 
+        self.state = CellState(int(data_dict['state_value']))
         if self.state == CellState.RAPID_DEPOLARIZATION:
             self.charge = self.cell_data.get('V_peak', 0)
 
@@ -150,10 +159,10 @@ class Cell:
         copied_cell = Cell(
             position=self.position,
             cell_type=self.cell_type,
-            cell_data=self.cell_data,
+            cell_data=self.config,
             init_state=self.state,
             self_polarization=self.self_polarization,
-            self_polarization_timer=self.self_polar_timer
+            self_polarization_timer=self.self_polar_timer,
         )
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied
