@@ -7,35 +7,35 @@ class ParameterPanel(QtWidgets.QWidget):
 
         self.cell_defaults = {
             "PACEMAKER": {
-                "V_rest": {"default": -60, "min": -78, "max": -42},
-                "V_thresh": {"default": -40, "min": -52, "max": -28},
-                "V_peak": {"default": 10, "min": 7, "max": 13},
-                "t40": {"default": 0.12, "min": 0.084, "max": 0.156},
-                "t03": {"default": 0.128, "min": 0.090, "max": 0.166},
-                "t34": {"default": 0.278, "min": 0.195, "max": 0.361},
+                "V_rest": {"default": -65, "min": -80, "max": -40},
+                "V_thresh": {"default": -40, "min": -60, "max": -20},
+                "V_peak": {"default": 10, "min": -10, "max": 40},
+                "t40": {"default": 0.100, "min": 0.050, "max": 0.400},
+                "t03": {"default": 0.010, "min": 0.002, "max": 0.020},
+                "t34": {"default": 0.200, "min": 0.050, "max": 0.300},
             },
             "ATRIAL": {
-                "V_rest": {"default": -85.0, "min": -110.5, "max": -59.5},
-                "V_peak": {"default": 20.0, "min": 14.0, "max": 26.0},
-                "V12": {"default": 5.0, "min": 3.5, "max": 6.5},
-                "V23": {"default": -15.0, "min": -19.5, "max": -10.5},
-                "t01": {"default": 0.004, "min": 0.0028, "max": 0.0052},
-                "t12": {"default": 0.008, "min": 0.0056, "max": 0.0104},
-                "t23": {"default": 0.158, "min": 0.110, "max": 0.205},
-                "t34": {"default": 0.238, "min": 0.167, "max": 0.309},
+                "V_rest": {"default": -75.0, "min": -45.0, "max": -90.0},
+                "V_peak": {"default": 20.0, "min": -10.0, "max": 50.0},
+                "V12": {"default": 10, "min": -20.0, "max": 30.0},
+                "V23": {"default": -40.0, "min": -70.0, "max": -10.0},
+                "t01": {"default": 0.001, "min": 0.001, "max": 0.004},
+                "t12": {"default": 0.008, "min": 0.001, "max": 0.020},
+                "t23": {"default": 0.100, "min": 0.020, "max": 0.180},
+                "t34": {"default": 0.080, "min": 0.010, "max": 0.140},
                 # "t40": {"default": 0.268, "min": 0.188, "max": 0.348},
             },
             "PURKINJE": {
-                "V_rest": {"default": -90.0, "min": -117.0, "max": -63.0},
-                "V40": {"default": -75.0, "min": -97.5, "max": -52.5},
-                "V_peak": {"default": 30.0, "min": 21.0, "max": 39.0},
-                "V12": {"default": 0.0, "min": -0.3, "max": 0.3},
-                "V23": {"default": -20.0, "min": -26.0, "max": -14.0},
-                "t01": {"default": 0.002, "min": 0.0014, "max": 0.0026},
-                "t12": {"default": 0.007, "min": 0.0049, "max": 0.0091},
-                "t23": {"default": 0.207, "min": 0.145, "max": 0.269},
-                "t34": {"default": 0.307, "min": 0.215, "max": 0.399},
-                "t40": {"default": 0.507, "min": 0.355, "max": 0.659},
+                "V_rest": {"default": -90.0, "min": -100.0, "max": -70.0},
+                "V40": {"default": -75.0, "min": -85.0, "max": -60.0},
+                "V_peak": {"default": 30.0, "min": 0.0, "max": 50.0},
+                "V12": {"default": 0.0, "min": -30.0, "max": 20.0},
+                "V23": {"default": -20.0, "min": -50.0, "max": 0.0},
+                "t01": {"default": 0.002, "min": 0.001, "max": 0.010},
+                "t12": {"default": 0.007, "min": 0.002, "max": 0.020},
+                "t23": {"default": 0.200, "min": 0.050, "max": 0.400},
+                "t34": {"default": 0.100, "min": 0.030, "max": 0.250},
+                "t40": {"default": 0.200, "min": 0.080, "max": 0.600},
             },
         }
 
@@ -135,11 +135,14 @@ class ParameterPanel(QtWidgets.QWidget):
                 if abs(default) > 1:
                     slider.setRange(int(min_val), int(max_val))
                     slider.setValue(int(default))
+                    label = str(int(default))
                 else:
                     slider.setRange(int(min_val * 1000), int(max_val * 1000))
                     slider.setValue(int(default * 1000))
+                    label = str(int(default * 1000))
 
-                value_label = QtWidgets.QLabel(str(default))
+                value_label = QtWidgets.QLabel(label)
+                value_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
                 value_label.setFixedWidth(60)
                 value_label.setStyleSheet("color: black; font-family: 'Mulish'; font-size: 13px;")
 
@@ -158,6 +161,8 @@ class ParameterPanel(QtWidgets.QWidget):
         scroll_layout.addStretch()
         scroll.setWidget(container)
         main_layout.addWidget(scroll)
+
+        self._link_parameters("ATRIAL", "V12", "V_peak")
 
     def get_current_values(self, cell_type: str | None = None) -> dict:
         result = {}
@@ -192,14 +197,15 @@ class ParameterPanel(QtWidgets.QWidget):
                     value_label.setText(str(default))
 
     def _update_label(self, cell_type, param_name, value):
-        slider, label = self.parameter_sliders[cell_type][param_name]
+        _, label = self.parameter_sliders[cell_type][param_name]
         default = self.cell_defaults[cell_type][param_name]["default"]
 
         if abs(default) < 1:
             real_value = value / 1000.0
+            label.setText(f"{real_value:.3f}")
         else:
             real_value = value
-        label.setText(f"{real_value:.3f}")
+            label.setText(str(real_value))
 
     def _create_section_header(self, title):
         line_left = QtWidgets.QFrame()
@@ -227,4 +233,26 @@ class ParameterPanel(QtWidgets.QWidget):
 
         return container
 
+    def _link_parameters(self, cell_type, param_low, param_high):
+            """
+            A helper function to establish dependencies between some sliders.
+            """
+            slider_low = self.parameter_sliders[cell_type][param_low][0]
+            slider_high = self.parameter_sliders[cell_type][param_high][0]
 
+            def enforce_constraint_low(value):
+                if value > slider_high.value():
+                    slider_high.blockSignals(True)
+                    slider_high.setValue(value)
+                    slider_high.blockSignals(False)
+                    self._update_label(cell_type, param_high, value)
+            
+            def enforce_constraint_high(value):
+                if value < slider_low.value():
+                    slider_low.blockSignals(True)
+                    slider_low.setValue(value)
+                    slider_low.blockSignals(False)
+                    self._update_label(cell_type, param_low, value)
+
+            slider_low.valueChanged.connect(enforce_constraint_low)
+            slider_high.valueChanged.connect(enforce_constraint_high)
