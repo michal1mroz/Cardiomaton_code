@@ -51,6 +51,8 @@ class SimulationService:
         #self.automaton.update_cell_from_dict(data)
 
     def modify_cells(self, modification):
+        self.automaton.commit_current_automaton()
+
         cells_positions = modification.cells
         if modification.necrosis_enabled:
             self.automaton.modify_cell_state(cells_positions, CellState.NECROSIS)
@@ -64,7 +66,7 @@ class SimulationService:
         """
         TODO: undo of last cell modification of the automaton
         """
-        pass
+        self.automaton.undo_modification()
 
     @property
     def frame_time(self) -> float:

@@ -1,10 +1,10 @@
 from libc.stdio cimport printf
-from libc.stdlib cimport malloc, free
-from libc.string cimport memset
+from libc.stdlib cimport malloc, realloc, free
+from libc.string cimport memset, memcpy
 from libc.stdint cimport uintptr_t
 
 
-from src.backend.structs.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict
+from src.backend.structs.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict, create_mimic_cell, recreate_cell_from_mimic
 from src.backend.enums.cell_state cimport CellStateC,state_to_cenum
 from src.backend.enums.cell_type cimport type_to_cenum
 from src.backend.enums.cell_type cimport CellTypeC
@@ -89,6 +89,14 @@ cdef class Automaton:
 
         self._init_img()
 
+        # Modification buffer
+
+        cdef CCell ***modification_snapshot_grids
+        self.modification_snapshot_grids = <CCell***> malloc(8 * sizeof(CCell**))
+
+        self.buf_size = 0
+
+
     def __dealloc__(self):
         """
         Destructor to free the resources for grids
@@ -111,7 +119,7 @@ cdef class Automaton:
                 if grid[i] != NULL:
                     free_c_cell(grid[i])
                     grid[i] = NULL
-            free(grid) 
+            free(grid)
 
     cpdef dict _create_data_map(self, dict cells):
         """
@@ -214,21 +222,20 @@ cdef class Automaton:
         cdef CCell* cell_b
         cdef int i
         cdef CellSnapshot* snapshot = self.frame_recorder.get_next_buffer()
-        
         self.frame_counter += 1
+
         for i in range(self.n_nodes):
             cell_a = self.grid_a[i]
             cell_b = self.grid_b[i]
             update_charge(cell_a, cell_b)
             draw_function(self.img_buffer, self.bytes_per_line, cell_b)
-            
+
             # Inline write to the buffer
             snapshot[i].pos_x = cell_b.pos_x
             snapshot[i].pos_y = cell_b.pos_y
             snapshot[i].c_state = cell_b.c_state
             snapshot[i].charge = cell_b.charge
             snapshot[i].timer = cell_b.timer
-
         self.grid_a = self.grid_b
         self.grid_b = tmp
 
@@ -275,7 +282,7 @@ cdef class Automaton:
         for i in range(self.n_nodes):
             cell = self.grid_a[i]
             self.dict_mapping[(cell.pos_x, cell.pos_y)] = cell_to_dict(cell, self.dict_mapping[(cell.pos_x, cell.pos_y)])
-    
+
     cpdef int to_cell_data(self):
         """
         Getter for the serialized data. Returns the Tuple with the current frame and the serialized cells.
@@ -304,8 +311,7 @@ cdef class Automaton:
     cpdef void modify_charge_data(self, set coords, dict atrial_charge_parameters, dict pacemaker_charge_parameters,
     dict purkinje_charge_parameters):
         """
-        Modyfikuje zarówno struktury CCell (C), jak i konfiguracje Pythonowe (config)
-        dla komórek o współrzędnych z 'coords'.
+        Modifies structs CCell with new charges made with updated charge parameters.
         """
         cdef int i
         cdef CCell* cell
@@ -349,6 +355,54 @@ cdef class Automaton:
                 add_cell_charges(cell, np.asarray(charges, dtype=np.float64))
             else:
                 raise RuntimeError("Attempted construction of a cell with no charge function")
+
+    cpdef void commit_current_automaton(self):
+        cdef CCell** snap
+        cdef int i
+
+        snap = <CCell**> malloc(self.n_nodes * sizeof(CCell*))
+        if snap == NULL:
+            raise MemoryError("Failed to allocate snapshot grid")
+
+        for i in range(self.n_nodes):
+            snap[i] = create_mimic_cell(self.grid_a[i])
+            if snap[i] == NULL:
+                while i > 0:
+                    i -= 1
+                    free(snap[i].charges)
+                    free(snap[i])
+                free(snap)
+                raise MemoryError("Failed to create mimic cell")
+
+        if self.buf_size % 8 == 0:
+            self.modification_snapshot_grids = <CCell***> realloc(
+                self.modification_snapshot_grids,
+                (self.buf_size + 8) * sizeof(CCell**)
+            )
+            if self.modification_snapshot_grids == NULL:
+                raise MemoryError("Failed to realloc snapshot buffer")
+
+        self.modification_snapshot_grids[self.buf_size] = snap
+        self.buf_size += 1
+        self.frame_recorder.clear_all()
+
+
+    cpdef void undo_modification(self):
+        if self.buf_size == 0:
+            return
+
+        self.buf_size -= 1
+        cdef CCell** snap = self.modification_snapshot_grids[self.buf_size]
+        cdef int i
+
+        for i in range(self.n_nodes):
+            recreate_cell_from_mimic(self.grid_a[i], snap[i])
+            recreate_cell_from_mimic(self.grid_b[i], snap[i])
+
+        self._dealloc_grid(snap)
+
+        self.modification_snapshot_grids[self.buf_size] = NULL
+        self.frame_recorder.clear_all()
 
     """
     Set of getters and setters for the python API

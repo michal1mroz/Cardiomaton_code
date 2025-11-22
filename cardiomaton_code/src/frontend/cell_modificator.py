@@ -15,6 +15,7 @@ class CellModificator:
     def __init__(self):
         self.selected_cells: dict[tuple[int, int], list[int]] = {}
         self.current_modification = 0
+        self.committed_modifications: list[int] = []
 
     def add_cell(self, cell):
         if cell not in self.selected_cells:
@@ -40,20 +41,23 @@ class CellModificator:
         for cell, history in self.selected_cells.items():
             if len(history) > 0 and history[-1] == self.current_modification:
                 committed.add(cell)
-
+        self.committed_modifications.append(self.current_modification)
         self.current_modification += 1
+
         return committed
 
     def undo_change(self):
         if self.current_modification == 0:
             return
+        if not self.committed_modifications:
+            return
+        last_commit = self.committed_modifications.pop()
 
-        last = self.current_modification - 1
         to_delete = []
 
         for cell, history in self.selected_cells.items():
-            if last in history:
-                history.remove(last)
+            if last_commit in history:
+                history.remove(last_commit)
                 if len(history) == 0:
                     to_delete.append(cell)
 
