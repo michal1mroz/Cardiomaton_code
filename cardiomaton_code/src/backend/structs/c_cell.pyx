@@ -234,6 +234,9 @@ cdef int is_relative_repolarization(CCell* cell):
 
 
 cdef CCell* create_mimic_cell(CCell* src):
+    """
+    Creates copy of a CCell as a snapshot without neighbourhood.
+    """
     cdef CCell* dst = <CCell*> malloc(sizeof(CCell))
     memcpy(dst, src, sizeof(CCell))
 
@@ -247,6 +250,9 @@ cdef CCell* create_mimic_cell(CCell* src):
     return dst
 
 cdef void recreate_cell_from_mimic(CCell* dst, CCell* mimic):
+    """
+    Copies parameters from src CCell into dst CCell, without neighbourhood.
+    """
     if dst == NULL or mimic == NULL:
         return
 

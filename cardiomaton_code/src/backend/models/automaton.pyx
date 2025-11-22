@@ -357,6 +357,10 @@ cdef class Automaton:
                 raise RuntimeError("Attempted construction of a cell with no charge function")
 
     cpdef void commit_current_automaton(self):
+        """
+        Takes current version of automaton and saves it in modification buffer.
+        It saves current automaton by copying CCell structures, without neighbours, just parameters.
+        """
         cdef CCell** snap
         cdef int i
 
@@ -388,6 +392,10 @@ cdef class Automaton:
 
 
     cpdef void undo_modification(self):
+        """
+        Takes last snapshot saved in modification buffer and loads it into automaton.
+        Takes snapshot CCell structures (mimics) and copy their values into automaton cells leaving neighbours connected.
+        """
         if self.buf_size == 0:
             return
 

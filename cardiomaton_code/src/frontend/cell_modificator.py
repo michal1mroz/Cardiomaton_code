@@ -1,5 +1,7 @@
 from PyQt6.QtGui import QColor
 from dataclasses import dataclass, field
+from typing import Tuple, Union, Set
+
 
 @dataclass
 class CellModification:
@@ -18,14 +20,20 @@ class CellModificator:
         self.current_modification = 0
         self.committed_modifications: list[int] = []
 
-    def add_cell(self, cell):
+    def add_cell(self, cell: Tuple[int, int]) -> None:
+        """
+        Adds one cell from current set of to be modified cells.
+        """
         if cell not in self.selected_cells:
             self.selected_cells[cell] = [self.current_modification]
         else:
             if len(self.selected_cells[cell]) == 0 or self.selected_cells[cell][-1] != self.current_modification:
                 self.selected_cells[cell].append(self.current_modification)
 
-    def remove_cell(self, cell):
+    def remove_cell(self, cell: Tuple[int, int]) -> None:
+        """
+        Removes one cell from current set of to be modified cells.
+        """
         if cell not in self.selected_cells:
             return
 
@@ -36,7 +44,10 @@ class CellModificator:
         if len(history) == 0:
             del self.selected_cells[cell]
 
-    def commit_change(self):
+    def commit_change(self) -> Set[Tuple[int, int]]:
+        """
+        Returns set of cells to be modified and marks them as applied.
+        """
         committed = set()
 
         for cell, history in self.selected_cells.items():
@@ -48,6 +59,9 @@ class CellModificator:
         return committed
 
     def undo_change(self):
+        """
+        Marks cells from last commit as undone.
+        """
         if self.current_modification == 0:
             return
         if not self.committed_modifications:
