@@ -196,10 +196,11 @@ class ParameterPanel(QtWidgets.QWidget):
 
                 if abs(default) < 1:
                     slider.setValue(int(default * 1000))
-                    value_label.setText(f"{default:.3f}")
+                    value_label.setText(str(int(default * 1000)))
                 else:
                     slider.setValue(int(default))
-                    value_label.setText(str(default))
+                    value_label.setText(str(int(default)))
+                
 
     def _update_label(self, cell_type, param_name, value):
         _, label = self.parameter_sliders[cell_type][param_name]
@@ -207,10 +208,10 @@ class ParameterPanel(QtWidgets.QWidget):
 
         if abs(default) < 1:
             real_value = value / 1000.0
-            label.setText(f"{real_value:.3f}")
+            label.setText(str(int(real_value * 1000)))
         else:
             real_value = value
-            label.setText(str(real_value))
+            label.setText(str(int(real_value)))
 
     def _create_section_header(self, title):
         line_left = QtWidgets.QFrame()
