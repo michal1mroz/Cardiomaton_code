@@ -170,6 +170,11 @@ cdef class Automaton:
             grid[i].ref_threshold = <double> py_cell.ref_threshold
             grid[i].charge = 0
 
+            grid[i].propagation_time = <int> py_cell.config.get("propagation_time")
+            grid[i].propagation_count = 1
+            grid[i].can_propagate = 0
+            grid[i].propagation_time_max = <int> py_cell.config.get("propagation_time_max", 5)
+
             self.cell_data[(py_cell.pos_x, py_cell.pos_y)] = CellWrapper(<uintptr_t> grid[i],
                                         [(nei.pos_x, nei.pos_y) for nei in py_cell.neighbors],
                                         py_cell.config)

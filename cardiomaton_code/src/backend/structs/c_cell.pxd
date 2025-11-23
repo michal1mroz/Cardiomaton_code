@@ -42,6 +42,11 @@ cdef struct CCell:
     double V_peak
     double ref_threshold
 
+    int propagation_time
+    int propagation_time_max
+    int can_propagate
+    int propagation_count
+
 #####################################
 # Function signatures
 

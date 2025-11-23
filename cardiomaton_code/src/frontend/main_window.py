@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
 
         self.base_frame_time = 0.05
 
+        # automaton_size = (507, 695)
         automaton_size = (220, 250)
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
 

@@ -197,7 +197,8 @@ cdef int is_neighbor_depolarized(CCell* cell):
 
     for i in range(cell.n_neighbors):
         neighbor = cell.neighbors[i]
-        if neighbor != NULL and neighbor.c_state == CellStateC.RAPID_DEPOLARIZATION:
+        if neighbor != NULL and neighbor.can_propagate == 1 and neighbor.propagation_count > neighbor.propagation_time:
+        # if neighbor != NULL and neighbor.c_state == CellStateC.RAPID_DEPOLARIZATION:
             count += 1
             if count >= NEIGHBOR_DEPOLARIZATION_COUNT: # current models doesn't work for >= 2 or more
                 return 1
@@ -294,3 +295,9 @@ cdef void recreate_cell_from_mimic(CCell* dst, CCell* mimic):
     dst.V_rest = mimic.V_rest
     dst.V_peak = mimic.V_peak
     dst.ref_threshold = mimic.ref_threshold
+
+    # Slowing attributes
+    dst.propagation_time = mimic.propagation_time
+    dst.propagation_time_max = mimic.propagation_time_max
+    dst.can_propagate = mimic.can_propagate
+    dst.propagation_count = mimic.propagation_count
