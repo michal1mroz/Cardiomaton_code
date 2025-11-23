@@ -93,3 +93,7 @@ cdef class FrameRecorder:
 
     cdef int get_count(self):
         return self.count
+
+    cdef void clear_all(self):
+        self.current_idx = -1
+        self.count = 0

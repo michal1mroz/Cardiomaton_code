@@ -5,6 +5,7 @@ from collections import deque
 import pyqtgraph as pq
 
 from src.controllers.simulation_controller import SimulationController
+from cardiomaton_code.src.frontend.cell_modificator import CellModification
 from src.models.cell import CellDict
 
 class CellInspector(QWidget):
@@ -195,9 +196,8 @@ class CellInspector(QWidget):
         Simple callback that depolarizes given cell.
         Will have to be reworked in the future
         """
-        payload = self.data
-        payload['state_value'] = 2
-        self.ctrl.update_cell(payload)
+        payload = CellModification(cells={self.data['position']}, depolarize = True)
+        self.ctrl.modify_cells(payload)
 
     def _submit_data(self):
         ...

@@ -1,4 +1,5 @@
 from libc.stdlib cimport malloc, free
+from libc.string cimport memcpy
 from libc.stdio cimport printf
 from src.backend.enums.cell_state cimport CellStateC, cell_state_name
 from src.backend.enums.cell_type cimport CellTypeC, type_to_pyenum
@@ -228,3 +229,68 @@ cdef int is_relative_repolarization(CCell* cell):
             if count >= NEIGHBOR_REFRACTION_POLAR:
                 return 1
     return 0
+
+#############################################################
+
+
+cdef CCell* create_mimic_cell(CCell* src):
+    """
+    Creates copy of a CCell as a snapshot without neighbourhood.
+    """
+    cdef CCell* dst = <CCell*> malloc(sizeof(CCell))
+    memcpy(dst, src, sizeof(CCell))
+
+    dst.neighbors = NULL
+
+
+    if src.charges != NULL:
+        dst.charges = <double*> malloc(src.n_charges * sizeof(double))
+        memcpy(dst.charges, src.charges, src.n_charges * sizeof(double))
+
+    return dst
+
+cdef void recreate_cell_from_mimic(CCell* dst, CCell* mimic):
+    """
+    Copies parameters from src CCell into dst CCell, without neighbourhood.
+    """
+    if dst == NULL or mimic == NULL:
+        return
+
+    # Positional data
+    dst.pos_x = mimic.pos_x
+    dst.pos_y = mimic.pos_y
+
+    # Basic attributes
+    dst.c_state = mimic.c_state
+    dst.c_type = mimic.c_type
+    dst.self_polarization = mimic.self_polarization
+
+    # Charge parameters
+    dst.charge = mimic.charge
+    dst.period = mimic.period
+    dst.timer = mimic.timer
+
+    dst.n_charges = mimic.n_charges
+    dst.charge_max = mimic.charge_max
+
+    if mimic.charges != NULL and mimic.n_charges > 0:
+
+        if dst.charges == NULL or dst.n_charges != mimic.n_charges:
+            if dst.charges != NULL:
+                free(dst.charges)
+            dst.charges = <double*> malloc(mimic.n_charges * sizeof(double))
+            if dst.charges == NULL:
+                return
+
+        memcpy(dst.charges, mimic.charges, mimic.n_charges * sizeof(double))
+
+    else:
+        if dst.charges != NULL:
+            free(dst.charges)
+        dst.charges = NULL
+
+    # Voltage model parameters
+    dst.V_thresh = mimic.V_thresh
+    dst.V_rest = mimic.V_rest
+    dst.V_peak = mimic.V_peak
+    dst.ref_threshold = mimic.ref_threshold
