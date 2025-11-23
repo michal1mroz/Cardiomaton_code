@@ -34,6 +34,8 @@ class MainLabel(QLabel):
         self.setScaledContents(False)
         self.setMinimumSize(1, 1)
 
+        self.brushes = [QBrush(self._get_color(i)) for i in range(10)]
+
         self.setStyleSheet("""
             QToolTip {
                 background-color: #cfe3fc;
@@ -41,17 +43,14 @@ class MainLabel(QLabel):
             }
         """)
 
+
     def paintEvent(self, event):
-        """Draws automaton pixmap and then cell modification highlights"""
         super().paintEvent(event)
         if self.pixmap() is None:
             return
 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-
-        brush = QBrush(QColor(109, 152, 244, 100))  # deafult color
-        painter.setBrush(brush)
         painter.setPen(Qt.PenStyle.NoPen)
 
         rows, cols = self.renderer.ctrl.shape
@@ -65,17 +64,21 @@ class MainLabel(QLabel):
         offset_x = (label_size.width() - pixmap_size.width()) / 2
         offset_y = (label_size.height() - pixmap_size.height()) / 2
 
-        for i, h in enumerate(self.cell_modificator.get_highlights()):
-            for (r, c) in h:
-                color = self.cell_modificator.get_color(i)
-                brush = QBrush(color)
-                painter.setBrush(brush)
-                x = offset_x + c * cell_width
-                y = offset_y + r * cell_height
-                rect = QRectF(x, y, cell_width, cell_height)
-                painter.drawRect(rect)
+        highlights = self.cell_modificator.get_highlights()
+
+        for (r, c), history in highlights.items():
+            if not history:
+                continue
+            painter.setBrush(self.brushes[history[-1]%10])
+
+            x = offset_x + c * cell_width
+            y = offset_y + r * cell_height
+            painter.drawRect(QRectF(x, y, cell_width, cell_height))
 
         painter.end()
+
+
+
     def _mouse_position(self, event: QMouseEvent) -> Union[None, Tuple[int, int]]:
         """
         Helper method to get the mouse position in term of pixmaps rows and columns.
@@ -170,9 +173,9 @@ class MainLabel(QLabel):
                 if 0 <= i < rows and 0 <= j < cols:
                     if (i - row) ** 2 + (j - col) ** 2 <= radius ** 2:
                         if add:
-                            self.cell_modificator.add_cells((i, j))
+                            self.cell_modificator.add_cell((i, j))
                         else:
-                            self.cell_modificator.remove_cells((i, j))
+                            self.cell_modificator.remove_cell((i, j))
 
         self.update()
     def _show_cell_info(self, info, global_pos, pos, debug = False):
@@ -214,5 +217,11 @@ class MainLabel(QLabel):
         super().leaveEvent(event)
     def set_running(self, state):
         self.running = state
+
+    def _get_color(self, index, total=10):
+        hue = int((index % total) * 360 / total)
+        color = QColor.fromHsv(hue, 255, 255, 128)
+        color.setAlpha(55)
+        return color
 
 

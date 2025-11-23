@@ -16,3 +16,4 @@ cdef class FrameRecorder:
     cdef void remove_newer(self, int)
     cdef void remove_older(self, int)
     cdef int get_count(self)
+    cdef void clear_all(self)
