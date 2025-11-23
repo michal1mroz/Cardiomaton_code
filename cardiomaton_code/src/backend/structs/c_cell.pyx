@@ -295,3 +295,9 @@ cdef void recreate_cell_from_mimic(CCell* dst, CCell* mimic):
     dst.V_rest = mimic.V_rest
     dst.V_peak = mimic.V_peak
     dst.ref_threshold = mimic.ref_threshold
+
+    # Slowing attributes
+    dst.propagation_time = mimic.propagation_time
+    dst.propagation_time_max = mimic.propagation_time_max
+    dst.can_propagate = mimic.can_propagate
+    dst.propagation_count = mimic.propagation_count
