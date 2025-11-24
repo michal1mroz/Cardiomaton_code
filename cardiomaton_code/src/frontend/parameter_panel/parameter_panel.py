@@ -1,6 +1,7 @@
 from typing import Optional, Dict
 
 from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtCore import pyqtSignal
 
 from src.frontend.parameter_panel.parameter_definition import ParameterDefinition, CELL_PARAMETER_DEFINITIONS, \
     CELL_PARAMETER_LABELS
@@ -8,6 +9,9 @@ from src.frontend.parameter_panel.parameter_slider import ParameterSlider
 
 
 class ParameterPanel(QtWidgets.QWidget):
+
+    sigParametersChanged = pyqtSignal(str)
+
     def __init__(self, parent: Optional[QtWidgets.QWidget] = None,
                  definitions: Optional[Dict[str, Dict[str, ParameterDefinition]]] = None) -> None:
         super().__init__(parent)
@@ -73,6 +77,8 @@ class ParameterPanel(QtWidgets.QWidget):
                 binding = ParameterSlider(definition=definition, slider=slider, value_label=value_label)
                 self._sliders[cell_type][name] = binding
 
+                binding.parameterChanged.connect(lambda ct=cell_type: self.sigParametersChanged.emit(ct))
+
             scroll_layout.addWidget(section_widget)
 
         scroll_layout.addStretch()
@@ -118,6 +124,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 slider_high.setValue(value)
                 slider_high.blockSignals(False)
                 binding_high._update_label(value)
+                binding_high.parameterChanged.emit()
 
         def enforce_constraint_high(value):
             if value < slider_low.value():
@@ -125,6 +132,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 slider_low.setValue(value)
                 slider_low.blockSignals(False)
                 binding_low._update_label(value)
+                binding_low.parameterChanged.emit()
 
         slider_low.valueChanged.connect(enforce_constraint_low)
         slider_high.valueChanged.connect(enforce_constraint_high)

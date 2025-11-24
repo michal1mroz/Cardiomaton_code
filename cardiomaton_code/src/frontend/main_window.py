@@ -2,8 +2,10 @@ from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QMainWindow
 
 from src.controllers.simulation_controller import SimulationController
+from src.frontend.action_potential_generator import ActionPotentialGenerator
 from src.frontend.cell_inspecting.cell_inspector_manager import CellInspectorManager
 from src.frontend.frame_rendering.frame_renderer import FrameRenderer
+from src.frontend.graph_widget import GraphWidget
 from src.frontend.playback_navigator import PlaybackNavigator
 from src.frontend.simulation_label.cell_data_provider import CellDataProvider
 from src.frontend.simulation_label.cell_modificator import CellModificator, CellModification
@@ -30,6 +32,12 @@ class MainWindow(QMainWindow):
         self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
         self.navigator = PlaybackNavigator()
         self.inspector_manager = CellInspectorManager(self.ui)
+        self.generator = ActionPotentialGenerator()
+        self.plot_windows = {}
+
+        self.overlay_graph = GraphWidget(parent=self)
+        self.overlay_graph.resize(585, 250)
+        self.overlay_graph.hide()
 
         self.render_label = SimulationView(self.cell_data_provider, self.ui.brush_size_slider, self.cell_modificator)
         self.render_charged = True
@@ -39,6 +47,8 @@ class MainWindow(QMainWindow):
 
         self._init_ui_layout()
         self._connect_signals()
+
+        self._reposition_overlay_graph()
 
     def _init_ui_layout(self):
         self.ui.simulation_layout.addWidget(self.render_label)
@@ -61,6 +71,8 @@ class MainWindow(QMainWindow):
         self.render_label.cellClicked.connect(self._on_cell_clicked)
         self.ui.commit_button.clicked.connect(self._modify_cells)
         self.ui.undo_button.clicked.connect(self._undo_cell_modification)
+
+        self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
 
     def _toggle_simulation(self):
         if not self.runner.running and self.navigator.current_buffer_index != -1:
@@ -146,3 +158,24 @@ class MainWindow(QMainWindow):
         with open(path, "r") as f:
             style = f.read()
         self.setStyleSheet(style)
+
+    def _on_parameter_slider_moved(self, changed_cell_type: str):
+        if self.overlay_graph.isHidden():
+            self.overlay_graph.show()
+        self.overlay_graph.raise_()
+
+        self.refresh_overlay_plot(changed_cell_type)
+
+    def refresh_overlay_plot(self, cell_type: str):
+        params = self.ui.parameter_panel.get_current_values(cell_type)
+        t, v = self.generator.generate(cell_type, params, n_cycles=3)
+        self.overlay_graph.update_data(t, v, title=f"Preview {cell_type}")
+
+    def _reposition_overlay_graph(self):
+        padding = 20
+        x = self.width() - self.overlay_graph.width() - padding
+        y = self.height() - self.overlay_graph.height() - padding
+
+        self.overlay_graph.move(x, y)
+
+        self.overlay_graph.raise_()

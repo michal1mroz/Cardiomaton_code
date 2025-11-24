@@ -1,9 +1,15 @@
 from PyQt6 import QtWidgets
+from PyQt6.QtCore import QObject, pyqtSignal
+
 from src.frontend.parameter_panel.parameter_definition import ParameterDefinition
 
-class ParameterSlider:
+class ParameterSlider(QObject):
+
+    parameterChanged = pyqtSignal()
+
     def __init__(self, definition: ParameterDefinition, slider: QtWidgets.QSlider,
                  value_label: QtWidgets.QLabel) -> None:
+        super().__init__()
         self._definition = definition
         self._slider = slider
         self._value_label = value_label
@@ -19,9 +25,11 @@ class ParameterSlider:
             self._definition.slider_maximum(),
         )
         self._slider.setValue(self._definition.slider_default())
+        self._slider.setTracking(True)
         self._value_label.setText(self._definition.format_default_text())
 
     def _on_slider_changed(self, value: int) -> None:
+        self.parameterChanged.emit()
         self._update_label(value)
 
     def _update_label(self, slider_value: int) -> None:
