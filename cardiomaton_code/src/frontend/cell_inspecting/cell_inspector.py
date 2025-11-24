@@ -26,7 +26,7 @@ class CellInspector(QWidget):
         self._plot = SeriesPlot(title="Charge over time", y_label="Charge", x_label="Time [Frames]", maxlen=500,
                                 parent=self)
 
-        self.setFont(QFont("Mulish", 12))
+        self.setFont(QFont("Mulish", 10))
 
         self._init_ui()
 
@@ -63,40 +63,10 @@ class CellInspector(QWidget):
             QSizePolicy.Policy.Fixed,
             QSizePolicy.Policy.Fixed,
         )
-        close_btn.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #EF8481;
-                color: white;
-                border-radius: 15px;
-                font-weight: bold;
-                font-family: Mulish;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background-color: #E74440;
-            }
-            """
-        )
+        close_btn.setObjectName("CloseBtn")
         close_btn.clicked.connect(self.close_inspector)
         top.addWidget(close_btn)
         self._root.addLayout(top)
-
-        button_style = """
-            QPushButton {
-                font-family: Mulish ExtraBold;
-                font-weight: bold;
-                font-size: 13px;
-                background-color: #6D98F4;
-                color: white;
-                border-radius: 10px;
-                padding: 2px 2px;
-            }
-            QPushButton:hover {
-                background-color: #3466CF;
-            }
-        """
-
         self._root.addWidget(self._details)
         self._root.addWidget(self._plot)
 

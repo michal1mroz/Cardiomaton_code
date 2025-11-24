@@ -14,13 +14,17 @@ class SeriesPlot(QWidget):
         self.setLayout(layout)
 
         self.plot_widget = pq.PlotWidget()
-        self.plot_widget.setBackground("w")
-        self.plot_widget.setTitle(title)
+        self.plot_curve = self.plot_widget.plot(pen=pq.mkPen(color='#CD4B48', width=2))
+        self.plot_widget.setBackground('#303742')
+        axis_color = (230, 234, 240)
+        self.plot_widget.getAxis('left').setTextPen(axis_color)
+        self.plot_widget.getAxis('bottom').setTextPen(axis_color)
+        self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
+        self.plot_widget.getPlotItem().getViewBox().setBorder(None)
+        self.plot_widget.setTitle('Charge over time', color="#E6EAF0", )
         self.plot_widget.setLabel("left", y_label)
         self.plot_widget.setLabel("bottom", x_label)
         self.plot_widget.showGrid(x=True, y=True)
-
-        self.plot_curve = self.plot_widget.plot(pen=pq.mkPen(color="r", width=2))
 
         layout.addWidget(self.plot_widget)
 

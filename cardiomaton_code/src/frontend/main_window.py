@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QMainWindow
 from src.controllers.simulation_controller import SimulationController
 from src.frontend.cell_inspecting.cell_inspector_manager import CellInspectorManager
 from src.frontend.frame_rendering.frame_renderer import FrameRenderer
-from src.frontend.playback_navigation import HistoryNavigator
+from src.frontend.playback_navigator import PlaybackNavigator
 from src.frontend.simulation_label.cell_data_provider import CellDataProvider
 from src.frontend.simulation_label.cell_modificator import CellModificator, CellModification
 from src.frontend.simulation_label.simulation_view import SimulationView
@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = UiMainWindow(self)
 
-        automaton_size = (220, 250)
+        automaton_size = (507, 695)
         self.base_frame_time = 0.05
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
 
@@ -28,11 +28,14 @@ class MainWindow(QMainWindow):
         self.cell_modificator = CellModificator()
 
         self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
-        self.navigator = HistoryNavigator()
+        self.navigator = PlaybackNavigator()
         self.inspector_manager = CellInspectorManager(self.ui)
 
         self.render_label = SimulationView(self.cell_data_provider, self.ui.brush_size_slider, self.cell_modificator)
         self.render_charged = True
+
+        self.dark_mode = True
+        self._apply_style()
 
         self._init_ui_layout()
         self._connect_signals()
@@ -109,7 +112,7 @@ class MainWindow(QMainWindow):
 
     def _display_frame(self, frame_num, pixmap):
         self.render_label.setPixmap(pixmap)
-        self.ui.frame_counter_label.setText(f"Frame {frame_num}")
+        self.ui.frame_counter_label.setText(f"Time {frame_num}")
 
     def _on_cell_clicked(self, cell_data: CellDict):
         self.inspector_manager.show_inspector(
@@ -137,3 +140,9 @@ class MainWindow(QMainWindow):
     def _undo_cell_modification(self):
         self.cell_modificator.undo_change()
         self.sim.undo_modification()
+
+    def _apply_style(self):
+        path = "./resources/style/dark_mode.qss" if self.dark_mode else "./resources/style/light.qss"
+        with open(path, "r") as f:
+            style = f.read()
+        self.setStyleSheet(style)

@@ -19,17 +19,20 @@ class ParameterPanel(QtWidgets.QWidget):
         self._sliders: Dict[str, Dict[str, ParameterSlider]] = {}
 
         main_layout = QtWidgets.QVBoxLayout(self)
+        main_layout.setObjectName("Layout")
 
         scroll = QtWidgets.QScrollArea()
         scroll.setWidgetResizable(True)
 
         container = QtWidgets.QWidget()
+        container.setObjectName("Layout")
         scroll_layout = QtWidgets.QVBoxLayout(container)
 
         for cell_type, parameters in self._definitions.items():
             scroll_layout.addWidget(self._create_section_header(cell_type))
 
             section_widget = QtWidgets.QWidget()
+            section_widget.setObjectName("Layout")
             section_layout = QtWidgets.QVBoxLayout(section_widget)
             section_layout.setContentsMargins(10, 0, 10, 0)
             section_layout.setSpacing(10)
@@ -38,29 +41,21 @@ class ParameterPanel(QtWidgets.QWidget):
 
             for name, definition in parameters.items():
                 row = QtWidgets.QWidget()
-                row_layout = QtWidgets.QvBoxLayout(row)
+                row_layout = QtWidgets.QVBoxLayout(row)
                 row_layout.setContentsMargins(0, 0, 0, 0)
                 row_layout.setSpacing(5)
 
                 name_label = QtWidgets.QLabel(name)
-                name_label.setStyleSheet("color: black; font-family: 'Mulish'; font-size: 13px;")
                 row_layout.addWidget(name_label)
 
                 slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
-                slider.setStyleSheet(
-                    """
-                    QSlider::groove:horizontal { border: 1px solid #DBE3F1; height: 4px; border-radius: 2px; background: #DBE3F1; }
-                    QSlider::handle:horizontal { border: 1px solid #6D98F4; width: 10px; margin: -3px 0; border-radius: 5px; background: #6D98F4; }
-                    QSlider::sub-page:horizontal { background: #6D98F4; border-radius: 2px; }
-                    """
-                )
                 slider.setMinimumWidth(150)
                 slider.setSingleStep(1)
                 slider.setObjectName(f"{cell_type}_{name}")
 
                 label_text = CELL_PARAMETER_LABELS[cell_type][name]
                 value_label = QtWidgets.QLabel(f"{label_text}:")
-                value_label.setStyleSheet("color: black; font-family: 'Mulish'; font-size: 13px;")
+                value_label.setObjectName("ParameterValueLabel")
 
                 row_layout.addWidget(slider)
                 row_layout.addWidget(value_label)
@@ -72,6 +67,7 @@ class ParameterPanel(QtWidgets.QWidget):
             scroll_layout.addWidget(section_widget)
 
         scroll_layout.addStretch()
+        scroll_layout.setObjectName("Layout")
         scroll.setWidget(container)
         main_layout.addWidget(scroll)
 
@@ -128,22 +124,17 @@ class ParameterPanel(QtWidgets.QWidget):
     def _create_section_header(self, title: str) -> QtWidgets.QWidget:
         line_left = QtWidgets.QFrame()
         line_left.setFrameShape(QtWidgets.QFrame.Shape.HLine)
-        line_left.setStyleSheet("background-color: #2e2e2e; max-height: 1px;")
+        line_left.setObjectName("ParametersLine")
 
         label = QtWidgets.QLabel(title)
-        label.setStyleSheet(
-            """
-            color: #6D98F4;
-            font-family: 'Mulish ExtraBold';
-            font-size: 14px;
-            """
-        )
+        label.setObjectName("ParameterTitle")
 
         line_right = QtWidgets.QFrame()
         line_right.setFrameShape(QtWidgets.QFrame.Shape.HLine)
-        line_right.setStyleSheet("background-color: #2e2e2e; max-height: 1px;")
+        line_right.setObjectName("ParametersLine")
 
         container = QtWidgets.QWidget()
+        container.setObjectName("Layout")
         layout = QtWidgets.QHBoxLayout(container)
         layout.setContentsMargins(0, 10, 0, 10)
         layout.setSpacing(10)

@@ -41,8 +41,6 @@ class CellHighlightPainter:
             y = offset_y + r * cell_height
             painter.drawRect(QRectF(x, y, cell_width, cell_height))
 
-        painter.end()
-
     @staticmethod
     def _get_color(index, total=10):
         hue = int((index % total) * 360 / total)

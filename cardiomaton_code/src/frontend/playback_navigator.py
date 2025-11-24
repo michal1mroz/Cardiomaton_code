@@ -1,6 +1,6 @@
 from PyQt6.QtCore import QTimer, QObject, pyqtSignal
 
-class HistoryNavigator(QObject):
+class PlaybackNavigator(QObject):
     request_render_buffer = pyqtSignal(int)
     interaction_started = pyqtSignal()
 
