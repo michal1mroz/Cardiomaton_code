@@ -1,43 +1,31 @@
 QMainWindow {
-    background-image: url(./resources/style/dark_background.png);
+    background-image: url(./resources/style/light_background.png);
 }
 
 #TopBar {
-    background-color: rgba(51, 59, 70, 70);
+    background-color: rgba(242, 247, 255, 200);
 }
 
 QWidget#Logo {
-    background-color: #5E83F2;
+    background-color: #6D98F4;
     border-radius: 25px;
     color: white;
     font-size: 24px;
 }
 
 QLabel#ProjectName {
-    color: #E6EAF0;
+    color: #233348;
     font-family: "Mulish ExtraBold";
     font-size: 22px;
 }
 
-QPushButton#BtnApp,
-QPushButton#BtnHelp,
-QPushButton#BtnAbout {
-    color: #E6EAF0;
-}
-
-QPushButton#BtnApp:hover,
-QPushButton#BtnHelp:hover,
-QPushButton#BtnAbout:hover {
-    color: #F9FBFF;
-}
-
 #Layout {
-    background-color: #181C23;
+    background-color: #FFFFFF;
     border-radius: 20px;
 }
 
 PlayerControlsWidget {
-    background-color: #181C23;
+    background-color: #FFFFFF;
     border-radius: 20px;
 }
 
@@ -49,20 +37,20 @@ QToolTip {
 }
 
 QScrollArea {
-    background-color: #181C23;
+    background-color: #FFFFFF;
     border: none;
     border-radius: 20px;
 }
 
 QScrollBar:vertical {
-    background: #35424F;
+    background: #f3f7ff;
     width: 10px;
     margin: 4px 0 4px 0;
     border-radius: 5px;
 }
 
 QScrollBar::handle:vertical {
-    background: #E1605D;
+    background: #EF8481;
     border-radius: 5px;
     min-height: 20px;
 }
@@ -83,13 +71,13 @@ QScrollBar::sub-page:vertical {
 }
 
 QLabel {
-    color: #E6EAF0;
+    color: #233348;
     background: transparent;
 }
 
 QPushButton {
-    background-color: #E1605D;
-    color: #E6EAF0;
+    background-color: #e1605d;
+    color: #FFFFFF;
     border-radius: 10px;
     border: none;
     padding: 6px 10px;
@@ -97,13 +85,13 @@ QPushButton {
 
 QPushButton:hover {
     background-color: #CD4B48;
-    color: #E6EAF0;
+    color: #FFFFFF;
 }
 
 #ToggleBtn {
     font-size: 40px;
     font-weight: bold;
-    color: #E1605D;
+    color: #e1605d;
     background-color: transparent;
 }
 
@@ -117,7 +105,7 @@ QPushButton:hover {
     font-weight: bold;
     background: none;
     border: none;
-    color: #E1605D;
+    color: #e1605d;
 }
 
 #ControlBtn:hover {
@@ -126,7 +114,7 @@ QPushButton:hover {
 
 #CloseBtn {
     background-color: #E1605D;
-    color: #E6EAF0;
+    color: #FFFFFF;
     border-radius: 15px;
     font-weight: bold;
     font-family: Mulish;
@@ -141,7 +129,7 @@ QPushButton:hover {
     font-family: 'Mulish ExtraBold';
     font-size: 14px;
     background-color: #5E83F2;
-    color: #E6EAF0;
+    color: #FFFFFF;
     border-radius: 10px;
     padding: 6px 10px;
 }
@@ -154,7 +142,7 @@ QPushButton:hover {
     font-family: 'Mulish ExtraBold';
     font-size: 14px;
     background-color: #E1605D;
-    color: #E6EAF0;
+    color: #FFFFFF;
     border-radius: 10px;
     padding: 6px 10px;
 }
@@ -166,7 +154,7 @@ QPushButton:hover {
 #NecrosisSwitch {
     font-family: 'Mulish';
     font-size: 13px;
-    color: #E6EAF0;
+    color: #233348;
     spacing: 8px;
 }
 
@@ -186,7 +174,7 @@ QPushButton:hover {
     font-size: 30px;
     font-weight: bold;
     background-color: #E1605D;
-    color: #E6EAF0;
+    color: #FFFFFF;
     border-radius: 20px;
 }
 
@@ -195,7 +183,7 @@ QPushButton:hover {
 }
 
 #CellInspectorContainer {
-    background-color: #181C23;
+    background-color: #FFFFFF;
     border-radius: 20px;
 }
 
@@ -224,7 +212,7 @@ QComboBox QAbstractItemView {
     font-family: 'Mulish';
     font-size: 18px;
     font-weight: bold;
-    background-color: #181C23;
+    background-color: #FFFFFF;
     color: #E1605D;
     selection-color: #CD4B48;
 }
@@ -279,42 +267,42 @@ QSlider::handle:horizontal:hover {
     background: #e0e0e0;
 }
 
-QPushButton#BtnApp,
-QPushButton#BtnHelp,
-QPushButton#BtnAbout {
-    color: #E6EAF0;
-    background:transparent;
-}
-
-QPushButton#BtnApp:hover,
-QPushButton#BtnHelp:hover,
-QPushButton#BtnAbout:hover {
-    color: #F9FBFF;
-    background:transparent;
-}
-
 #ParameterValueLabel {
-    color: #E6EAF0;
+    color: #233348;
     font-family: 'Mulish';
     font-size: 13px;
 }
 
 #ParametersLine {
-    background-color: #E6EAF0;
+    background-color: #233348;
     max-height: 1px;
 }
 
 #ParameterTitle {
-    color: #E6EAF0;
+    color: #233348;
     font-family: 'Mulish ExtraBold';
     font-size: 14px;
 }
 
 #BtnTheme {
-    color: #E6EAF0;
+    color: #1F1534;
     background: transparent;
 }
 
 #BtnTheme::hover {
-    color: #F9FBFF;
+    color: #3030A5;
+}
+
+QPushButton#BtnApp,
+QPushButton#BtnHelp,
+QPushButton#BtnAbout {
+    color: #1F1534;
+    background: transparent;
+}
+
+QPushButton#BtnApp:hover,
+QPushButton#BtnHelp:hover,
+QPushButton#BtnAbout:hover {
+    color: #3030A5;
+    background: transparent;
 }

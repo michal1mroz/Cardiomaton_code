@@ -33,12 +33,18 @@ class TopBarWidget(QWidget):
         self.btn_about.setText("About us")
         self.btn_about.setObjectName("BtnAbout")
 
+        self.btn_theme = UIFactory.create_pushbutton(self)
+        self.btn_theme.setText("☀")
+        self.btn_theme.setObjectName("BtnTheme")
+        self.btn_theme.setFixedWidth(40)
+
         layout.addWidget(self.logo)
         layout.addWidget(self.project_name)
         layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         layout.addWidget(self.btn_app)
         layout.addWidget(self.btn_help)
         layout.addWidget(self.btn_about)
+        layout.addWidget(self.btn_theme)
 
         layout.setStretch(0, 1)
         layout.setStretch(1, 1)
@@ -46,3 +52,4 @@ class TopBarWidget(QWidget):
         layout.setStretch(3, 1)
         layout.setStretch(4, 1)
         layout.setStretch(5, 1)
+        layout.setStretch(6, 0)

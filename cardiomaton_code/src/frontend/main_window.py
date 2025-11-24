@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
         self.ui.undo_button.clicked.connect(self._undo_cell_modification)
 
         self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
+        self.ui.topbar.btn_theme.clicked.connect(self._toggle_theme)
 
     def _toggle_simulation(self):
         if not self.runner.running and self.navigator.current_buffer_index != -1:
@@ -153,11 +154,17 @@ class MainWindow(QMainWindow):
         self.cell_modificator.undo_change()
         self.sim.undo_modification()
 
+    def _toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        self._apply_style()
+
     def _apply_style(self):
-        path = "./resources/style/dark_mode.qss" if self.dark_mode else "./resources/style/light.qss"
+        path = "./resources/style/dark_mode.qss" if self.dark_mode else "./resources/style/light_mode.qss"
         with open(path, "r") as f:
             style = f.read()
         self.setStyleSheet(style)
+        icon_text = "☀" if self.dark_mode else "☾"
+        self.ui.topbar.btn_theme.setText(icon_text)
 
     def _on_parameter_slider_moved(self, changed_cell_type: str):
         if self.overlay_graph.isHidden():
