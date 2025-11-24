@@ -251,23 +251,32 @@ QCheckBox::indicator:checked {
 }
 
 QSlider::groove:horizontal {
-    border: 1px solid #616c7e;
+    border: 1px solid #bbb;
+    background: #c0c0c0;
     height: 4px;
-    border-radius: 2px;
-    background: #616c7e;
+    border-radius: 4px;
 }
-
-QSlider::handle:horizontal {
-    border: 1px solid #6D98F4;
-    width: 10px;
-    margin: -3px 0;
-    border-radius: 5px;
-    background: #6D98F4;
-}
-
 QSlider::sub-page:horizontal {
-    background: #4F75E5;
-    border-radius: 2px;
+    background: #0078D7;
+    border: 1px solid #777;
+    height: 4px;
+    border-radius: 4px;
+}
+QSlider::add-page:horizontal {
+    background: #c0c0c0;
+    border: 0px solid #777;
+    height: 4px;
+    border-radius: 4px;
+}
+QSlider::handle:horizontal {
+    background: white;
+    border: 1px solid #5c5c5c;
+    width: 14px;
+    margin: -6px 0;
+    border-radius: 7px;
+}
+QSlider::handle:horizontal:hover {
+    background: #e0e0e0;
 }
 
 QPushButton#BtnApp,

@@ -26,7 +26,7 @@ class ParameterSlider:
 
     def _update_label(self, slider_value: int) -> None:
         real_value = self._definition.to_real_value(slider_value)
-        self._value_label.setText(f"{real_value:.3f}")
+        self._value_label.setText(self._to_slider_value(real_value))
 
     def reset(self) -> None:
         self._slider.setValue(self._definition.slider_default())
@@ -37,3 +37,8 @@ class ParameterSlider:
 
     def get_slider_widget(self) -> QtWidgets.QSlider:
         return self._slider
+
+    def _to_slider_value(self, value: float) -> str:
+        if self._definition.is_time:
+            return str(int(round(value * 1000.0)))
+        return str(int(round(value)))
