@@ -93,7 +93,7 @@ CELL_PARAMETER_LABELS: Final[Dict[str, Dict[str, str]]] = {
         "V_peak": "Peak Membrane Potential (mV)",
         "t40": "Slow Depolarization Duration (ms)",
         "t03": "Rapid Depolarization Duration (ms)",
-        "t34": "Repolarization Duration (ms)", # Poprawiona literówka: Repolarization
+        "t34": "Repolarization Duration (ms)",
     },
     "ATRIAL": {
         "V_rest": "Resting Membrane Potential (mV)",

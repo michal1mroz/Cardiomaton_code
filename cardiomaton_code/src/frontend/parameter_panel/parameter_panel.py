@@ -45,20 +45,29 @@ class ParameterPanel(QtWidgets.QWidget):
                 row_layout.setContentsMargins(0, 0, 0, 0)
                 row_layout.setSpacing(5)
 
-                name_label = QtWidgets.QLabel(name)
+                label_text = CELL_PARAMETER_LABELS[cell_type][name]
+                name_label = QtWidgets.QLabel(label_text)
                 row_layout.addWidget(name_label)
+
+                bottom_row = QtWidgets.QWidget()
+                bottom_layout = QtWidgets.QHBoxLayout(bottom_row)
+                bottom_layout.setContentsMargins(0, 0, 0, 0)
+                bottom_layout.setSpacing(10)
 
                 slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
                 slider.setMinimumWidth(150)
                 slider.setSingleStep(1)
                 slider.setObjectName(f"{cell_type}_{name}")
 
-                label_text = CELL_PARAMETER_LABELS[cell_type][name]
-                value_label = QtWidgets.QLabel(f"{label_text}:")
+                value_label = QtWidgets.QLabel(definition.format_default_text())
                 value_label.setObjectName("ParameterValueLabel")
+                value_label.setFixedWidth(60)
+                value_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-                row_layout.addWidget(slider)
-                row_layout.addWidget(value_label)
+                bottom_layout.addWidget(slider)
+                bottom_layout.addWidget(value_label)
+
+                row_layout.addWidget(bottom_row)
                 section_layout.addWidget(row)
 
                 binding = ParameterSlider(definition=definition, slider=slider, value_label=value_label)
@@ -67,7 +76,6 @@ class ParameterPanel(QtWidgets.QWidget):
             scroll_layout.addWidget(section_widget)
 
         scroll_layout.addStretch()
-        scroll_layout.setObjectName("Layout")
         scroll.setWidget(container)
         main_layout.addWidget(scroll)
 
@@ -109,14 +117,14 @@ class ParameterPanel(QtWidgets.QWidget):
                 slider_high.blockSignals(True)
                 slider_high.setValue(value)
                 slider_high.blockSignals(False)
-                binding_high.update_label(value)
+                binding_high._update_label(value)
 
         def enforce_constraint_high(value):
             if value < slider_low.value():
                 slider_low.blockSignals(True)
                 slider_low.setValue(value)
                 slider_low.blockSignals(False)
-                binding_low.update_label(value)
+                binding_low._update_label(value)
 
         slider_low.valueChanged.connect(enforce_constraint_low)
         slider_high.valueChanged.connect(enforce_constraint_high)
