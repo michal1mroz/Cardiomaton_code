@@ -1,5 +1,32 @@
+/* =======================================================
+   COLOR PALETTE:
+   -------------------------------------------------------
+   Red (Base):          #E1605D
+   Red (Hover):         #CD4B48
+
+   Blue (Base):         #5E83F2
+   Blue (Hover):        #496BD3
+
+   Text Dark:           #233348
+   Text Light/White:    #FFFFFF
+
+   White transparent background:      rgba(255, 255, 255, 230)
+   ======================================================= */
+
+
+/* --- BACKGROUNDS --- */
+
+
 QMainWindow {
     background-image: url(./resources/style/light_background.png);
+}
+
+#Layout,
+PlayerControlsWidget,
+#CellInspectorContainer,
+QScrollArea {
+    background-color: #FFFFFF;
+    border-radius: 20px;
 }
 
 #TopBar {
@@ -13,34 +40,270 @@ QWidget#Logo {
     font-size: 24px;
 }
 
-QLabel#ProjectName {
+QToolTip {
+    background-color: #FFFFFF;
     color: #233348;
+    padding: 12px;
+    border: 1px solid #E6EAF0;
+}
+
+
+/* --- TEXT --- */
+
+
+QLabel {
+    color: #233348;
+    background: transparent;
+}
+
+QLabel#ProjectName {
     font-family: "Mulish ExtraBold";
     font-size: 22px;
 }
 
-#Layout {
-    background-color: #FFFFFF;
-    border-radius: 20px;
+#ParameterValueLabel {
+    font-family: 'Mulish';
+    font-size: 13px;
 }
 
-PlayerControlsWidget {
-    background-color: #FFFFFF;
-    border-radius: 20px;
+#ParameterTitle {
+    color: #233348;
+    font-family: 'Mulish ExtraBold';
+    font-size: 14px;
 }
 
-QToolTip {
-    background-color: /* tooltip bg */;
-    color: /* tooltip text */;
-    padding: 12px;
-    border: 1px solid /* tooltip border */;
-}
-
-QScrollArea {
-    background-color: #FFFFFF;
+#ParametersLine {
+    background-color: #798BA3;
+    max-height: 1px;
     border: none;
+}
+
+
+/* --- BUTTONS --- */
+
+
+QPushButton,
+#CloseBtn,
+#UndoBtn,
+#play_button {
+    background-color: #E1605D;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 10px;
+}
+
+QPushButton:hover,
+#CloseBtn:hover,
+#UndoBtn:hover,
+#play_button:hover {
+    background-color: #CD4B48;
+    color: #FFFFFF;
+}
+
+#CloseBtn {
+    border-radius: 15px;
+    font-weight: bold;
+    font-family: Mulish;
+    font-size: 14px;
+}
+
+#UndoBtn {
+    font-family: 'Mulish ExtraBold';
+    font-size: 14px;
+}
+
+#play_button {
+    font-size: 30px;
+    font-weight: bold;
     border-radius: 20px;
 }
+
+#BlueBtn,
+QPushButton#GraphCloseBtn {
+    background-color: #5E83F2;
+    color: #FFFFFF;
+    border: none;
+    padding: 6px 10px;
+}
+
+#BlueBtn:hover,
+QPushButton#GraphCloseBtn:hover {
+    background-color: #496BD3;
+}
+
+#BlueBtn {
+    font-family: 'Mulish ExtraBold';
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+QPushButton#GraphCloseBtn {
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#ToggleBtn,
+#ControlBtn {
+    background-color: transparent;
+    border: none;
+    font-weight: bold;
+    color: #E1605D;
+}
+
+#ToggleBtn:hover,
+#ControlBtn:hover {
+    color: #CD4B48;
+}
+
+#ToggleBtn { font-size: 40px; }
+#ControlBtn { font-size: 30px; }
+
+
+/* --- TOPBAR BUTTONS --- */
+
+
+#BtnTheme,
+QPushButton#BtnApp,
+QPushButton#BtnHelp,
+QPushButton#BtnAbout {
+    color: #1F1534;
+    background: transparent;
+    border: none;
+}
+
+#BtnTheme:hover,
+QPushButton#BtnApp:hover,
+QPushButton#BtnHelp:hover,
+QPushButton#BtnAbout:hover {
+    color: #496BD3;
+    background: transparent;
+}
+
+
+/* --- COMBOBOX --- */
+
+
+QComboBox {
+    font-family: Mulish;
+    font-size: 25px;
+    font-weight: bold;
+    color: #E1605D;
+    background-color: transparent;
+    margin-left: 10px;
+}
+
+QComboBox:hover {
+    color: #CD4B48;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 0px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+}
+
+QComboBox QAbstractItemView {
+    font-family: 'Mulish';
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #FFFFFF;
+    color: #E1605D;
+    selection-color: #CD4B48;
+    outline: none;
+}
+
+QComboBox QAbstractItemView::item {
+    padding-left: 10px;
+}
+
+
+/* --- CHECKBOX --- */
+
+
+QCheckBox {
+    color: #233348;
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid #4574DA;
+    background-color: transparent;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #4574DA;
+}
+
+
+/* --- NECROSIS SWITCH --- */
+
+#NecrosisSwitch {
+    font-family: 'Mulish';
+    font-size: 13px;
+    color: #233348;
+    spacing: 8px;
+}
+
+#NecrosisSwitch::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid #4574DA;
+    background-color: transparent;
+}
+
+#NecrosisSwitch::indicator:checked {
+    background-color: #4574DA;
+}
+
+
+/* --- SLIDER --- */
+
+
+QSlider::groove:horizontal {
+    border: 1px solid #bbb;
+    background: #c0c0c0;
+    height: 4px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #0078D7;
+    border: 1px solid #777;
+    height: 4px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #c0c0c0;
+    border: 0px solid #777;
+    height: 4px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: white;
+    border: 1px solid #5c5c5c;
+    width: 14px;
+    margin: -6px 0;
+    border-radius: 7px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: #e0e0e0;
+}
+
+
+/* --- SCROLLBAR --- */
+
 
 QScrollBar:vertical {
     background: #f3f7ff;
@@ -70,239 +333,18 @@ QScrollBar::sub-page:vertical {
     background: transparent;
 }
 
-QLabel {
-    color: #233348;
-    background: transparent;
-}
 
-QPushButton {
-    background-color: #e1605d;
-    color: #FFFFFF;
-    border-radius: 10px;
-    border: none;
-    padding: 6px 10px;
-}
-
-QPushButton:hover {
-    background-color: #CD4B48;
-    color: #FFFFFF;
-}
-
-#ToggleBtn {
-    font-size: 40px;
-    font-weight: bold;
-    color: #e1605d;
-    background-color: transparent;
-}
-
-#ToggleBtn:hover {
-    color: #CD4B48;
-}
+/* --- GRAPHS --- */
 
 
-#ControlBtn {
-    font-size: 30px;
-    font-weight: bold;
-    background: none;
-    border: none;
-    color: #e1605d;
-}
-
-#ControlBtn:hover {
-    color:  #CD4B48;
-}
-
-#CloseBtn {
-    background-color: #E1605D;
-    color: #FFFFFF;
-    border-radius: 15px;
-    font-weight: bold;
-    font-family: Mulish;
-    font-size: 14px;
-}
-
-#CloseBtn:hover {
-    background-color: #CD4B48;
-}
-
-#BlueBtn {
-    font-family: 'Mulish ExtraBold';
-    font-size: 14px;
-    background-color: #5E83F2;
-    color: #FFFFFF;
-    border-radius: 10px;
-    padding: 6px 10px;
-}
-
-#BlueBtn:hover {
-    background-color:  #496BD3;
-}
-
-#UndoBtn {
-    font-family: 'Mulish ExtraBold';
-    font-size: 14px;
-    background-color: #E1605D;
-    color: #FFFFFF;
-    border-radius: 10px;
-    padding: 6px 10px;
-}
-
-#UndoBtn:hover {
-    background-color: #CD4B48;
-}
-
-#NecrosisSwitch {
-    font-family: 'Mulish';
-    font-size: 13px;
-    color: #233348;
-    spacing: 8px;
-}
-
-#NecrosisSwitch::indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    border: 2px solid #4574DA;
-    background-color: transparent;
-}
-
-#NecrosisSwitch::indicator:checked {
-    background-color: #4574DA;
-}
-
-#play_button {
-    font-size: 30px;
-    font-weight: bold;
-    background-color: #E1605D;
-    color: #FFFFFF;
+SeriesPlot,
+GraphWidget {
+    background-color: rgba(255, 255, 255, 230);
     border-radius: 20px;
-}
 
-#play_button:hover {
-    background-color: #CD4B48;
-}
-
-#CellInspectorContainer {
-    background-color: #FFFFFF;
-    border-radius: 20px;
-}
-
-QComboBox {
-    font-family: Mulish;
-    font-size: 25px;
-    font-weight: bold;
-    color: #E1605D;
-    background-color: transparent;
-    margin-left: 10px;
-}
-
-QComboBox::hover{
-    color: #CD4B48;
-}
-
-QComboBox::drop-down {
-    border: none;
-    width: 0px;
-}
-QComboBox::down-arrow {
-    image: none;
-}
-
-QComboBox QAbstractItemView {
-    font-family: 'Mulish';
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #FFFFFF;
-    color: #E1605D;
-    selection-color: #CD4B48;
-}
-
-QComboBox QAbstractItemView::item {
-    padding-left: 10px;
-}
-
-QCheckBox {
-    color: /* checkbox text */;
-    spacing: 8px;
-}
-
-QCheckBox::indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    border: 2px solid /* checkbox border */;
-    background-color: transparent;
-}
-
-QCheckBox::indicator:checked {
-    background-color: /* checkbox fill */;
-}
-
-QSlider::groove:horizontal {
-    border: 1px solid #bbb;
-    background: #c0c0c0;
-    height: 4px;
-    border-radius: 4px;
-}
-QSlider::sub-page:horizontal {
-    background: #0078D7;
-    border: 1px solid #777;
-    height: 4px;
-    border-radius: 4px;
-}
-QSlider::add-page:horizontal {
-    background: #c0c0c0;
-    border: 0px solid #777;
-    height: 4px;
-    border-radius: 4px;
-}
-QSlider::handle:horizontal {
-    background: white;
-    border: 1px solid #5c5c5c;
-    width: 14px;
-    margin: -6px 0;
-    border-radius: 7px;
-}
-QSlider::handle:horizontal:hover {
-    background: #e0e0e0;
-}
-
-#ParameterValueLabel {
-    color: #233348;
-    font-family: 'Mulish';
-    font-size: 13px;
-}
-
-#ParametersLine {
-    background-color: #233348;
-    max-height: 1px;
-}
-
-#ParameterTitle {
-    color: #233348;
-    font-family: 'Mulish ExtraBold';
-    font-size: 14px;
-}
-
-#BtnTheme {
-    color: #1F1534;
-    background: transparent;
-}
-
-#BtnTheme::hover {
-    color: #3030A5;
-}
-
-QPushButton#BtnApp,
-QPushButton#BtnHelp,
-QPushButton#BtnAbout {
-    color: #1F1534;
-    background: transparent;
-}
-
-QPushButton#BtnApp:hover,
-QPushButton#BtnHelp:hover,
-QPushButton#BtnAbout:hover {
-    color: #3030A5;
-    background: transparent;
+    /* Custom Properties dla PyQtGraph */
+    qproperty-plotBackground: white;
+    qproperty-traceColor: #CD4B48;
+    qproperty-axisColor: #6c7c91;
+    qproperty-titleColor: #233348;
 }

@@ -2,11 +2,11 @@ from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QMouseEvent, QPainter
 
-from src.frontend.simulation_label.cell_brush import CellBrush
-from src.frontend.simulation_label.cell_coordinate_mapper import CellCoordinateMapper
-from src.frontend.simulation_label.cell_data_provider import CellDataProvider
-from src.frontend.simulation_label.cell_highlight_painter import CellHighlightPainter
-from src.frontend.simulation_label.cell_tooltip_manager import CellTooltipManager
+from src.frontend.simulation_display.cell_brush import CellBrush
+from src.frontend.simulation_display.cell_coordinate_mapper import CellCoordinateMapper
+from src.frontend.simulation_display.cell_data_provider import CellDataProvider
+from src.frontend.simulation_display.cell_highlight_painter import CellHighlightPainter
+from src.frontend.simulation_display.cell_tooltip_manager import CellTooltipManager
 
 class SimulationView(QLabel):
     cellClicked = pyqtSignal(object)

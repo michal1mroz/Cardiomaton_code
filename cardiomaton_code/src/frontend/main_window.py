@@ -1,16 +1,16 @@
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QMainWindow
 
-from src.controllers.simulation_controller import SimulationController
-from src.frontend.action_potential_generator import ActionPotentialGenerator
+from src.backend.controllers.simulation_controller import SimulationController
+from src.backend.services.action_potential_generator import ActionPotentialGenerator
 from src.frontend.cell_inspecting.cell_inspector_manager import CellInspectorManager
 from src.frontend.frame_rendering.frame_renderer import FrameRenderer
-from src.frontend.graph_widget import GraphWidget
-from src.frontend.playback_navigator import PlaybackNavigator
-from src.frontend.simulation_label.cell_data_provider import CellDataProvider
-from src.frontend.simulation_label.cell_modificator import CellModificator, CellModification
-from src.frontend.simulation_label.simulation_view import SimulationView
-from src.frontend.simulation_loop import SimulationRunner
+from src.frontend.ui_components.potential_graph_widget import GraphWidget
+from src.backend.controllers.playback_navigator import PlaybackNavigator
+from src.frontend.simulation_display.cell_data_provider import CellDataProvider
+from src.frontend.simulation_display.cell_modificator import CellModificator, CellModification
+from src.frontend.simulation_display.simulation_view import SimulationView
+from src.backend.services.simulation_loop import SimulationRunner
 from src.frontend.ui_main_window import UiMainWindow
 from src.models.cell import CellDict
 

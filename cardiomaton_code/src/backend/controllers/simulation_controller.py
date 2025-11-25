@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, Dict
 from src.models.cell import CellDict
-from src.services.simulation_service import SimulationService
+from src.backend.services.simulation_service import SimulationService
 from PyQt6.QtGui import QImage
 
 class SimulationController:

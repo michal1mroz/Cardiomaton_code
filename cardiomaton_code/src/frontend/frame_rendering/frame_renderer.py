@@ -4,7 +4,7 @@ from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import QSize
 
 from src.frontend.frame_rendering.pixmap_renderer import PixmapRenderer
-from src.controllers.simulation_controller import SimulationController
+from src.backend.controllers.simulation_controller import SimulationController
 
 class FrameRenderer:
 

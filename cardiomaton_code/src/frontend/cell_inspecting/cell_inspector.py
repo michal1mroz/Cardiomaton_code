@@ -3,7 +3,6 @@ from typing import Optional, Iterable
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy
 
-from src.controllers.simulation_controller import SimulationController
 from src.frontend.cell_inspecting.cell_details import CellDetails
 from src.frontend.cell_inspecting.series_plot import SeriesPlot
 from src.models.cell import CellDict

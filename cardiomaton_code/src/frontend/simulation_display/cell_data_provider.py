@@ -1,6 +1,6 @@
 from typing import Tuple, Optional
 
-from src.controllers.simulation_controller import SimulationController
+from src.backend.controllers.simulation_controller import SimulationController
 from src.models.cell import CellDict
 
 

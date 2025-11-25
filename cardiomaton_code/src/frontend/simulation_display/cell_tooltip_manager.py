@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QLabel, QToolTip
 from PyQt6.QtGui import QMouseEvent
 
 
-from src.frontend.simulation_label.cell_data_provider import CellDataProvider
+from src.frontend.simulation_display.cell_data_provider import CellDataProvider
 from src.models.cell import CellDict
 
 class CellTooltipManager:

@@ -1,6 +1,6 @@
 from PyQt6.QtCore import QTimer, QObject, pyqtSignal
 
-from src.controllers.simulation_controller import SimulationController
+from src.backend.controllers.simulation_controller import SimulationController
 
 class SimulationRunner(QObject):
     frame_tick = pyqtSignal()
