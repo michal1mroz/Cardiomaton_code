@@ -16,9 +16,12 @@ class ParameterPanel(QtWidgets.QWidget):
                  definitions: Optional[Dict[str, Dict[str, ParameterDefinition]]] = None) -> None:
         super().__init__(parent)
 
+
+
         self._definitions: Dict[str, Dict[str, ParameterDefinition]] = (
             definitions if definitions is not None else CELL_PARAMETER_DEFINITIONS
         )
+
 
         self._sliders: Dict[str, Dict[str, ParameterSlider]] = {}
 
@@ -138,24 +141,25 @@ class ParameterPanel(QtWidgets.QWidget):
         slider_high.valueChanged.connect(enforce_constraint_high)
 
     def _create_section_header(self, title: str) -> QtWidgets.QWidget:
-        line_left = QtWidgets.QFrame()
-        line_left.setFrameShape(QtWidgets.QFrame.Shape.HLine)
-        line_left.setObjectName("ParametersLine")
-
-        label = QtWidgets.QLabel(title)
-        label.setObjectName("ParameterTitle")
-
-        line_right = QtWidgets.QFrame()
-        line_right.setFrameShape(QtWidgets.QFrame.Shape.HLine)
-        line_right.setObjectName("ParametersLine")
-
         container = QtWidgets.QWidget()
         container.setObjectName("Layout")
         layout = QtWidgets.QHBoxLayout(container)
         layout.setContentsMargins(0, 10, 0, 10)
         layout.setSpacing(10)
-        layout.addWidget(line_left)
-        layout.addWidget(label)
-        layout.addWidget(line_right)
+        if title != "__GLOBAL__":
+            line_left = QtWidgets.QFrame()
+            line_left.setFrameShape(QtWidgets.QFrame.Shape.HLine)
+            line_left.setObjectName("ParametersLine")
+
+            label = QtWidgets.QLabel(title)
+            label.setObjectName("ParameterTitle")
+
+            line_right = QtWidgets.QFrame()
+            line_right.setFrameShape(QtWidgets.QFrame.Shape.HLine)
+            line_right.setObjectName("ParametersLine")
+
+            layout.addWidget(line_left)
+            layout.addWidget(label)
+            layout.addWidget(line_right)
 
         return container

@@ -361,6 +361,22 @@ cdef class Automaton:
             else:
                 raise RuntimeError("Attempted construction of a cell with no charge function")
 
+
+    cpdef void modify_propagation_time(self, set coords, int propagation_time_value):
+        """
+        Modifies structs CCell with new propagation time parameter.
+        """
+        cdef int i
+        cdef CCell* cell
+        cdef int x, y
+
+        for i in range(self.n_nodes):
+            cell = self.grid_a[i]
+            x, y = cell.pos_x, cell.pos_y
+
+            if (x, y) in coords:
+                cell.propagation_time = propagation_time_value
+
     cpdef void commit_current_automaton(self):
         """
         Takes current version of automaton and saves it in modification buffer.

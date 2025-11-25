@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
             purkinje_charge_parameters=all_params["PURKINJE"],
             atrial_charge_parameters=all_params["ATRIAL"],
             pacemaker_charge_parameters=all_params["PACEMAKER"],
+            global_parameters=all_params["__GLOBAL__"],
             necrosis_enabled=self.ui.necrosis_switch.isChecked(),
             modifier_name="user_slider",
         )
@@ -170,8 +171,8 @@ class MainWindow(QMainWindow):
         if self.overlay_graph.isHidden():
             self.overlay_graph.show()
         self.overlay_graph.raise_()
-
-        self.refresh_overlay_plot(changed_cell_type)
+        if changed_cell_type != "__GLOBAL__":
+            self.refresh_overlay_plot(changed_cell_type)
 
     def refresh_overlay_plot(self, cell_type: str):
         params = self.ui.parameter_panel.get_current_values(cell_type)

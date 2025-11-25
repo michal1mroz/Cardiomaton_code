@@ -56,6 +56,8 @@ class SimulationService:
         self.automaton.commit_current_automaton() # cell modification
         if modification.necrosis_enabled:
             self.automaton.modify_cell_state(cells_positions, CellState.NECROSIS)
+        if "propagation_time" in modification.global_parameters.keys():
+            self.automaton.modify_propagation_time(cells_positions, modification.global_parameters["propagation_time"])
         self.automaton.modify_charge_data(cells_positions,
                                           modification.atrial_charge_parameters,
                                           modification.pacemaker_charge_parameters,
