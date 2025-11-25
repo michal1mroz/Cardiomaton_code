@@ -1,632 +1,149 @@
-import os
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtGui import QFontDatabase, QColor
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMainWindow, QVBoxLayout
-from src.frontend.parameter_panel import ParameterPanel
-from src.frontend.cell_modificator import CellModificator
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QScrollArea, QListView
+from PyQt6 import QtWidgets, QtCore, QtGui
+
+from src.frontend.parameter_panel.parameter_panel import ParameterPanel
+from src.frontend.ui_components.modification_panel import ModificationPanel
+from src.frontend.ui_components.player_controls_widget import PlayerControlsWidget
+from src.frontend.ui_components.top_bar_widget import TopBarWidget
+from src.frontend.ui_components.ui_factory import UIFactory
 
 
 class UiMainWindow(object):
-    """
-    Graphical user interface for the Cardiomaton simulation application.
-
-    This class sets up the main window, including layouts, buttons, sliders,
-    labels, and other widgets necessary for controlling and visualizing
-    the simulation.
-    """
-
     def __init__(self, main_window: QMainWindow):
-        """
-        Initialize the UI for the main window.
+        UIFactory.load_fonts()
+        self._setup_main_window_properties(main_window)
 
-        Args:
-            main_window (QMainWindow): The main window instance to set up the UI in.
-        """
-        self._load_fonts()
-
-        # Main window
-        main_window.resize(1100, 600)
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Expanding
-        )
-        size_policy.setHorizontalStretch(0)
-        size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(main_window.sizePolicy().hasHeightForWidth())
-        main_window.setSizePolicy(size_policy)
-        main_window.setMinimumSize(QtCore.QSize(1100, 600))
-        main_window.setMaximumSize(QtCore.QSize(1100, 600))
-        main_window.setAutoFillBackground(False)
-        main_window.setStyleSheet(
-            "background-image: url(./resources/style/background.png);\n"
-            "background-repeat: no-repeat;\n"
-            "background-position: center;\n"
-        )
-
-        # Central widget
-        self.centralwidget = self._create_widget(main_window)
+        self.centralwidget = UIFactory.create_widget(main_window)
 
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_4.setSpacing(0)
 
-        # Main layout container
-        self.layout = self._create_widget(self.centralwidget)
-
+        self.layout = UIFactory.create_widget(self.centralwidget)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.layout)
 
-        # Upper layout
-        self.upper_layout = QtWidgets.QWidget(parent=self.layout)
-        self.upper_layout.setEnabled(True)
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Policy.MinimumExpanding,
-            QtWidgets.QSizePolicy.Policy.MinimumExpanding
-        )
-        size_policy.setHeightForWidth(self.upper_layout.sizePolicy().hasHeightForWidth())
-        self.upper_layout.setSizePolicy(size_policy)
-        self.upper_layout.setStyleSheet("background: transparent;")
+        self.topbar = TopBarWidget()
+        UIFactory.add_shadow(self.topbar)
+        self.verticalLayout.addWidget(self.topbar)
 
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.upper_layout)
-        self.horizontalLayout.setContentsMargins(29, -1, 29, -1)
-        self.horizontalLayout.setSpacing(20)
+        self.bottom_container = UIFactory.create_widget(self.layout)
+        self.bottom_layout = QtWidgets.QHBoxLayout(self.bottom_container)
+        self.bottom_layout.setSpacing(40)
 
-        # Logo
-        self.logo = QtWidgets.QWidget(parent=self.upper_layout)
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
-                                            QtWidgets.QSizePolicy.Policy.Expanding)
-        size_policy.setHorizontalStretch(0)
-        size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(self.logo.sizePolicy().hasHeightForWidth())
-        self.logo.setSizePolicy(size_policy)
-        self.logo.setMinimumSize(QtCore.QSize(50, 50))
-        self.logo.setMaximumSize(QtCore.QSize(50, 50))
-        self.logo.setStyleSheet("border-radius: 25px;\n"
-                                "background-color: #6D98F4;\n"
-                                "color: white;\n"
-                                "font-size: 24px;\n"
-                                "")
-        self._add_shadow(self.logo)
-        self.horizontalLayout.addWidget(self.logo)
+        self._init_settings_panel()
+        self._init_simulation_area()
 
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.logo)
-        self.horizontalLayout.addWidget(self.logo)
+        self.bottom_layout.addWidget(self.settings_container, stretch=11)
+        self.bottom_layout.addWidget(self.simulation_widget, stretch=13)
 
-        # Project name label
-        self.project_name = self._create_label(self.upper_layout, "Cardiomaton", "Mulish ExtraBold", 22)
-        self.horizontalLayout.addWidget(self.project_name)
-
-        spacer_item = QtWidgets.QSpacerItem(
-            40, 20,
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Minimum
-        )
-        self.horizontalLayout.addItem(spacer_item)
-
-        # Upper buttons
-        self.pushButton_app = self._create_pushbutton(self.upper_layout, font_family="Mulish ExtraBold")
-        self.horizontalLayout.addWidget(self.pushButton_app)
-
-        self.pushButton_help = self._create_pushbutton(self.upper_layout)
-        self.horizontalLayout.addWidget(self.pushButton_help)
-
-        self.pushButton_about_us = self._create_pushbutton(self.upper_layout)
-        self.horizontalLayout.addWidget(self.pushButton_about_us)
-
-        self.horizontalLayout.setStretch(0, 1)
-        self.horizontalLayout.setStretch(1, 1)
-        self.horizontalLayout.setStretch(2, 4)
-        self.horizontalLayout.setStretch(3, 1)
-        self.horizontalLayout.setStretch(4, 1)
-        self.horizontalLayout.setStretch(5, 1)
-
-        self.verticalLayout.addWidget(self.upper_layout)
-
-        # Bottom layout
-        self.bottom_layout = self._create_widget(self.layout)
-
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.bottom_layout)
-        self.horizontalLayout_3.setSpacing(40)
-
-        # Settings layout
-        self.settings_layout = self._create_widget(self.bottom_layout)
-
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.settings_layout)
-        self.verticalLayout_2.setContentsMargins(20, 0, 12, 10)
-        self.verticalLayout_2.setSpacing(20)
-
-        # Presets, parameters, players layouts
-        self.presets_layout = QtWidgets.QWidget(parent=self.settings_layout)
-        self.presets_layout.setStyleSheet(
-            "background-color: white;\n"
-            "border-radius: 20px;\n"
-        )
-        self._add_shadow(self.presets_layout)
-        self.verticalLayout_2.addWidget(self.presets_layout)
-
-        # --- Parameters layout widgets ---
-        self.parameters_scroll = QtWidgets.QScrollArea(parent=self.settings_layout)
-        self.parameters_scroll.setWidgetResizable(True)
-        self.parameters_scroll.setStyleSheet("""
-                    QScrollArea {
-                        border: none;
-                        background-color: black;
-                        border-radius: 20px;
-                    }
-                    QScrollBar:vertical {
-                        background: #1e1e1e;
-                        width: 10px;
-                        margin: 4px 0 4px 0;
-                        border-radius: 5px;
-                    }
-                    QScrollBar::handle:vertical {
-                        background: #6D98F4;
-                        border-radius: 5px;
-                        min-height: 20px;
-                    }
-                    QScrollBar::handle:vertical:hover {
-                        background: #89B0FF;
-                    }
-                    QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                        background: none;
-                        height: 0px;
-                    }
-                """)
-        self._add_shadow(self.parameters_scroll)
-
-        # Parameters menu container
-        self.parameters_container = QtWidgets.QWidget()
-        self.parameters_container.setStyleSheet("background-color: white; border-radius: 20px;")
-
-        self.parameters_layout = QtWidgets.QVBoxLayout(self.parameters_container)
-        self.parameters_layout.setContentsMargins(20, 20, 20, 20)
-        self.parameters_layout.setSpacing(15)
-
-        top_row = QtWidgets.QWidget(self.parameters_container)
-        top_layout = QtWidgets.QHBoxLayout(top_row)
-        top_layout.setContentsMargins(0, 0, 0, 0)
-        top_layout.setSpacing(15)
-
-        # Commit button
-        self.commit_button = QtWidgets.QPushButton("Commit", parent=top_row)
-        self.commit_button.setStyleSheet("""
-            QPushButton {
-                font-family: 'Mulish ExtraBold';
-                font-size: 14px;
-                background-color: #6D98F4;
-                color: white;
-                border-radius: 10px;
-                padding: 6px 10px;
-            }
-            QPushButton:hover {
-                background-color: #89B0FF;
-            }
-        """)
-        self.commit_button.setFixedHeight(32)
-        self._add_shadow(self.commit_button)
-        top_layout.addWidget(self.commit_button)
-
-        # Undo button
-
-        self.undo_button = QtWidgets.QPushButton("Undo", parent=top_row)
-        self.undo_button.setStyleSheet("""
-            QPushButton {
-                font-family: 'Mulish ExtraBold';
-                font-size: 14px;
-                background-color: #FF6D6D;
-                color: white;
-                border-radius: 10px;
-                padding: 6px 10px;
-            }
-            QPushButton:hover {
-                background-color: #FF8989;
-            }
-        """)
-        self.undo_button.setFixedHeight(32)
-        self._add_shadow(self.undo_button)
-        top_layout.addWidget(self.undo_button)
-
-        self.brush_size_slider = self._create_slider(parent=top_row)
-        self.brush_size_slider.setRange(1, 8)
-        self.brush_size_slider.setValue(3)
-        self.brush_size_slider.setFixedWidth(100)
-
-        self.brush_value_label = self._create_label(
-            parent=top_row,
-            text=str(self.brush_size_slider.value()),
-            font_size=13,
-            bold=True,
-            color="#6D98F4"
-        )
-
-        self.brush_size_slider.valueChanged.connect(
-            lambda v: self.brush_value_label.setText(str(v))
-        )
-
-        brush_layout = QtWidgets.QHBoxLayout()
-        brush_layout.setSpacing(6)
-        brush_layout.addWidget(self.brush_size_slider)
-        brush_layout.addWidget(self.brush_value_label)
-
-        top_layout.addLayout(brush_layout)
-
-
-        # Necrosis switch
-        self.necrosis_switch = QtWidgets.QCheckBox("Necrosis", parent=top_row)
-        self.necrosis_switch.setStyleSheet("""
-            QCheckBox {
-                font-family: 'Mulish';
-                font-size: 13px;
-                color: black;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-                border-radius: 10px;
-                border: 2px solid #6D98F4;
-                background-color: transparent;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #6D98F4;
-            }
-        """)
-        top_layout.addWidget(self.necrosis_switch, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
-
-        self.parameters_layout.addWidget(top_row)
-
-        self.parameter_panel = ParameterPanel(self.parameters_container)
-        self.parameters_layout.addWidget(self.parameter_panel)
-
-        self.parameters_layout.addStretch()
-
-        self.parameters_scroll.setWidget(self.parameters_container)
-
-        self.verticalLayout_2.addWidget(self.parameters_scroll)
-
-        self.cell_inspector_container= QWidget()
-        self.cell_inspector_container.setStyleSheet("""
-                    background-color: white;
-                    border-radius: 20px;
-                """)
-        self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
-        self.cell_inspector_layout.setContentsMargins(20, 0, 12, 10)
-        self.cell_inspector_layout.setSpacing(20)
-
-        self.players_layout = QtWidgets.QWidget(parent=self.settings_layout)
-        self.players_layout.setStyleSheet(
-            "background-color: white;\n"
-            "border-radius: 20px;\n"
-        )
-        self._add_shadow(self.players_layout)
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.players_layout)
-
-        #Player controls layout
-        self.player_controls_layout = QtWidgets.QHBoxLayout()
-        self.player_controls_layout.setSpacing(40)
-        self.player_controls_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
-
-        self.speed_dropdown = QtWidgets.QComboBox(parent=self.players_layout)
-        self.speed_dropdown.addItems(["1x", "2x", "3x"])
-        self.speed_dropdown.setCurrentText("1x")
-        self.speed_dropdown.setStyleSheet("""
-            QComboBox {
-                font-family: Mulish;
-                font-size: 25px;
-                font-weight: bold;
-                color: #EF8481;
-            }
-            QComboBox:hover {
-                color: #E74440;
-            }
-            QComboBox QAbstractItemView {
-                background: white;
-                border-radius: 5px;
-                color: #EF8481;
-                font-size: 12px;
-            }
-            
-            QComboBox::drop-down {
-                width: 0px; 
-                border: none; 
-            }
-            
-            QComboBox::down-arrow {
-                image: none;
-                width: 0px;
-                height: 0px;
-                border: none;
-            }
-        """)
-
-        view = QtWidgets.QListView()
-        font_popup = QtGui.QFont("Mulish", 12)
-        font_popup.setBold(True)
-        view.setFont(font_popup)
-
-        view.setSpacing(0)
-        view.setUniformItemSizes(True)
-        view.setMaximumWidth(40)
-        view.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
-
-        self.speed_dropdown.setView(view)
-        self.player_controls_layout.addWidget(self.speed_dropdown)
-
-        self.prev_button = QtWidgets.QPushButton("❮❮", parent=self.players_layout)
-        self.prev_button.setStyleSheet("""
-            QPushButton {
-                font-size: 30px;
-                font-weight: bold;
-                color: #EF8481;
-                background: none;  
-                border: none;
-            }
-            QPushButton:hover {
-                color: #E74440;  
-            }
-        """)
-        self.player_controls_layout.addWidget(self.prev_button)
-
-        self.play_button = QtWidgets.QPushButton("▶", parent=self.players_layout)
-        self.play_button.setFixedSize(40, 40)
-        self.play_button.setStyleSheet("""
-            QPushButton {
-                font-size: 30px;
-                font-weight: bold;
-                border-radius: 20px;
-                background-color: #EF8481;
-                color: white;
-            }
-            QPushButton:hover {
-                background-color: #E74440;
-            }
-        """)
-        self.player_controls_layout.addWidget(self.play_button)
-        self._add_shadow(self.play_button)
-
-        self.next_button = QtWidgets.QPushButton("❯❯", parent=self.players_layout)
-        self.next_button.setStyleSheet("""
-            QPushButton {
-                font-size: 30px;
-                font-weight: bold;
-                color: #EF8481;
-                background: none;   
-                border: none;
-            }
-            QPushButton:hover {
-                color: #E74440; 
-            }
-        """)
-
-        self.player_controls_layout.addWidget(self.next_button)
-
-        self.toggle_render_button = QtWidgets.QPushButton("↯", parent=self.players_layout)
-        self.toggle_render_button.setStyleSheet("""
-            QPushButton {
-                font-size: 40px;
-                font-weight: bold;
-                color: #EF8481;
-            }
-            QPushButton:hover {
-                color: #E74440;  
-            }
-        """)
-        self.player_controls_layout.addWidget(self.toggle_render_button)
-
-        self.verticalLayout_3.addLayout(self.player_controls_layout)
-
-        self.verticalLayout_2.addWidget(self.players_layout)
-        self.verticalLayout_2.setStretch(0, 1)
-        self.verticalLayout_2.setStretch(1, 6)
-        self.verticalLayout_2.setStretch(2, 1)
-
-        self.horizontalLayout_3.addWidget(self.settings_layout)
-
-        # Simulation widget
-        self.simulation_widget = QtWidgets.QWidget(parent=self.bottom_layout)
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Expanding
-        )
-        self.simulation_widget.setSizePolicy(size_policy)
-
-        self.simulation_layout = QtWidgets.QVBoxLayout(self.simulation_widget)
-
-        self.horizontalLayout_3.addWidget(self.simulation_widget)
-        self.horizontalLayout_3.setStretch(0, 11)
-        self.horizontalLayout_3.setStretch(1, 13)
-
-        # Frame counter label
-        self.frame_counter_label = self._create_label(self.simulation_widget, "Frame: 0", font_size=14)
-        self.frame_counter_label.setGeometry(40, 400, 150, 40)
-
-        self.verticalLayout.addWidget(self.bottom_layout)
+        self.verticalLayout.addWidget(self.bottom_container)
         self.verticalLayout.setStretch(0, 1)
         self.verticalLayout.setStretch(1, 6)
 
         self.horizontalLayout_4.addWidget(self.layout)
         main_window.setCentralWidget(self.centralwidget)
 
-        self.retranslate_ui(main_window)
-        QtCore.QMetaObject.connectSlotsByName(main_window)
+        self._map_shortcuts()
 
+        QtCore.QMetaObject.connectSlotsByName(main_window)
         QtCore.QTimer.singleShot(0, self._resize_layouts)
 
-    def retranslate_ui(self, main_window: QMainWindow):
-        """
-        Set text values for all widgets to allow for translation support.
-
-        Args:
-            main_window (QMainWindow): The main window instance for setting the window title.
-        """
-
-        _translate = QtCore.QCoreApplication.translate
-        main_window.setWindowTitle(_translate("MainWindow", "Cardiomaton"))
-        self.project_name.setText(_translate("MainWindow", "Cardiomaton"))
-        self.pushButton_app.setText(_translate("MainWindow", "App"))
-        self.pushButton_help.setText(_translate("MainWindow", "Help"))
-        self.pushButton_about_us.setText(_translate("MainWindow", "About us"))
-
-    @staticmethod
-    def _load_fonts():
-        """
-        Load all TrueType fonts from the resources/fonts directory into the application.
-        """
-        fonts_dir = "resources/fonts"
-        for filename in os.listdir(fonts_dir):
-            if filename.lower().endswith(".ttf"):
-                QFontDatabase.addApplicationFont(os.path.join(fonts_dir, filename))
-
-    @staticmethod
-    def _add_shadow(widget: QWidget, blur: int = 30, offset_x: int = 2, offset_y: int = 2,
-                   color: QColor = QColor(150, 150, 150, 100)) -> None:
-        """
-        Adds a drop shadow effect to the given widget.
-
-        Args:
-            widget (QWidget): The widget to add a shadow to.
-            blur (int, optional): Blur radius of the shadow.
-            offset_x (int, optional): Horizontal offset of the shadow.
-            offset_y (int, optional): Vertical offset of the shadow.
-            color (QColor, optional): Color of the shadow. Defaults to semi-transparent gray.
-        """
-
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(blur)
-        shadow.setOffset(offset_x, offset_y)
-        shadow.setColor(color)
-        widget.setGraphicsEffect(shadow)
-
-    @staticmethod
-    def _create_label(parent: QWidget, text: str = "", font_family: str = "Mulish",
-                     font_size: int = 12, bold: bool = True, color: str = "#233348") -> QtWidgets.QLabel:
-        """
-        Creates a QLabel with specified font, size, color, and parent.
-
-        Parameters:
-            parent (QWidget): Parent widget.
-            text (str, optional): Label text.
-            font_family (str, optional): Font family
-            font_size (int, optional): Font size.
-            bold (bool, optional): Whether font is bold.
-            color (str, optional): Font color in hex.
-
-        Returns:
-            QtWidgets.QLabel: The created QLabel instance.
-        """
-
-        label = QtWidgets.QLabel(parent)
-        font = QtGui.QFont()
-        font.setFamily(font_family)
-        font.setPointSize(font_size)
-        font.setBold(bold)
-        label.setFont(font)
-        label.setStyleSheet(f"color: {color};")
-        label.setText(text)
-
-        return label
-
-    @staticmethod
-    def _create_pushbutton(parent: QWidget, font_family: str = "Mulish",
-                          font_size:int = 13, bold: bool = True, color: str = "#233348",
-                          hover_color: str = "#6D98F4") -> QtWidgets.QPushButton:
-        """
-        Creates a QPushButton with a specified font and hover color.
-
-        Parameters:
-            parent (QWidget): Parent widget.
-            font_family (str, optional): Font family.
-            font_size (int, optional): Font size.
-            bold (bool, optional): Whether font is bold.
-            color (str, optional): Text color.
-            hover_color (str, optional): Text color on hover.
-
-        Returns:
-            QtWidgets.QPushButton: The created QPushButton instance.
-        """
-
-        pushbutton = QtWidgets.QPushButton(parent)
-        font = QtGui.QFont()
-        font.setFamily(font_family)
-        font.setPointSize(font_size)
-        font.setBold(bold)
-        pushbutton.setFont(font)
-        pushbutton.setStyleSheet(f"""
-            QPushButton {{
-                border: none;             
-                color: {color};            
-            }}
-            QPushButton:hover {{
-                color: {hover_color}; 
-            }}
-        """)
-
-        return pushbutton
-
-    @staticmethod
-    def _create_widget(parent: QWidget) -> QWidget:
-        """
-        Creates a transparent QWidget with expanding size policy.
-
-        Parameters:
-            parent (QWidget): The parent widget.
-
-        Returns:
-            QWidget: The created QWidget instance with transparent background and expanding size policy.
-        """
-
-        widget = QtWidgets.QWidget(parent)
-        widget.setEnabled(True)
+    def _setup_main_window_properties(self, window):
+        window.resize(1100, 600)
+        window.setWindowTitle("Cardiomaton")
         size_policy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Policy.Expanding,
             QtWidgets.QSizePolicy.Policy.Expanding
         )
-        size_policy.setHeightForWidth(widget.sizePolicy().hasHeightForWidth())
-        widget.setSizePolicy(size_policy)
-        widget.setStyleSheet("background: transparent;")
+        # ...
+        window.setMinimumSize(QtCore.QSize(1100, 600))
+        window.setMaximumSize(QtCore.QSize(1100, 600))
+        window.setAutoFillBackground(False)
+        window.setSizePolicy(size_policy)
 
-        return widget
+    def _init_settings_panel(self):
+        self.settings_container = QWidget()
+        layout = QVBoxLayout(self.settings_container)
+        layout.setContentsMargins(20, 0, 12, 10)
+        layout.setSpacing(20)
+
+        self.presets_layout = QWidget()
+        self.presets_layout.setObjectName("Layout")
+        UIFactory.add_shadow(self.presets_layout)
+
+        self.parameters_scroll = QScrollArea()
+        self.parameters_scroll.setWidgetResizable(True)
+        self.parameters_scroll.setObjectName("Layout")
+        UIFactory.add_shadow(self.parameters_scroll)
+
+        self.parameters_inner_container = QWidget()
+        self.parameters_inner_layout = QVBoxLayout(self.parameters_inner_container)
+        self.parameters_inner_container.setObjectName("Layout")
+
+        self.modification_panel = ModificationPanel()
+        self.parameters_inner_layout.addWidget(self.modification_panel)
+
+        self.parameter_panel = ParameterPanel(self.parameters_inner_container)
+        self.parameters_inner_layout.addWidget(self.parameter_panel)
+        self.parameters_inner_layout.addStretch()
+
+        self.parameters_scroll.setWidget(self.parameters_inner_container)
+
+        self.player_controls = PlayerControlsWidget()
+
+        self._configure_player_controls(self.player_controls)
+
+        UIFactory.add_shadow(self.player_controls)
+
+        self.cell_inspector_container = QWidget()
+        self.cell_inspector_container.setObjectName("CellInspectorContainer")
+        self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
+
+        layout.addWidget(self.presets_layout)
+        layout.addWidget(self.parameters_scroll)
+        layout.addWidget(self.player_controls)
+
+        layout.setStretch(0, 1)
+        layout.setStretch(1, 6)
+        layout.setStretch(2, 1)
+
+        self.settings_layout = self.settings_container
+        self.verticalLayout_2 = layout
 
     @staticmethod
-    def _create_slider(parent: QWidget) -> QtWidgets.QSlider:
-        """
-        Creates a horizontal QSlider with customized style.
+    def _configure_player_controls(widget: PlayerControlsWidget):
+        widget.speed_dropdown.setCurrentText("1x")
+        view = QListView()
+        widget.speed_dropdown.setView(view)
 
-        Parameters:
-            parent (QWidget): The parent widget.
+        widget.play_button.setFixedSize(40, 40)
+        UIFactory.add_shadow(widget.play_button)
 
-        Returns:
-            QtWidgets.QSlider: The created QSlider instance.
-        """
+    def _init_simulation_area(self):
+        self.simulation_widget = QWidget()
+        self.simulation_layout = QVBoxLayout(self.simulation_widget)
 
-        slider = QtWidgets.QSlider(parent)
-        slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        slider.setStyleSheet("""
-            QSlider::groove:horizontal {
-                border: 1px solid #DBE3F1;
-                height: 4px;
-                border-radius: 2px;
-                background: #DBE3F1;
-            }
+        self.frame_counter_label = UIFactory.create_label(self.simulation_widget, "Time 0", font_size=14, bold=True)
+        self.frame_counter_label.setGeometry(40, 400, 150, 40)
+        self.frame_counter_label.setObjectName("frame_counter_label")
 
-            QSlider::handle:horizontal {
-                border: 1px solid #6D98F4;
-                width: 10px;
-                margin: -3px 0;
-                border-radius: 5px;
-                background: #6D98F4;
-            }
+    def _map_shortcuts(self):
+        self.project_name = self.topbar.project_name
 
-            QSlider::sub-page:horizontal {
-                background: #6D98F4;
-                border-radius: 2px;
-            }
-            """)
+        self.play_button = self.player_controls.play_button
+        self.prev_button = self.player_controls.prev_button
+        self.next_button = self.player_controls.next_button
+        self.speed_dropdown = self.player_controls.speed_dropdown
+        self.toggle_render_button = self.player_controls.toggle_render_button
 
-        return slider
+        self.commit_button = self.modification_panel.commit_button
+        self.undo_button = self.modification_panel.undo_button
+        self.brush_size_slider = self.modification_panel.brush_slider
+        self.necrosis_switch = self.modification_panel.necrosis_switch
 
     def _resize_layouts(self):
         height = self.settings_layout.height() // 8
         self.presets_layout.setMinimumHeight(height)
         self.presets_layout.setMaximumHeight(height)
-        self.players_layout.setMinimumHeight(height)
-        self.players_layout.setMaximumHeight(height)
+        self.player_controls.setMinimumHeight(height)
+        self.player_controls.setMaximumHeight(height)

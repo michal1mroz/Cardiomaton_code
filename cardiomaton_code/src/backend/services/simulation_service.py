@@ -1,12 +1,9 @@
-from time import time
 from typing import Dict, Optional, Tuple
 from src.models.cell import CellDict
 from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
-#from src.models.automaton import Automaton
 from src.backend.models.automaton import Automaton
 from src.backend.enums.cell_state import CellState
-from cardiomaton_code.src.frontend.cell_modificator import CellModification
 from PyQt6.QtGui import QImage
 
 class SimulationService:

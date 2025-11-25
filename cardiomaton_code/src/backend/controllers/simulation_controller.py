@@ -1,8 +1,6 @@
 from typing import Optional, Tuple, Dict
 from src.models.cell import CellDict
-from src.frontend.frame_recorder import FrameRecorder
-from src.services.simulation_service import SimulationService
-from cardiomaton_code.src.frontend.cell_modificator import CellModification
+from src.backend.services.simulation_service import SimulationService
 from PyQt6.QtGui import QImage
 
 class SimulationController:
@@ -14,7 +12,6 @@ class SimulationController:
             frame_time (float): Time between frames in seconds.
         """
         self.service = SimulationService(frame_time, image)
-        self.recorder = FrameRecorder(capacity=200)
 
     def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
@@ -66,7 +63,6 @@ class SimulationController:
 
     @property
     def shape(self) -> Tuple[int, int]:
-        """ """
         return self.service.get_shape()
 
     def get_cell_data(self, position: Tuple[int, int]) -> Optional[Dict]:
