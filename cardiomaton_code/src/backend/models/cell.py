@@ -28,7 +28,12 @@ class Cell:
         self.cell_data = self.config["cell_data"]
         self.self_polarization = self_polarization if self_polarization is not None else self.config.get("self_polarization", False)
         self.state = init_state
-        self.timer = 0
+        # cells withot self-depolarization can have the timer set to 0
+        if cell_type in [CellType.INTERNODAL_ANT, CellType.INTERNODAL_MID, CellType.INTERNODAL_POST]:
+            self.timer = 0
+        else: # cells with self-depolarization have shifted initial timer so that the user does not wait too long for the first action potential
+            self.timer = 2200
+        # self.timer = 0
         self.neighbors = []
         self.period = self.config["period"]
         self.n_range = self.config["range"]
