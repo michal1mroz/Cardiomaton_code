@@ -1,0 +1,207 @@
+{
+    "JUNCTION": {
+        "id": 1,
+        "cell_data": {
+            "V_rest": -60.0,
+            "V_thresh": -60.0,
+            "V_peak": 15.0,
+            "t_thresh": 0.5,
+            "t_peak": 0.45,
+            "t_end": 0.95,
+            "eps": 0.01
+        },
+        "period": 1.2,
+        "range": 200,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": false,
+        "charge_function": "",
+        "name": "Junction"
+    },
+    "HIS_LEFT": {
+        "id": 2,
+        "cell_data": {
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.001,
+            "t12": 0.005,
+            "t23": 0.230,
+            "t34": 0.400,
+            "t40": 2.900
+        },
+        "period": 2.900,
+        "range": 6800,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": true,
+        "charge_function": "PURKINJE",
+        "name": "Left bundle branch"
+    },
+    "HIS_RIGHT": {
+        "id": 3,
+        "cell_data": {
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.001,
+            "t12": 0.005,
+            "t23": 0.230,
+            "t34": 0.400,
+            "t40": 2.900
+        },
+        "period": 2.900,
+        "range": 6800,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": true,
+        "charge_function": "PURKINJE",
+        "name": "Right bundle branch"
+    },
+    "BACHMANN": {
+        "id": 4,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.268
+        },
+        "period": 0.368,
+        "range": 200,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Bachmann's bundle"
+    },
+    "INTERNODAL_POST": {
+        "id": 5,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.239
+        },
+        "period": 0.239,
+        "range": 300,
+        "propagation_time": 5,
+        "propagation_time_max": 10,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Posterior internodal tract"
+    },
+    "INTERNODAL_ANT": {
+        "id": 6,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.239
+        },
+        "period": 0.239,
+        "range": 300,
+        "propagation_time": 6,
+        "propagation_time_max": 10,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Anterior internodal tract"
+    },
+    "INTERNODAL_MID": {
+        "id": 7,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.239
+        },
+        "period": 0.239,
+        "range": 300,
+        "propagation_time": 8,
+        "propagation_time_max": 10,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Middle internodal tract"
+    },
+    "HIS_BUNDLE": {
+        "id": 8,
+        "cell_data": {
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.001,
+            "t12": 0.005,
+            "t23": 0.230,
+            "t34": 0.400,
+            "t40": 2.900
+        },
+        "period": 2.900,
+        "range": 6800,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": true,
+        "charge_function": "PURKINJE",
+        "name": "Bundle of His"
+    },
+    "SA_NODE": {
+        "id": 9,
+        "cell_data": {
+            "V_rest": -60,
+            "V_thresh": -40,
+            "V_peak": 10,
+            "t40": 0.700,
+            "t03": 0.710,
+            "t34": 0.900
+        },
+        "period": 0.900,
+        "range": 3000,
+        "propagation_time": 6,
+        "propagation_time_max": 12,
+        "self_polarization": true,
+        "charge_function": "PACEMAKER",
+        "name": "Sinoatrial node"
+    },
+    "AV_NODE": {
+        "id": 10,
+        "cell_data": {
+            "V_rest": -65,
+            "V_thresh": -45,
+            "V_peak": 5,
+            "t40": 1.000,
+            "t03": 1.010,
+            "t34": 1.310
+        },
+        "period": 1.310,
+        "range": 5200,
+        "propagation_time": 12,
+        "propagation_time_max": 20,
+        "self_polarization": true,
+        "charge_function": "PACEMAKER",
+        "name": "Atrioventricular node"
+    }
+}
