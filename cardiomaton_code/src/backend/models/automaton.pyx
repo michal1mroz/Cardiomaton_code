@@ -168,7 +168,7 @@ cdef class Automaton:
             grid[i].V_rest = <double> py_cell.cell_data.get("V_rest")
             grid[i].V_thresh = <double> py_cell.cell_data.get("V_thresh", 0) # Default since some cells don't have this value
             grid[i].ref_threshold = <double> py_cell.ref_threshold
-            grid[i].charge = 0
+            grid[i].charge = <double> py_cell.charge
 
             grid[i].propagation_time = <int> py_cell.config.get("propagation_time")
             grid[i].propagation_count = 1

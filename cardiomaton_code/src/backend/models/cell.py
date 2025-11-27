@@ -29,11 +29,11 @@ class Cell:
         self.self_polarization = self_polarization if self_polarization is not None else self.config.get("self_polarization", False)
         self.state = init_state
         self.timer = 0
-        self.charge = 0.0
         self.neighbors = []
         self.period = self.config["period"]
         self.n_range = self.config["range"]
         self.charges, self.max_charge, self.ref_threshold = ChargeUpdate.get_func(self.config)
+        self.charge = self.charges[self.timer]
 
     def __repr__(self) -> str:
         return f"<Cell>: position: ({self.pos_x}, {self.pos_y}), charge: {self.charge}, state: {self.state}, self_polar: {self.self_polarization}, type: {self.cell_type}"
