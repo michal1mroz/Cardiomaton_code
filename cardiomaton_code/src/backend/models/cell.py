@@ -46,3 +46,6 @@ class Cell:
             (self.pos_x - nei.pos_x, self.pos_y - nei.pos_y)
             for nei in self.neighbors
         ]
+    
+    def get_position(self):
+        return (self.pos_x, self.pos_y)

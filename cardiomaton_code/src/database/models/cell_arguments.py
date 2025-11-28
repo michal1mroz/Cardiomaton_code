@@ -1,32 +1,34 @@
-from sqlalchemy import Column, Integer, Float, String
+from sqlalchemy import Column, Integer, Float, String, Boolean
 from src.database.db import Base
+import json
 
 class CellArguments(Base):
     __tablename__ = "cell_arguments"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    V_rest = Column(Float, nullable=False)
-    V_thresh = Column(Float, nullable=False)
-    V_peak = Column(Float, nullable=False)
-    t_thresh = Column(Float, nullable=False)
-    t_peak = Column(Float, nullable=False)
-    t_end = Column(Float, nullable=False)
-    eps = Column(Float, nullable=False)
+    cell_data = Column(String)
     period = Column(Float, nullable=False)
-    duration = Column(Float, nullable=False)
+    range = Column(Float, nullable=False)
+    self_polarization = Column(Boolean)
+    charge_function = Column(String)
+    name = Column(String, nullable=False)
 
+    def set_cell_data(self, cell_data):
+        self.cell_data = json.dumps(cell_data)
+    
+    def get_cell_data(self):
+        """Get the cell_data as dictionary"""
+        return json.loads(self.cell_data) if self.cell_data else {}
+    
     def to_dict(self):
         return {
             "id": self.id,
-            "V_rest": self.V_rest,
-            "V_thresh": self.V_thresh,
-            "V_peak": self.V_peak,
-            "t_thresh": self.t_thresh,
-            "t_peak": self.t_peak,
-            "t_end": self.t_end,
-            "eps": self.eps,
+            "cell_data": self.get_cell_data(),
             "period": self.period,
-            "duration": self.duration,
+            "range": self.range,
+            "self_polarization": self.self_polarization,
+            "charge_function": self.charge_function, 
+            "name": self.name
         }
     

@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Tuple
 import numpy as np
 
-from cardiomaton_code.src.models.cell import Cell
-from src.models.cell_state import CellState
-from src.models.cell_type import CellType
+from src.backend.models.cell import Cell
+from src.backend.enums.cell_state import CellState
+from src.backend.enums.cell_type import CellType
 
 """
     This module provides the functions needed to serialize and deserialize the cells into/from the binary blob.
@@ -109,6 +109,7 @@ cell_dtype = np.dtype([
     ("neighbors", np.uint32),
     ("n_neighbors", np.uint8),
     ("arg_id", np.int32),
+    ("timer", np.uint16),
 ])
 
 def encode_cell(cell: Cell, arg_id: np.int32) -> np.void:
@@ -125,10 +126,11 @@ def encode_cell(cell: Cell, arg_id: np.int32) -> np.void:
     return np.array((
             pack_enums(cell.state, cell.cell_type, cell.self_polarization),
             np.float32(cell.charge),
-            np.array(cell.position, dtype=np.int16),
-            pack_neighbors(cell.neighbors_to_ints()),
-            np.uint8(len(cell.neighbours)),
-            np.int32(arg_id)),
+            np.array(cell.get_position(), dtype=np.int16),
+            pack_neighbors(cell.neighbors_to_tuple_list()),
+            np.uint8(len(cell.neighbors)),
+            np.int32(arg_id),
+            np.uint16(cell.timer)),
         dtype=cell_dtype)[()]
 
 def decode_cell(blob: np.void, cell_args) -> Tuple[Cell, List[Tuple[int, int]]]:
@@ -147,11 +149,12 @@ def decode_cell(blob: np.void, cell_args) -> Tuple[Cell, List[Tuple[int, int]]]:
     position = tuple(blob["position"])
     neighbors = list(map(lambda x: (position[0] - x[0], position[1] - x[1]), unpack_neighbors(blob["neighbors"], blob["n_neighbors"])))
     arg_id = blob["arg_id"]
-    cell = Cell(position = position, cell_type=cell_type, cell_data=cell_args[arg_id], init_state=state, self_polarization=self_polar)
+    cell = Cell(position = position, cell_type=cell_type, cell_config=cell_args[arg_id], init_state=state, self_polarization=self_polar)
     cell.charge = float(blob["charge"])
+    cell.timer = int(blob["timer"])
     return cell, neighbors
 
-def serialize_cells(cells: List[Cell], arg_dict: Dict) -> bytes:
+def __serialize_cells(cells: List[Cell], arg_dict: Dict) -> bytes:
     """
         Function that serializes a list of cells to a byte array.
 

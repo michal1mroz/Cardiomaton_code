@@ -2,26 +2,80 @@ from typing import Optional, Dict, Any, Callable, List, Set, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from datetime import datetime
+import numpy as np
 
-from src.models.automaton import Automaton
+from src.backend.models.automaton import Automaton
+from src.backend.models.cell import Cell
+
 from src.database.models.automaton_cell_args import AutomatonCellArgs
 from src.database.models.cell_arguments import CellArguments
 from src.database.models.automaton import AutomatonTable
-from src.database.utils.cell_utils import serialize_cells, deserialize_cells, decode_cell
+from src.database.utils.cell_utils import deserialize_cells, decode_cell, cell_dtype, encode_cell
 
-from src.models.cell import Cell
+from src.database.dto.automaton_dto import AutomatonDto
 
 def get_or_create_cell_arguments(db: Session,
                                  cell_data_dict: Dict[str, Any]) -> int:
-    stmt = select(CellArguments).filter_by(**cell_data_dict)
-    row = db.execute(stmt).scalars().first()
-    if row:
-        return row.id
+    flat = {
+        'period': cell_data_dict['period'],
+        'range': cell_data_dict['range'],
+        'self_polarization': cell_data_dict['self_polarization'],
+        'charge_function': cell_data_dict['charge_function'],
+        'name': cell_data_dict['name']
+    }
     
-    new_row = CellArguments(**cell_data_dict)
+    stmt = select(CellArguments).filter_by(**flat)
+    existing = db.execute(stmt).scalars().first()
+    if existing:
+        existing_data = existing.get_cell_data()
+        if existing_data == cell_data_dict['cell_data']:
+            return existing.id
+    
+    new_row = CellArguments(**flat)
+    new_row.set_cell_data(cell_data_dict['cell_data'])
+
     db.add(new_row)
     db.flush()
     return new_row.id
+
+def create_config_key(cell_config: Dict[str, Any]) -> tuple:
+    """Create a unique tuple key from cell_config that handles nested dictionaries"""
+    key_parts = []
+    
+    for field in ['period', 'range', 'self_polarization', 'charge_function', 'name']:
+        key_parts.append((field, cell_config.get(field)))
+    
+    cell_data = cell_config.get('cell_data', {})
+    if cell_data:
+        sorted_cell_data = sorted(cell_data.items())
+        key_parts.append(('cell_data', tuple(sorted_cell_data)))
+    
+    return tuple(key_parts)
+
+def serialize_cells(cells: List[Cell], arg_dict: Dict) -> bytes:
+    """
+        Function that serializes a list of cells to a byte array.
+
+        Args:
+            cells List[Cell]: list of cells to be encoded
+            arg_dict Dict: dictionary that maps frozenset(cell_data.items()) keys to the database id
+        
+        Returns:
+            bytes - a byte array with encoded cells
+    """
+    n = len(cells)
+    if n == 0:
+        return b""
+    
+    arr = np.empty(n, dtype=cell_dtype)
+    for i, c in enumerate(cells):
+        encoded = encode_cell(c, arg_dict[create_config_key(c.config)])
+        if isinstance(encoded, np.ndarray):
+            arr[i] = encoded[0]
+        else:
+            arr[i] = encoded
+
+    return arr
 
 def create_or_overwrite_entry(
         db: Session,
@@ -31,11 +85,11 @@ def create_or_overwrite_entry(
         height: int,
         frames: int,
 ) -> AutomatonTable:
-    mapping: Dict[frozenset, int] = {}
+    mapping: Dict[tuple, int] = {}
     for cell in cells:
-        frozen = frozenset(cell.cell_data.items())
+        frozen = create_config_key(cell.config)
         if frozen not in mapping:
-            arg_id = get_or_create_cell_arguments(db, cell.cell_data)
+            arg_id = get_or_create_cell_arguments(db, cell.config)
             mapping[frozen] = arg_id
 
     blob = serialize_cells(cells, mapping)
@@ -62,6 +116,7 @@ def create_or_overwrite_entry(
 
     db.commit()
     return row
+
 
 def get_entry(
         db: Session,
@@ -107,16 +162,22 @@ def get_automaton(db: Session, name: str) -> Automaton:
 
     for cell in dictionary["cells"]:
         c, nei = decode_cell(cell, mapping)
-        position = c.position
+        position = (c.pos_x, c.pos_y)
         positions[position] = nei
         cells[position] = c
 
     for pos, cell in cells.items():
         neis = positions[pos]
         for nei in neis:
-            cell.add_neighbour(cells[nei])
-    
-    return Automaton(shape=(dictionary["width"], dictionary["height"]), cells=cells, frame=dictionary["frames"]) 
+            cell.add_neighbor(cells[nei])
+
+    return AutomatonDto(
+        cell_map = cells,
+        shape = (dictionary['width'], dictionary['height']),
+        frame = dictionary['frames']
+    )
+
+#Automaton(shape=(dictionary["width"], dictionary["height"]), cells=cells, frame=dictionary["frames"]) 
 
 def delete_entry(db: Session, name: str) -> bool:
     row = db.query(AutomatonTable).filter(AutomatonTable.name == name).one_or_none()
