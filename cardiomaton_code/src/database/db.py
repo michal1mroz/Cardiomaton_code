@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import Generator
 from pathlib import Path
 
-DATABASE_URL = "sqlite:///./resources/db/cardiomaton_code.db"
+DATABASE_URL = "sqlite:///./resources/db/cardiomaton.db"
 RESOURCES_DIR = ...
 
 engine = create_engine(DATABASE_URL, echo=False, connect_args={"check_same_thread": False})

@@ -11,6 +11,12 @@ and then installed.
 
 To use the jupyter with poetry environment first create the poetry venv and then add the new kernel with venv set to the path of the poetrys venv (for linux it's typically ~/.cache/pypoetry/virtualenvs/<cardiomaton...>/bin/<python_interperter_version>).
 
+### Creating default database:
+Right now program uses the database to load the automaton. To create the default database entry for the database please run `populate_db.py` script with:
+```shell
+python populate_db.py
+```
+
 ### Compiling cython modules:
 Before the program can be run all cython modules need to be compiled. To do so use provided scripts with the command:
 ```shell
