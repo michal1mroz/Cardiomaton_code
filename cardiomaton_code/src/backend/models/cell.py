@@ -19,7 +19,7 @@ class Cell:
     Helper class used to store the cell before it can be loaded to the automaton
     """
     def __init__(self, position: Tuple[int, int], cell_type: CellType, cell_config: Dict = None, init_state: CellState = CellState.POLARIZATION,
-                 self_polarization: bool = None, self_polarization_timer: int = 0):
+                 self_polarization: bool = None, self_polarization_timer: int = 0, charge: float = 0):
 
         self.config = cell_config if cell_config is not None else cell_type.config 
         self.pos_x, self.pos_y = position
@@ -28,8 +28,8 @@ class Cell:
         self.cell_data = self.config["cell_data"]
         self.self_polarization = self_polarization if self_polarization is not None else self.config.get("self_polarization", False)
         self.state = init_state
-        self.timer = 0
-        self.charge = 0.0
+        self.timer = self_polarization_timer
+        self.charge = charge
         self.neighbors = []
         self.period = self.config["period"]
         self.n_range = self.config["range"]

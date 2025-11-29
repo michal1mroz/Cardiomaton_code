@@ -22,3 +22,6 @@ cdef class CellWrapper:
             cell_type = py_type.name,
             auto_polarization = False if self.cell_a.self_polarization == 0 else True
         )
+
+    cpdef uintptr_t get_cell(self):
+        return <uintptr_t>self.cell_a

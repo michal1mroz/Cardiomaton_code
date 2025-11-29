@@ -35,7 +35,7 @@ class SimulationService:
         db = SessionLocal()
         dto = get_automaton(db, "default")
 
-        self.automaton = Automaton(dto.shape, dto.cell_map, img_ptr = int(ptr), img_bytes=image.bytesPerLine(), frame_time=frame_time)
+        self.automaton = Automaton(dto.shape, dto.cell_map, img_ptr = int(ptr), img_bytes=image.bytesPerLine(), frame=dto.frame, frame_time=frame_time)
         # self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
 
     def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:

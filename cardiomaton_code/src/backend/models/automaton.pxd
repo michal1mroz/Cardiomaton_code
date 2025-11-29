@@ -23,7 +23,7 @@ cdef class Automaton:
     cdef public dict dict_mapping
 
     # Public python API
-    cpdef void update_grid(self, object is_charged)
+    cpdef void update_grid(self, object show_charge)
     cpdef int to_cell_data(self)
 
     cpdef float get_frame_time(self)
@@ -34,6 +34,9 @@ cdef class Automaton:
     cpdef int get_buffer_size(self)
     cpdef int render_frame(self, int idx, object if_charged, object drop_newer)
     cpdef void set_frame_counter(self, int)
+    cpdef dict serialize_automaton(self)
+
+    cdef dict _serialize_automaton(self)
 
     # Cell modification functions
     cpdef void modify_cell_state(self, set coords, object new_state)
@@ -42,7 +45,6 @@ cdef class Automaton:
 
     # Private python compatible methods
     cpdef dict _create_data_map(self, dict)
-    cpdef dict _cells_to_dict(self)
 
     # C exclusive methods
     cdef void _dealloc_grid(self, CCell**)    
