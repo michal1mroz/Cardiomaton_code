@@ -7,6 +7,7 @@ cdef class Automaton:
     # C exclusive attributes
     cdef CCell** grid_a
     cdef CCell** grid_b
+
     cdef int frame_counter
     cdef int is_running
     cdef int n_nodes
@@ -21,6 +22,10 @@ cdef class Automaton:
     cdef public tuple size
     cdef public dict cell_data
     cdef public dict dict_mapping
+
+    # Cell modification attributes
+    cdef CCell ***modification_snapshot_grids
+    cdef int buf_size
 
     # Public python API
     cpdef void update_grid(self, object show_charge)
@@ -41,16 +46,17 @@ cdef class Automaton:
     # Cell modification functions
     cpdef void modify_cell_state(self, set coords, object new_state)
     cpdef void modify_charge_data(self, set coords, dict atrial_charge_parameters, dict pacemaker_charge_parameters, dict purkinje_charge_parameters)
+    cpdef void commit_current_automaton(self)
+    cpdef void undo_modification(self)
 
 
     # Private python compatible methods
     cpdef dict _create_data_map(self, dict)
+    cpdef dict _cells_to_dict(self)
 
     # C exclusive methods
-    cdef void _dealloc_grid(self, CCell**)    
+    cdef void _dealloc_grid(self, CCell**)
     cdef void _generate_grid(self, CCell**, list)
     cdef void _update_grid_nogil(self, DrawFunc)
     cdef void _init_img(self)
     cdef void _clear_img(self)
-
-

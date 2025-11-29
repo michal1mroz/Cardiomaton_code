@@ -1,12 +1,9 @@
-from time import time
 from typing import Dict, Optional, Tuple
 from src.models.cell import CellDict
 from src.utils.graph_builder import extract_conduction_pixels
 from src.models.cellular_graph import Space
-#from src.models.automaton import Automaton
 from src.backend.models.automaton import Automaton
 from src.backend.enums.cell_state import CellState
-from src.frontend.cell_modificator import CellModification
 from PyQt6.QtGui import QImage
 
 from src.database.db import init_db, SessionLocal
@@ -60,6 +57,11 @@ class SimulationService:
 
     def modify_cells(self, modification):
         cells_positions = modification.cells
+        if modification.depolarize: # cell depolarization
+            self.automaton.modify_cell_state(cells_positions, CellState.RAPID_DEPOLARIZATION)
+            return
+
+        self.automaton.commit_current_automaton() # cell modification
         if modification.necrosis_enabled:
             self.automaton.modify_cell_state(cells_positions, CellState.NECROSIS)
         self.automaton.modify_charge_data(cells_positions,
@@ -72,7 +74,7 @@ class SimulationService:
         """
         TODO: undo of last cell modification of the automaton
         """
-        pass
+        self.automaton.undo_modification()
 
     @property
     def frame_time(self) -> float:

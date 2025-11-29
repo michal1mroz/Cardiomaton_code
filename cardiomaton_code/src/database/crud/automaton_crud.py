@@ -30,6 +30,8 @@ def get_or_create_cell_arguments(db: Session,
     flat = {
         'period': cell_data_dict['period'],
         'range': cell_data_dict['range'],
+        'propagation_time': cell_data_dict['propagation_time'],
+        'propagation_time_max': cell_data_dict['propagation_time_max'],
         'self_polarization': cell_data_dict['self_polarization'],
         'charge_function': cell_data_dict['charge_function'],
         'name': cell_data_dict['name']

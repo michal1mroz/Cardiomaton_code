@@ -1,4 +1,5 @@
 from libc.stdlib cimport malloc, free
+from libc.string cimport memcpy
 
 from src.backend.enums.cell_state cimport CellStateC
 from src.backend.enums.cell_type cimport CellTypeC
@@ -41,6 +42,11 @@ cdef struct CCell:
     double V_peak
     double ref_threshold
 
+    int propagation_time
+    int propagation_time_max
+    int can_propagate
+    int propagation_count
+
 #####################################
 # Function signatures
 
@@ -50,6 +56,8 @@ cdef void add_cell_charges(CCell*, double[:])
 cdef void allocate_neighbors(CCell*, int)
 cdef void free_cell_charges(CCell*)
 cdef void free_c_cell(CCell*)
+cdef CCell* create_mimic_cell(CCell* src)
+cdef void recreate_cell_from_mimic(CCell* dst, CCell* src)
 
 cdef dict cell_to_dict(CCell*, dict)
 

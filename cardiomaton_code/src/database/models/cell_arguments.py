@@ -10,6 +10,9 @@ class CellArguments(Base):
     cell_data = Column(String)
     period = Column(Float, nullable=False)
     range = Column(Float, nullable=False)
+    propagation_time = Column(Integer, nullable=False)
+    propagation_time_max = Column(Integer, nullable=False)
+
     self_polarization = Column(Boolean)
     charge_function = Column(String)
     name = Column(String, nullable=False)
@@ -27,6 +30,8 @@ class CellArguments(Base):
             "cell_data": self.get_cell_data(),
             "period": self.period,
             "range": self.range,
+            "propagation_time": self.propagation_time,
+            "propagation_time_max": self.propagation_time_max,
             "self_polarization": self.self_polarization,
             "charge_function": self.charge_function, 
             "name": self.name

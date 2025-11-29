@@ -1,238 +1,138 @@
-from PyQt6.QtWidgets import QMainWindow
-from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QImage
-from src.frontend.cell_inspector import CellInspector
-from src.models.cell import CellDict
-from src.controllers.simulation_controller import SimulationController
-from src.frontend.frame_renderer import FrameRenderer
-from src.frontend.main_label import MainLabel
+from PyQt6.QtWidgets import QMainWindow
+
+from src.backend.controllers.simulation_controller import SimulationController
+from src.backend.services.action_potential_generator import ActionPotentialGenerator
+from src.frontend.cell_inspecting.cell_inspector_manager import CellInspectorManager
+from src.frontend.frame_rendering.frame_renderer import FrameRenderer
+from src.frontend.ui_components.potential_graph_widget import GraphWidget
+from src.backend.controllers.playback_navigator import PlaybackNavigator
+from src.frontend.simulation_display.cell_data_provider import CellDataProvider
+from src.frontend.simulation_display.cell_modificator import CellModificator, CellModification
+from src.frontend.simulation_display.simulation_view import SimulationView
+from src.backend.services.simulation_loop import SimulationRunner
 from src.frontend.ui_main_window import UiMainWindow
-
-
-from cardiomaton_code.src.frontend.cell_modificator import CellModificator, CellModification
+from src.models.cell import CellDict
 
 
 class MainWindow(QMainWindow):
-    """
-    Main application window for the Cardiomaton simulator.
-
-    This window initializes and manages the simulation rendering, playback controls.
-    """
-
     def __init__(self):
-        """
-        Initialize the main window and its components.
-        """
         super().__init__()
         self.ui = UiMainWindow(self)
 
+        automaton_size = (507, 695)
         self.base_frame_time = 0.05
-
-        automaton_size = (220, 250)
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
 
         self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
         self.renderer = FrameRenderer(self.sim, self.image)
+        self.cell_data_provider = CellDataProvider(self.sim)
         self.cell_modificator = CellModificator()
 
-        self.render_label = MainLabel(self.renderer, self.ui.brush_size_slider, self.cell_modificator)
+        self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
+        self.navigator = PlaybackNavigator()
+        self.inspector_manager = CellInspectorManager(self.ui)
+        self.generator = ActionPotentialGenerator()
+        self.plot_windows = {}
 
-        self.render_charged = True # flag telling how simulation is rendered : True - showing charge; False - showing state
-        self.running = False
+        self.overlay_graph = GraphWidget(parent=self)
+        self.overlay_graph.resize(585, 250)
+        self.overlay_graph.hide()
 
-        self.cell_inspector = None
+        self.render_label = SimulationView(self.cell_data_provider, self.ui.brush_size_slider, self.cell_modificator)
+        self.render_charged = True
 
-        self.frames_per_click = 10
-        self.current_playback_buffer_index = -1
+        self.dark_mode = True
+        self._apply_style()
 
-        self._init_ui()
-        self._init_timer()
+        self._init_ui_layout()
+        self._connect_signals()
 
+        self._reposition_overlay_graph()
 
-    def _init_ui(self):
-        """
-        Builds the user interface layout and widgets.
-        """
-
-        # Simulation display
+    def _init_ui_layout(self):
         self.ui.simulation_layout.addWidget(self.render_label)
 
-        self.cell_inspector = None
-        self.render_label.cellClicked.connect(self._show_cell_inspector)
+    def _connect_signals(self):
+        self.runner.frame_tick.connect(self._update_live_frame)
 
-        # Start/stop button
-        self.ui.play_button.clicked.connect(self.toggle_simulation)
+        self.navigator.interaction_started.connect(self._pause_simulation_for_history)
+        self.navigator.request_render_buffer.connect(self._render_history_frame)
 
-        # Speed dropdown
-        self.ui.speed_dropdown.currentTextChanged.connect(self._change_speed)
+        self.ui.play_button.clicked.connect(self._toggle_simulation)
+        self.ui.speed_dropdown.currentTextChanged.connect(self._on_speed_change)
+        self.ui.toggle_render_button.clicked.connect(self._toggle_render_mode)
 
-        # Playback hold
-        self.ui.prev_button.pressed.connect(self._start_playback_hold)
-        self.ui.prev_button.released.connect(self._stop_playback_hold)
+        self.ui.prev_button.pressed.connect(self.navigator.start_backward_hold)
+        self.ui.prev_button.released.connect(self.navigator.stop_backward_hold)
+        self.ui.next_button.pressed.connect(self.navigator.start_forward_hold)
+        self.ui.next_button.released.connect(self.navigator.stop_forward_hold)
 
-        # Forward hold
-        self.ui.next_button.pressed.connect(self._start_forward_hold)
-        self.ui.next_button.released.connect(self._stop_forward_hold)
-
-        # Timers for playback and forward buttons
-        self.playback_timer = QTimer(self)
-        self.playback_timer.timeout.connect(self._on_playback)
-
+        self.render_label.cellClicked.connect(self._on_cell_clicked)
         self.ui.commit_button.clicked.connect(self._modify_cells)
-
         self.ui.undo_button.clicked.connect(self._undo_cell_modification)
 
-        self.forward_timer = QTimer(self)
-        self.forward_timer.timeout.connect(self._on_forward)
+        self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
+        self.ui.topbar.btn_theme.clicked.connect(self._toggle_theme)
 
-        # Color by charge / state option
-        self.ui.toggle_render_button.clicked.connect(self.toggle_render_mode)
+    def _toggle_simulation(self):
+        if not self.runner.running and self.navigator.current_buffer_index != -1:
+            self.sim.set_frame_counter(self.navigator.current_buffer_index)
+            self.navigator.reset_index()
 
-    def toggle_render_mode(self):
-        """
-        Toggle between rendering modes: by charge or by state.
-        """
+        is_running = self.runner.toggle()
+        self._update_ui_state(is_running)
+
+    def _pause_simulation_for_history(self):
+        if self.runner.running:
+            self.runner.stop()
+            self._update_ui_state(False)
+
+        self.navigator.set_buffer_size(self.sim.get_buffer_size())
+
+    def _update_ui_state(self, is_running: bool):
+        self.ui.play_button.setText("▪" if is_running else "▶")
+        self.render_label.set_running(is_running)
+        self.inspector_manager.set_running_state(is_running)
+
+    def _on_speed_change(self):
+        self.runner.set_speed_level(self.ui.speed_dropdown.currentText(), self.sim)
+
+    def _toggle_render_mode(self):
         self.render_charged = not self.render_charged
         self.ui.toggle_render_button.setText("↯" if self.render_charged else "️⏣")
 
-    def _init_timer(self):
-        """
-        Initializes the QTimer for frame updates.
-        """
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self._update_frame)
-        QTimer.singleShot(0, self._update_frame)
+        if not self.runner.running:
+            if self.navigator.current_buffer_index != -1:
+                self._render_history_frame(self.navigator.current_buffer_index)
+            else:
+                self._update_live_frame()
 
-    def toggle_simulation(self):
-        """
-        Toggles the simulation loop between start and stop.
-        """
-        if self.running:
-            self.timer.stop()
-            self.ui.play_button.setText("▶")
-            self.running = False
-        else:
-            self.sim.set_frame_counter(self.current_playback_buffer_index)
-            self.current_playback_buffer_index = -1
-            self.timer.start(int(self.sim.frame_time * 1000))
-            self.ui.play_button.setText("▪")
-            self.running = True
-
-        if self.cell_inspector:
-            self.cell_inspector.set_running(self.running)
-        self.render_label.set_running(self.running)
-
-    def _set_running_state(self, running: bool):
-        self.running = running
-        self.ui.play_button.setText("▪" if running else "▶")
-        if self.cell_inspector:
-            self.cell_inspector.set_running(running)
-        self.render_label.set_running(running)
-        if not running:
-            self.timer.stop()
-
-    def _change_speed(self):
-        """
-        Updates the simulation speed based on slider value.
-        """
-        current_speed = self.ui.speed_dropdown.currentText()
-        speed_int = int(current_speed[0])
-
-        multiplier = 2 ** (speed_int - 1)
-
-        new_frame_time = self.base_frame_time / multiplier
-        self.sim.frame_time = new_frame_time
-        if self.timer.isActive():
-            self.timer.start(int(new_frame_time * 1000))
-
-    def _update_frame_counter(self, frame: int):
-        self.ui.frame_counter_label.setText(f"Frame: {frame}")
-
-    def _update_frame(self):
-        """
-        Renders and displays the next frame of the simulation.
-        """
+    def _update_live_frame(self):
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
+        self._display_frame(frame, pixmap)
 
+        if self.inspector_manager.is_active:
+            pos = self.inspector_manager.get_current_position()
+            self.inspector_manager.update_data(self.sim.get_cell_data(pos))
+
+    def _render_history_frame(self, index: int):
+        self.inspector_manager.hide_inspector()
+
+        frame, pixmap = self.renderer.render_frame(self.render_label.size(), index, self.render_charged,
+                                                   drop_newer=False)
+        self._display_frame(frame, pixmap)
+
+    def _display_frame(self, frame_num, pixmap):
         self.render_label.setPixmap(pixmap)
-        self.ui.frame_counter_label.setText(f"Frame: {frame}")
-        
-        # Maybe let's think of some observers or other callbacks to update widgets. MM
-        if self.cell_inspector:
-            self.cell_inspector.update(self.sim.get_cell_data(self.cell_inspector.position))
+        self.ui.frame_counter_label.setText(f"Time {frame_num}")
 
-    def _start_playback_hold(self):
-        self._on_playback()
-        self.playback_timer.start(100)
-
-    def _stop_playback_hold(self):
-        self.playback_timer.stop()
-
-    def _start_forward_hold(self):
-        self._on_forward()
-        self.forward_timer.start(100)
-
-    def _stop_forward_hold(self):
-        self.forward_timer.stop()
-
-    def _on_playback(self) -> None:
-        if self.running:
-            self._set_running_state(False)
-
-        try:
-            new_index = self.current_playback_buffer_index - self.frames_per_click
-            if new_index < -self.sim.get_buffer_size():
-                new_index = -self.sim.get_buffer_size()
-
-            self._render_buffer_frame(new_index)
-        except Exception:
-            pass
-
-    def _on_forward(self) -> None:
-        if self.running:
-            self._set_running_state(False)
-
-        try:
-            new_index = self.current_playback_buffer_index + self.frames_per_click
-            if new_index > -1:
-                new_index = -1
-
-            self._render_buffer_frame(new_index)
-        except Exception:
-            pass
-
-    def _render_buffer_frame(self, index: int, drop_newer: bool = False) -> None:
-        """Load and render a frame from the simulation recorder buffer."""
-        self.current_playback_buffer_index = index
-        self._remove_inspector()
-        frame, pixmap = self.renderer.render_frame(self.render_label.size(), index, self.render_charged, drop_newer)
-        self._update_frame_counter(frame)
-       
-        self.render_label.setPixmap(pixmap)
-
-    def _show_cell_inspector(self, cell_data: CellDict) -> None:
-        if self.cell_inspector:
-            self._remove_inspector()
-
-        self.cell_inspector = CellInspector(
-            cell_data, on_close_callback=self._remove_inspector,
-            running=self.running, ctrl=self.sim
+    def _on_cell_clicked(self, cell_data: CellDict):
+        self.inspector_manager.show_inspector(
+            cell_data,
+            on_close_callback=self.inspector_manager.hide_inspector,
+            is_running=self.runner.running
         )
-        self.ui.cell_inspector_layout.addWidget(self.cell_inspector)
-        self.ui.parameters_scroll.setVisible(False)
-        self.ui.presets_layout.setVisible(False)
-        self.ui.cell_inspector_container.setParent(self.ui.settings_layout)
-
-        self.ui.verticalLayout_2.insertWidget(0, self.ui.cell_inspector_container, 7)
-
-    def _remove_inspector(self) -> None:
-        if self.cell_inspector:
-            self.ui.cell_inspector_container.setParent(None)
-            # self.ui.parameters_layout.setVisible(True)
-            self.ui.parameters_scroll.setVisible(True)
-            self.ui.presets_layout.setVisible(True)
-            self.cell_inspector.deleteLater()
-            self.cell_inspector = None
 
     def _modify_cells(self):
         all_params = self.ui.parameter_panel.get_current_values()
@@ -253,3 +153,36 @@ class MainWindow(QMainWindow):
     def _undo_cell_modification(self):
         self.cell_modificator.undo_change()
         self.sim.undo_modification()
+
+    def _toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        self._apply_style()
+
+    def _apply_style(self):
+        path = "./resources/style/dark_mode.qss" if self.dark_mode else "./resources/style/light_mode.qss"
+        with open(path, "r") as f:
+            style = f.read()
+        self.setStyleSheet(style)
+        icon_text = "☀" if self.dark_mode else "☾"
+        self.ui.topbar.btn_theme.setText(icon_text)
+
+    def _on_parameter_slider_moved(self, changed_cell_type: str):
+        if self.overlay_graph.isHidden():
+            self.overlay_graph.show()
+        self.overlay_graph.raise_()
+
+        self.refresh_overlay_plot(changed_cell_type)
+
+    def refresh_overlay_plot(self, cell_type: str):
+        params = self.ui.parameter_panel.get_current_values(cell_type)
+        t, v = self.generator.generate(cell_type, params, n_cycles=3)
+        self.overlay_graph.update_data(t, v, title=f"Preview {cell_type}")
+
+    def _reposition_overlay_graph(self):
+        padding = 20
+        x = self.width() - self.overlay_graph.width() - padding
+        y = self.height() - self.overlay_graph.height() - padding
+
+        self.overlay_graph.move(x, y)
+
+        self.overlay_graph.raise_()
