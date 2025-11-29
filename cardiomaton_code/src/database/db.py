@@ -6,7 +6,7 @@ from pathlib import Path
 DATABASE_URL = "sqlite:///./resources/db/cardiomaton_code.db"
 RESOURCES_DIR = ...
 
-engine = create_engine(DATABASE_URL, echo=True, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, echo=False, connect_args={"check_same_thread": False})
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 

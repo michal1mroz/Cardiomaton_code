@@ -8,31 +8,6 @@ from src.database.utils.cell_utils import *
 from src.database.models.automaton_cell_args import *
 from src.database.models.cell_arguments import *
 
-cell_data = {
-    frozenset({
-        "V_rest":-60.0, 
-        "V_thresh":-60.0, 
-        "V_peak":15.0,
-        "t_thresh":0.5, 
-        "t_peak":0.45, 
-        "t_end":0.95,
-        "eps":0.01,
-        "period":1.2,
-        "range": 200
-    }.items()): 1,
-    frozenset({
-        "V_rest":-60.0, 
-        "V_thresh":-40.0, 
-        "V_peak":15.0,
-        "t_thresh":0.35, 
-        "t_peak":0.45, 
-        "t_end":0.80,
-        "eps":0.005,
-        "period":0.8,
-        "range": 200
-    }.items()): 2
-}
-
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     ConfigLoader.loadConfig()
@@ -54,4 +29,5 @@ if __name__ == '__main__':
     # print(aut)
 
     print(list_entries(db))
-    # print(delete_entry(db, "default"))
+    print(delete_entry(db, "default"))
+    print(list_entries(db))
