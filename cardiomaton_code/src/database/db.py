@@ -4,7 +4,9 @@ from typing import Generator
 from pathlib import Path
 
 DATABASE_URL = "sqlite:///./resources/db/cardiomaton.db"
-RESOURCES_DIR = ...
+RESOURCES_DIR = Path("resources/db")
+
+RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
 
 engine = create_engine(DATABASE_URL, echo=False, connect_args={"check_same_thread": False})
 
