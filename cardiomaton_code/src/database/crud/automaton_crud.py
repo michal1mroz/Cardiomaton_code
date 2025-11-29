@@ -14,8 +14,19 @@ from src.database.utils.cell_utils import deserialize_cells, decode_cell, cell_d
 
 from src.database.dto.automaton_dto import AutomatonDto
 
+
+"""
+    Right now this module contains the definitions for most crud operations on the database that might be useful
+    in the project.
+"""
+
 def get_or_create_cell_arguments(db: Session,
                                  cell_data_dict: Dict[str, Any]) -> int:
+    """
+    Get or create for a set of cell arguments. First performs the query on the first layer of the
+    dict and then filters the result on the contents of the cell_data dictionary.
+    Returns the id of the corresponding entry (either created or already existing one)
+    """
     flat = {
         'period': cell_data_dict['period'],
         'range': cell_data_dict['range'],
@@ -54,6 +65,7 @@ def create_config_key(cell_config: Dict[str, Any]) -> tuple:
 
 def serialize_cells(cells: List[Cell], arg_dict: Dict) -> bytes:
     """
+        Moved from the cell_utils due to the dependency problems.
         Function that serializes a list of cells to a byte array.
 
         Args:
@@ -85,6 +97,21 @@ def create_or_overwrite_entry(
         height: int,
         frames: int,
 ) -> AutomatonTable:
+    """
+        Creates a new automaton entry. If the entry under the specified name already exists it is overwritten.
+        Returns the table schema object that was created.
+
+        Args:
+            db: Session - database session
+            name: str - string with entries name
+            cells: List[Cell] - list of cells defining the automaton
+            width: int - width of the automaton grid
+            height: int - height of the automaton grid
+            frames: int - value of the frame counter from the automaton
+
+        Returns:
+            AutomatonTable - created automaton table
+    """
     mapping: Dict[tuple, int] = {}
     for cell in cells:
         frozen = create_config_key(cell.config)
@@ -123,6 +150,17 @@ def get_entry(
         name: str,
         include_blob: bool = True
 ) -> Optional[Dict[str, Any]]:
+    """
+        Returns a simple automaton entry from the database
+
+        Args:
+            db: Session - database session
+            name: str - automaton string
+            include_blob: bool - set to true to include the binary data. False otherwise
+
+        Returns:
+            Dictionary representation of the AutomatonTable
+    """
     row = db.query(AutomatonTable).filter(AutomatonTable.name == name).one_or_none()
     if row is None:
         return None
@@ -138,6 +176,9 @@ def get_entry(
     }
 
 def get_arguments_for_automaton(db: Session, automaton_id: int):
+    """
+        Helper query
+    """
     stmt = (
         select(CellArguments)
         .join(AutomatonCellArgs, CellArguments.id == AutomatonCellArgs.arg_id)
@@ -146,7 +187,17 @@ def get_arguments_for_automaton(db: Session, automaton_id: int):
     )
     return db.execute(stmt).scalars().all()
 
-def get_automaton(db: Session, name: str) -> Automaton:
+def get_automaton(db: Session, name: str) -> AutomatonDto:
+    """
+    Get automaton dto. Returns a data in the format that allows for an easy creation of the automaton.
+
+    Arguments:
+        db: Session - database session
+        name: str - name of the automaton
+
+    Returns:
+        AutomatonDto: dataclass - returns serialized automaton data.
+    """
     dictionary = get_entry(db, name, True)
     if dictionary is None:
         raise RuntimeError(f"No automaton with name \"{name}\" found")
@@ -177,12 +228,42 @@ def get_automaton(db: Session, name: str) -> Automaton:
         frame = dictionary['frames']
     )
 
-#Automaton(shape=(dictionary["width"], dictionary["height"]), cells=cells, frame=dictionary["frames"]) 
-
 def delete_entry(db: Session, name: str) -> bool:
+    """
+    Deletes the entry from the automaton table and a joiner table.
+
+    Arguments:
+        db: Session - database session
+        name: str - name of the automaton
+
+    Returns:
+        bool - status of the operation
+    """
     row = db.query(AutomatonTable).filter(AutomatonTable.name == name).one_or_none()
     if row is None:
         return False
+    
+    automaton_id = row.id
+    db.query(AutomatonCellArgs).filter(AutomatonCellArgs.automaton_id == automaton_id).delete()
+
     db.delete(row)
     db.commit()
     return True
+
+def list_entries(db: Session) -> List[Dict]:
+    """
+    Returns the entries from the database in the dictionary format and without the binary data.
+
+    Arguments:
+        db: Session - database session
+    
+    Returns:
+        List[Dict] - list of automatons in the dictionary format and without the binary data (see get_entry for the details)
+    """
+    entries = db.query(AutomatonTable).all()
+    if entries is None:
+        return None
+    res = []
+    for entry in entries:
+        res.append(get_entry(db, entry.name, False))
+    return res
