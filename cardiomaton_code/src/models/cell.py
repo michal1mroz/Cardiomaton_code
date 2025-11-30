@@ -2,11 +2,9 @@ from __future__ import annotations
 from typing import List, Tuple, Dict, TypedDict
 
 #from src.models.cell_state import CellState
-from cardiomaton_code.src.backend.enums.cell_state import CellState
+from src.backend.enums.cell_state import CellState
 
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
-
-# from src.models.cell_type import CellType
 
 class CellDict(TypedDict):
     position: Tuple[int, int]
@@ -169,6 +167,13 @@ class Cell:
         copied_cell.state_timer = self.state_timer
         # Neighbours are intentionally not copied
         return copied_cell
+
+    def neighbors_to_ints(self) -> List[Tuple[int, int]]:
+        res = []
+        for nei in self.neighbours:
+            x, y = nei.position
+            res.append((self.position[0] - x, self.position[1] - y))
+        return res
     
     def update_charge(self):
         return self.charges[self.state_timer]

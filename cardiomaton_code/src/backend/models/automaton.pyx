@@ -5,8 +5,8 @@ from libc.stdint cimport uintptr_t
 
 
 from src.backend.structs.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict, create_mimic_cell, recreate_cell_from_mimic
-from src.backend.enums.cell_state cimport CellStateC,state_to_cenum
-from src.backend.enums.cell_type cimport type_to_cenum
+from src.backend.enums.cell_state cimport CellStateC,state_to_cenum, state_to_pyenum
+from src.backend.enums.cell_type cimport type_to_cenum, type_to_pyenum
 from src.backend.enums.cell_type cimport CellTypeC
 from src.backend.utils.charge_update cimport update_charge
 from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc
@@ -33,7 +33,7 @@ class CellData:
 cdef class Automaton:
 
     def __init__(self, size: Tuple[int, int], cells: dict[Tuple[int, int], Cell], img_ptr,
-            int img_bytes, frame_time: float = 0.2):
+            int img_bytes, frame: int = 0, frame_time: float = 0.2):
         """
         Constructor. Assumes size is the size of the image on which the grid is projected. Uses the same values
         as the previous version, but stores as much data as possible in c containers.
@@ -63,18 +63,8 @@ cdef class Automaton:
             self.grid_b[i] = NULL
 
         self.is_running = 0
-        self.frame_counter = 0
+        self.frame_counter = <int> frame
 
-        self.dict_mapping = {
-            pos: CellDict(position = pos,
-                    state_value= cell.state.value,
-                    state_name = cell.state.name.capitalize(),
-                    charge = cell.charge,
-                    ccs_part=cell.cell_type.value,
-                    cell_type = cell.cell_type.name,
-                    auto_polarization=cell.self_polarization)
-            for pos, cell in cells.items()
-        }
 
         self.cell_data = dict()
         self._generate_grid(self.grid_a, cell_list)
@@ -168,7 +158,7 @@ cdef class Automaton:
             grid[i].V_rest = <double> py_cell.cell_data.get("V_rest")
             grid[i].V_thresh = <double> py_cell.cell_data.get("V_thresh", 0) # Default since some cells don't have this value
             grid[i].ref_threshold = <double> py_cell.ref_threshold
-            grid[i].charge = 0
+            grid[i].charge = <double> py_cell.charge
 
             grid[i].propagation_time = <int> py_cell.config.get("propagation_time")
             grid[i].propagation_count = 1
@@ -244,7 +234,7 @@ cdef class Automaton:
         self.grid_a = self.grid_b
         self.grid_b = tmp
 
-    cpdef void update_grid(self, show_charge: bool):
+    cpdef void update_grid(self, object show_charge):
         """
         Simple update method for the python API. The logic should be moved to the nogil pure C implementation.
         """
@@ -457,3 +447,33 @@ cdef class Automaton:
 
     cpdef int get_buffer_size(self):
         return self.frame_recorder.get_count()
+
+    cdef dict _serialize_automaton(self):
+        """
+        Serializes the automaton grid to the format that is
+        usable by the database.
+        """
+        cdef int i
+        cdef CCell* cell_a
+        res = {}
+
+        for _, wrapper in self.cell_data.items():
+            cell_a = <CCell*>((<CellWrapper>wrapper).get_cell())
+            pos = (int(cell_a.pos_x), int(cell_a.pos_y))
+            temp_cell = Cell(pos, type_to_pyenum(cell_a.c_type), 
+                            wrapper.cell_data,
+                            state_to_pyenum(cell_a.c_state),
+                            True if cell_a.self_polarization == 1 else 0,
+                            int(cell_a.timer),
+                            float(cell_a.charge))
+            res[pos] = temp_cell
+        
+        for pos, wrapper in self.cell_data.items():
+            neis = wrapper.neighbors
+            for nei_pos in neis:
+                res[pos].add_neighbor(res[nei_pos])
+        
+        return res
+
+    cpdef dict serialize_automaton(self):
+        return self._serialize_automaton()

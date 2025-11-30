@@ -28,7 +28,7 @@ cdef class Automaton:
     cdef int buf_size
 
     # Public python API
-    cpdef void update_grid(self, object is_charged)
+    cpdef void update_grid(self, object show_charge)
     cpdef int to_cell_data(self)
 
     cpdef float get_frame_time(self)
@@ -39,6 +39,9 @@ cdef class Automaton:
     cpdef int get_buffer_size(self)
     cpdef int render_frame(self, int idx, object if_charged, object drop_newer)
     cpdef void set_frame_counter(self, int)
+    cpdef dict serialize_automaton(self)
+
+    cdef dict _serialize_automaton(self)
 
     # Cell modification functions
     cpdef void modify_cell_state(self, set coords, object new_state)
@@ -60,7 +63,3 @@ cdef class Automaton:
     cdef void _update_grid_nogil(self, DrawFunc)
     cdef void _init_img(self)
     cdef void _clear_img(self)
-
-
-
-

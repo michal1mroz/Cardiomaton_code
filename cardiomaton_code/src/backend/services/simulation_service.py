@@ -6,6 +6,10 @@ from src.backend.models.automaton import Automaton
 from src.backend.enums.cell_state import CellState
 from PyQt6.QtGui import QImage
 
+from src.database.db import init_db, SessionLocal
+from src.database.crud.automaton_crud import get_automaton
+from src.database.dto.automaton_dto import AutomatonDto
+
 class SimulationService:
     """
     Handles the core logic of the cellular automaton simulation.
@@ -18,14 +22,18 @@ class SimulationService:
         Args:
             frame_time (float): Time between frames in seconds.
         """
-        graph, A, B = extract_conduction_pixels()
-        space = Space(graph)
-        _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
+        # graph, A, B = extract_conduction_pixels()
+        # space = Space(graph)
+        # _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
         ptr = image.bits()
         if hasattr(ptr, "setsize"):
             ptr.setsize(image.bytesPerLine() * image.height())
+        init_db()
+        db = SessionLocal()
+        dto = get_automaton(db, "default")
 
-        self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
+        self.automaton = Automaton(dto.shape, dto.cell_map, img_ptr = int(ptr), img_bytes=image.bytesPerLine(), frame=dto.frame, frame_time=frame_time)
+        # self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
 
     def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
