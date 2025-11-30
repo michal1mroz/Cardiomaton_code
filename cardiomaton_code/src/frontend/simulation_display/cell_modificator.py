@@ -9,6 +9,7 @@ class CellModification:
     purkinje_charge_parameters: dict[str, float] = field(default_factory=list)
     atrial_charge_parameters: dict[str, float] = field(default_factory=list)
     pacemaker_charge_parameters: dict[str, float] = field(default_factory=list)
+    global_parameters: dict[str, float] = field(default_factory=list)
     necrosis_enabled: bool = False
     depolarize: bool = False
     modifier_name: str | None = None

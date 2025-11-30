@@ -34,6 +34,9 @@ class ParameterDefinition:
 
 
 CELL_PARAMETER_DEFINITIONS: Final[Dict[str, Dict[str, ParameterDefinition]]] = {
+    "__GLOBAL__": {
+        "propagation_time": ParameterDefinition(default=1, minimum=1, maximum=7),
+    },
     "PACEMAKER": {
         "V_rest":   ParameterDefinition(default=-65,   minimum=-80,    maximum=-40),
         "V_thresh": ParameterDefinition(default=-40,   minimum=-60,    maximum=-20),
@@ -88,6 +91,9 @@ CELL_PARAMETER_DEFINITIONS: Final[Dict[str, Dict[str, ParameterDefinition]]] = {
 }
 
 CELL_PARAMETER_LABELS: Final[Dict[str, Dict[str, str]]] = {
+    "__GLOBAL__": {
+        "propagation_time": "Signal propagation delay"
+    },
     "PACEMAKER": {
         "V_rest": "Maximum Diastolic Potential (mV)",
         "V_thresh": "Threshold Potential (mV)",

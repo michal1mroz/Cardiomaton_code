@@ -43,6 +43,9 @@ cdef class Automaton:
     # Cell modification functions
     cpdef void modify_cell_state(self, set coords, object new_state)
     cpdef void modify_charge_data(self, set coords, dict atrial_charge_parameters, dict pacemaker_charge_parameters, dict purkinje_charge_parameters)
+    cpdef void modify_propagation_time(self, set coords, int propagation_time_value)
+
+
     cpdef void commit_current_automaton(self)
     cpdef void undo_modification(self)
 
