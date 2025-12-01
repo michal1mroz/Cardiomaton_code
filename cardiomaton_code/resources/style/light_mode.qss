@@ -160,11 +160,30 @@ QPushButton#GraphCloseBtn {
 #ToggleBtn { font-size: 40px; }
 #ControlBtn { font-size: 30px; }
 
+#presetBtn {
+    font-family: 'Mulish ExtraBold';
+    background-color: #E1605D;
+    color: #FFFFFF;
+    border: none;
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+#presetBtn:hover {
+    background-color: #CD4B48;
+    color: #FFFFFF;
+}
+
+
 
 /* --- TOPBAR BUTTONS --- */
 
 
 #BtnTheme,
+#BtnAccess,
 QPushButton#BtnApp,
 QPushButton#BtnHelp,
 QPushButton#BtnAbout {
@@ -173,7 +192,16 @@ QPushButton#BtnAbout {
     border: none;
 }
 
+#BtnTheme{
+    font-size: 25px;
+}
+
+#BtnAccess {
+    font-size: 35px;
+}
+
 #BtnTheme:hover,
+#BtnAccess:hover
 QPushButton#BtnApp:hover,
 QPushButton#BtnHelp:hover,
 QPushButton#BtnAbout:hover {
@@ -185,7 +213,7 @@ QPushButton#BtnAbout:hover {
 /* --- COMBOBOX --- */
 
 
-QComboBox {
+#speedComboBox  {
     font-family: Mulish;
     font-size: 25px;
     font-weight: bold;
@@ -194,20 +222,20 @@ QComboBox {
     margin-left: 10px;
 }
 
-QComboBox:hover {
+#speedComboBox:hover {
     color: #CD4B48;
 }
 
-QComboBox::drop-down {
+#speedComboBox::drop-down {
     border: none;
     width: 0px;
 }
 
-QComboBox::down-arrow {
+#speedComboBox::down-arrow {
     image: none;
 }
 
-QComboBox QAbstractItemView {
+#speedComboBox QAbstractItemView {
     font-family: 'Mulish';
     font-size: 18px;
     font-weight: bold;
@@ -217,7 +245,7 @@ QComboBox QAbstractItemView {
     outline: none;
 }
 
-QComboBox QAbstractItemView::item {
+#speedComboBox QAbstractItemView::item {
     padding-left: 10px;
 }
 
@@ -249,13 +277,13 @@ QCheckBox::indicator:checked {
     font-family: 'Mulish';
     font-size: 13px;
     color: #233348;
-    spacing: 8px;
+    spacing: 9px;
 }
 
 #NecrosisSwitch::indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 7px;
     border: 2px solid #4574DA;
     background-color: transparent;
 }
@@ -347,4 +375,40 @@ GraphWidget {
     qproperty-traceColor: #CD4B48;
     qproperty-axisColor: #6c7c91;
     qproperty-titleColor: #233348;
+}
+
+/* --- PRESETS ---*/
+
+#presetComboBox {
+    font-family: Mulish;
+    font-size: 18px;
+    color: #233348;
+    background-color: transparent;
+    border: 1px solid #DBE3F1;
+    border-radius: 16px;
+    padding: 5px 25px 5px 25px;
+    width: 100px;
+}
+
+#presetComboBox::drop-down {
+    margin-right: 10px;
+}
+
+#presetComboBox::down-arrow {
+    color: #6D98F4;
+}
+
+#presetComboBox QAbstractItemView {
+    font-family: 'Mulish';
+    background-color: #FFFFFF;
+    color: #233348;
+    selection-color: #6D98F4;
+
+    border: 1px solid #DBE3F1;
+}
+
+#presetComboBox QAbstractItemView::item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
 }

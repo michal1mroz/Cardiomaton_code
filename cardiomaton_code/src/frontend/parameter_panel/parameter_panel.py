@@ -54,6 +54,7 @@ class ParameterPanel(QtWidgets.QWidget):
 
                 label_text = CELL_PARAMETER_LABELS[cell_type][name]
                 name_label = QtWidgets.QLabel(label_text)
+                name_label.setObjectName("ParameterNameLabel")
                 row_layout.addWidget(name_label)
 
                 bottom_row = QtWidgets.QWidget()

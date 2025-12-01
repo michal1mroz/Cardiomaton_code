@@ -1,52 +1,34 @@
-/* =======================================================
-   COLOR PALETTE:
-   -------------------------------------------------------
-   Red (Base):          #E1605D
-   Red (Hover):         #CD4B48
-
-   Blue (Base):         #5E83F2
-   Blue (Hover):        #496BD3
-
-   Text Main:           #E6EAF0
-   Text Hover/Bright:   #F9FBFF
-
-   Background Dark:     #181C23
-   Background Lighter:  #303742
-   TopBar Background:   rgba(51, 59, 70, 70)
-   ======================================================= */
-
-
 /* --- BACKGROUNDS --- */
 
 
 QMainWindow {
-    background-image: url(./resources/style/dark_background.png);
+    background-image: url(./resources/style/accessibility_background.png);
 }
 
 #Layout,
 PlayerControlsWidget,
 #CellInspectorContainer,
 QScrollArea {
-    background-color: #181C23;
+    background-color: #FFFFFF;
     border-radius: 20px;
 }
 
 #TopBar {
-    background-color: rgba(51, 59, 70, 70);
+    background-color: rgba(242, 247, 255, 240);
 }
 
 QWidget#Logo {
-    background-color: #5E83F2;
+    background-color: #6D98F4;
     border-radius: 25px;
     color: white;
     font-size: 24px;
 }
 
 QToolTip {
-    background-color: #181C23;
-    color: #E6EAF0;
+    background-color: #FFFFFF;
+    color: #233348;
     padding: 12px;
-    border: 1px solid #303742;
+    border: 1px solid #E6EAF0;
 }
 
 
@@ -54,7 +36,7 @@ QToolTip {
 
 
 QLabel {
-    color: #E6EAF0;
+    color: #233348;
     background: transparent;
 }
 
@@ -63,21 +45,31 @@ QLabel#ProjectName {
     font-size: 22px;
 }
 
+#ParameterNameLabel{
+    font-size: 16px;
+}
+
 #ParameterValueLabel {
     font-family: 'Mulish';
-    font-size: 13px;
+    font-size: 16px;
 }
 
 #ParameterTitle {
-    color: #E6EAF0;
+    color: #233348;
     font-family: 'Mulish ExtraBold';
-    font-size: 14px;
+    font-size: 16px;
 }
 
 #ParametersLine {
-    background-color: #E6EAF0;
+    background-color: #798BA3;
     max-height: 1px;
-        border: none;
+    border: none;
+}
+
+#frame_counter_label {
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    padding: 6px 5px;
 }
 
 
@@ -89,7 +81,7 @@ QPushButton,
 #UndoBtn,
 #play_button {
     background-color: #E1605D;
-    color: #E6EAF0;
+    color: #FFFFFF;
     border: none;
     border-radius: 10px;
     padding: 6px 10px;
@@ -100,7 +92,7 @@ QPushButton:hover,
 #UndoBtn:hover,
 #play_button:hover {
     background-color: #CD4B48;
-    color: #E6EAF0;
+    color: #FFFFFF;
 }
 
 #CloseBtn {
@@ -121,7 +113,6 @@ QPushButton:hover,
     border-radius: 20px;
 }
 
-
 #BlueBtn,
 QPushButton#GraphCloseBtn {
     background-color: #5E83F2;
@@ -139,7 +130,6 @@ QPushButton#GraphCloseBtn:hover {
     font-family: 'Mulish ExtraBold';
     font-size: 14px;
     border-radius: 10px;
-    color: #E6EAF0;
 }
 
 QPushButton#GraphCloseBtn {
@@ -147,7 +137,6 @@ QPushButton#GraphCloseBtn {
     font-weight: bold;
     font-size: 12px;
 }
-
 
 #ToggleBtn,
 #ControlBtn {
@@ -164,34 +153,6 @@ QPushButton#GraphCloseBtn {
 
 #ToggleBtn { font-size: 40px; }
 #ControlBtn { font-size: 30px; }
-
-
-#BtnTheme,
-#BtnAccess,
-QPushButton#BtnApp,
-QPushButton#BtnHelp,
-QPushButton#BtnAbout {
-    color: #E6EAF0;
-    background: transparent;
-    border: none;
-}
-
-#BtnTheme{
-    font-size: 20px;
-}
-
-#BtnAccess {
-    font-size: 30px;
-}
-
-#BtnTheme:hover,
-#BtnAccess:hover,
-QPushButton#BtnApp:hover,
-QPushButton#BtnHelp:hover,
-QPushButton#BtnAbout:hover {
-    color: #F9FBFF;
-    background: transparent;
-}
 
 #presetBtn {
     font-family: 'Mulish ExtraBold';
@@ -211,10 +172,46 @@ QPushButton#BtnAbout:hover {
 }
 
 
+
+/* --- TOPBAR BUTTONS --- */
+
+
+#BtnTheme,
+#BtnAccess,
+QPushButton#BtnApp,
+QPushButton#BtnHelp,
+QPushButton#BtnAbout {
+    color: #1F1534;
+    background: transparent;
+    border: none;
+}
+
+#BtnTheme{
+    font-size: 25px;
+}
+
+#BtnAccess {
+    font-size: 20px;
+}
+
+#BrushSliderLabel {
+    font-size: 18px;
+}
+
+#BtnTheme:hover,
+#BtnAccess:hover,
+QPushButton#BtnApp:hover,
+QPushButton#BtnHelp:hover,
+QPushButton#BtnAbout:hover {
+    color: #496BD3;
+    background: transparent;
+}
+
+
 /* --- COMBOBOX --- */
 
 
-#speedComboBox {
+#speedComboBox  {
     font-family: Mulish;
     font-size: 25px;
     font-weight: bold;
@@ -240,7 +237,7 @@ QPushButton#BtnAbout:hover {
     font-family: 'Mulish';
     font-size: 18px;
     font-weight: bold;
-    background-color: #181C23;
+    background-color: #FFFFFF;
     color: #E1605D;
     selection-color: #CD4B48;
     outline: none;
@@ -251,15 +248,36 @@ QPushButton#BtnAbout:hover {
 }
 
 
-/* --- CHECKBOX & SWITCH --- */
+/* --- CHECKBOX --- */
 
 
 QCheckBox {
-    color: #E6EAF0;
+    color: #233348;
     spacing: 8px;
 }
 
-QCheckBox::indicator,
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid #4574DA;
+    background-color: transparent;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #4574DA;
+}
+
+
+/* --- NECROSIS SWITCH --- */
+
+#NecrosisSwitch {
+    font-family: 'Mulish';
+    font-size: 16px;
+    color: #233348;
+    spacing: 9px;
+}
+
 #NecrosisSwitch::indicator {
     width: 15px;
     height: 15px;
@@ -268,16 +286,8 @@ QCheckBox::indicator,
     background-color: transparent;
 }
 
-QCheckBox::indicator:checked,
 #NecrosisSwitch::indicator:checked {
     background-color: #4574DA;
-}
-
-#NecrosisSwitch {
-    font-family: 'Mulish';
-    font-size: 13px;
-    color: #E6EAF0;
-    spacing: 8px;
 }
 
 
@@ -322,14 +332,14 @@ QSlider::handle:horizontal:hover {
 
 
 QScrollBar:vertical {
-    background: #35424F;
+    background: #f3f7ff;
     width: 10px;
     margin: 4px 0 4px 0;
     border-radius: 5px;
 }
 
 QScrollBar::handle:vertical {
-    background: #E1605D;
+    background: #EF8481;
     border-radius: 5px;
     min-height: 20px;
 }
@@ -353,24 +363,16 @@ QScrollBar::sub-page:vertical {
 /* --- GRAPHS --- */
 
 
-SeriesPlot {
-    background-color: #303742;
-    border-radius: 20px;
-
-    qproperty-plotBackground: #303742;
-    qproperty-traceColor: #CD4B48;
-    qproperty-axisColor: rgb(230, 234, 240);
-    qproperty-titleColor: #F9FBFF;
-}
-
+SeriesPlot,
 GraphWidget {
-    background-color: #181C23;
+    background-color: rgba(255, 255, 255, 230);
     border-radius: 20px;
 
-    qproperty-plotBackground: #181C23;
+    /* Custom Properties dla PyQtGraph */
+    qproperty-plotBackground: white;
     qproperty-traceColor: #CD4B48;
-    qproperty-axisColor: rgb(230, 234, 240);
-    qproperty-titleColor: #E6EAF0;
+    qproperty-axisColor: #6c7c91;
+    qproperty-titleColor: #233348;
 }
 
 /* --- PRESETS ---*/
@@ -378,9 +380,9 @@ GraphWidget {
 #presetComboBox {
     font-family: Mulish;
     font-size: 18px;
-    color: #E6EAF0;
-    background-color: #303742;
-    border: 1px solid #303742;
+    color: #233348;
+    background-color: transparent;
+    border: 1px solid #DBE3F1;
     border-radius: 16px;
     padding: 5px 25px 5px 25px;
     width: 100px;
@@ -396,10 +398,11 @@ GraphWidget {
 
 #presetComboBox QAbstractItemView {
     font-family: 'Mulish';
-    background-color: #303742;
-    color: #E6EAF0;
+    background-color: #FFFFFF;
+    color: #233348;
     selection-color: #6D98F4;
-    border: 1px solid #303742;
+
+    border: 1px solid #DBE3F1;
 }
 
 #presetComboBox QAbstractItemView::item {

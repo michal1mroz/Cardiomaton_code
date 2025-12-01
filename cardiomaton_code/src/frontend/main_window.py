@@ -42,7 +42,8 @@ class MainWindow(QMainWindow):
         self.render_label = SimulationView(self.cell_data_provider, self.ui.brush_size_slider, self.cell_modificator)
         self.render_charged = True
 
-        self.dark_mode = True
+        self.dark_mode = False
+        self.accessibility_mode = False
         self._apply_style()
 
         self._init_ui_layout()
@@ -74,6 +75,7 @@ class MainWindow(QMainWindow):
 
         self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
         self.ui.topbar.btn_theme.clicked.connect(self._toggle_theme)
+        self.ui.topbar.btn_access.clicked.connect(self._toggle_accessibility_mode)
 
     def _toggle_simulation(self):
         if not self.runner.running and self.navigator.current_buffer_index != -1:
@@ -157,15 +159,35 @@ class MainWindow(QMainWindow):
 
     def _toggle_theme(self):
         self.dark_mode = not self.dark_mode
+        self.accessibility_mode = False
+        self._apply_style()
+
+    def _toggle_accessibility_mode(self):
+        self.accessibility_mode = not self.accessibility_mode
+        self.dark_mode = False
         self._apply_style()
 
     def _apply_style(self):
-        path = "./resources/style/dark_mode.qss" if self.dark_mode else "./resources/style/light_mode.qss"
-        with open(path, "r") as f:
+        if self.accessibility_mode:
+            path = "./resources/style/accessibility_mode.qss"
+            icon_text = "☾"
+            access_text = "◎"
+        elif self.dark_mode:
+            path = "./resources/style/dark_mode.qss"
+            icon_text = "☀"
+            access_text = "◉"
+
+        else:
+            path = "./resources/style/light_mode.qss"
+            icon_text = "☾"
+            access_text = "◉"
+
+        with open(path, "r", encoding='utf-8') as f:
             style = f.read()
         self.setStyleSheet(style)
-        icon_text = "☀" if self.dark_mode else "☾"
         self.ui.topbar.btn_theme.setText(icon_text)
+        self.ui.topbar.btn_access.setText(access_text)
+
 
     def _on_parameter_slider_moved(self, changed_cell_type: str):
         if self.overlay_graph.isHidden():

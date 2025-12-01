@@ -6,7 +6,7 @@ class ModificationPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 10, 0, 0)
+        layout.setContentsMargins(20, 10, 0, 0)
         layout.setSpacing(15)
         layout.setObjectName("Layout")
 
@@ -20,6 +20,7 @@ class ModificationPanel(QWidget):
         self.brush_slider.setRange(1, 8)
         self.brush_slider.setFixedWidth(100)
         self.brush_value_label = QLabel("1")
+        self.brush_value_label.setObjectName("BrushSliderLabel")
 
         self.brush_slider.valueChanged.connect(lambda v: self.brush_value_label.setText(str(v)))
 
@@ -34,3 +35,4 @@ class ModificationPanel(QWidget):
         layout.addWidget(self.undo_button)
         layout.addLayout(brush_layout)
         layout.addWidget(self.necrosis_switch)
+        layout.addStretch()
