@@ -183,11 +183,28 @@ QPushButton#BtnAbout:hover {
     background: transparent;
 }
 
+#presetBtn {
+    font-family: 'Mulish ExtraBold';
+    background-color: #E1605D;
+    color: #FFFFFF;
+    border: none;
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+#presetBtn:hover {
+    background-color: #CD4B48;
+    color: #FFFFFF;
+}
+
 
 /* --- COMBOBOX --- */
 
 
-QComboBox {
+#speedComboBox {
     font-family: Mulish;
     font-size: 25px;
     font-weight: bold;
@@ -196,20 +213,20 @@ QComboBox {
     margin-left: 10px;
 }
 
-QComboBox:hover {
+#speedComboBox:hover {
     color: #CD4B48;
 }
 
-QComboBox::drop-down {
+#speedComboBox::drop-down {
     border: none;
     width: 0px;
 }
 
-QComboBox::down-arrow {
+#speedComboBox::down-arrow {
     image: none;
 }
 
-QComboBox QAbstractItemView {
+#speedComboBox QAbstractItemView {
     font-family: 'Mulish';
     font-size: 18px;
     font-weight: bold;
@@ -219,7 +236,7 @@ QComboBox QAbstractItemView {
     outline: none;
 }
 
-QComboBox QAbstractItemView::item {
+#speedComboBox QAbstractItemView::item {
     padding-left: 10px;
 }
 
@@ -344,4 +361,39 @@ GraphWidget {
     qproperty-traceColor: #CD4B48;
     qproperty-axisColor: rgb(230, 234, 240);
     qproperty-titleColor: #E6EAF0;
+}
+
+/* --- PRESETS ---*/
+
+#presetComboBox {
+    font-family: Mulish;
+    font-size: 18px;
+    color: #E6EAF0;
+    background-color: #303742;
+    border: 1px solid #303742;
+    border-radius: 16px;
+    padding: 5px 25px 5px 25px;
+    width: 100px;
+}
+
+#presetComboBox::drop-down {
+    margin-right: 10px;
+}
+
+#presetComboBox::down-arrow {
+    color: #6D98F4;
+}
+
+#presetComboBox QAbstractItemView {
+    font-family: 'Mulish';
+    background-color: #303742;
+    color: #E6EAF0;
+    selection-color: #6D98F4;
+    border: 1px solid #303742;
+}
+
+#presetComboBox QAbstractItemView::item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
 }

@@ -4,6 +4,7 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 from src.frontend.parameter_panel.parameter_panel import ParameterPanel
 from src.frontend.ui_components.modification_panel import ModificationPanel
 from src.frontend.ui_components.player_controls_widget import PlayerControlsWidget
+from src.frontend.ui_components.presets_widget import PresetsWidget
 from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
 
@@ -55,7 +56,6 @@ class UiMainWindow(object):
             QtWidgets.QSizePolicy.Policy.Expanding,
             QtWidgets.QSizePolicy.Policy.Expanding
         )
-        # ...
         window.setMinimumSize(QtCore.QSize(1100, 600))
         window.setMaximumSize(QtCore.QSize(1100, 600))
         window.setAutoFillBackground(False)
@@ -67,7 +67,7 @@ class UiMainWindow(object):
         layout.setContentsMargins(20, 0, 12, 10)
         layout.setSpacing(20)
 
-        self.presets_layout = QWidget()
+        self.presets_layout = PresetsWidget()
         self.presets_layout.setObjectName("Layout")
         UIFactory.add_shadow(self.presets_layout)
 

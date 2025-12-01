@@ -13,6 +13,7 @@ class PlayerControlsWidget(QWidget):
 
         self.speed_dropdown = QComboBox()
         self.speed_dropdown.addItems(["1x", "2x", "3x"])
+        self.speed_dropdown.setObjectName("speedComboBox")
 
         self.prev_button = QPushButton("❮❮")
         self.prev_button.setObjectName("ControlBtn")

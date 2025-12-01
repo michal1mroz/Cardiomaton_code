@@ -161,7 +161,7 @@ class MainWindow(QMainWindow):
 
     def _apply_style(self):
         path = "./resources/style/dark_mode.qss" if self.dark_mode else "./resources/style/light_mode.qss"
-        with open(path, "r") as f:
+        with open(path, "r", encoding='utf-8') as f:
             style = f.read()
         self.setStyleSheet(style)
         icon_text = "☀" if self.dark_mode else "☾"
