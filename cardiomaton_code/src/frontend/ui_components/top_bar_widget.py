@@ -38,6 +38,11 @@ class TopBarWidget(QWidget):
         self.btn_theme.setObjectName("BtnTheme")
         self.btn_theme.setFixedWidth(40)
 
+        self.btn_access = UIFactory.create_pushbutton(self)
+        self.btn_access.setText("◉")
+        self.btn_access.setObjectName("BtnAccess")
+        self.btn_access.setFixedWidth(40)
+
         layout.addWidget(self.logo)
         layout.addWidget(self.project_name)
         layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
@@ -45,6 +50,7 @@ class TopBarWidget(QWidget):
         layout.addWidget(self.btn_help)
         layout.addWidget(self.btn_about)
         layout.addWidget(self.btn_theme)
+        layout.addWidget(self.btn_access)
 
         layout.setStretch(0, 1)
         layout.setStretch(1, 1)

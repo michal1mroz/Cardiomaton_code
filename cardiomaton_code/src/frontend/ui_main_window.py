@@ -23,8 +23,10 @@ class UiMainWindow(object):
         self.layout = UIFactory.create_widget(self.centralwidget)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.layout)
 
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setSpacing(10)
+
         self.topbar = TopBarWidget()
-        UIFactory.add_shadow(self.topbar)
         self.verticalLayout.addWidget(self.topbar)
 
         self.bottom_container = UIFactory.create_widget(self.layout)
@@ -39,7 +41,7 @@ class UiMainWindow(object):
 
         self.verticalLayout.addWidget(self.bottom_container)
         self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 6)
+        self.verticalLayout.setStretch(1, 7)
 
         self.horizontalLayout_4.addWidget(self.layout)
         main_window.setCentralWidget(self.centralwidget)

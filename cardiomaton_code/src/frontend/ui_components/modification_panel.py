@@ -20,6 +20,7 @@ class ModificationPanel(QWidget):
         self.brush_slider.setRange(1, 8)
         self.brush_slider.setFixedWidth(100)
         self.brush_value_label = QLabel("1")
+        self.brush_value_label.setObjectName("BrushSliderLabel")
 
         self.brush_slider.valueChanged.connect(lambda v: self.brush_value_label.setText(str(v)))
 

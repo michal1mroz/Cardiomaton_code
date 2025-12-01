@@ -183,6 +183,7 @@ QPushButton#GraphCloseBtn {
 
 
 #BtnTheme,
+#BtnAccess,
 QPushButton#BtnApp,
 QPushButton#BtnHelp,
 QPushButton#BtnAbout {
@@ -191,7 +192,16 @@ QPushButton#BtnAbout {
     border: none;
 }
 
+#BtnTheme{
+    font-size: 25px;
+}
+
+#BtnAccess {
+    font-size: 35px;
+}
+
 #BtnTheme:hover,
+#BtnAccess:hover
 QPushButton#BtnApp:hover,
 QPushButton#BtnHelp:hover,
 QPushButton#BtnAbout:hover {
