@@ -267,13 +267,13 @@ QCheckBox::indicator:checked {
     font-family: 'Mulish';
     font-size: 13px;
     color: #233348;
-    spacing: 8px;
+    spacing: 9px;
 }
 
 #NecrosisSwitch::indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 7px;
     border: 2px solid #4574DA;
     background-color: transparent;
 }

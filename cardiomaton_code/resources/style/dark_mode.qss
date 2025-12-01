@@ -251,9 +251,9 @@ QCheckBox {
 
 QCheckBox::indicator,
 #NecrosisSwitch::indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 7px;
     border: 2px solid #4574DA;
     background-color: transparent;
 }

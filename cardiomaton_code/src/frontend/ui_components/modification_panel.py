@@ -6,7 +6,7 @@ class ModificationPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 10, 0, 0)
+        layout.setContentsMargins(20, 10, 0, 0)
         layout.setSpacing(15)
         layout.setObjectName("Layout")
 
@@ -34,3 +34,4 @@ class ModificationPanel(QWidget):
         layout.addWidget(self.undo_button)
         layout.addLayout(brush_layout)
         layout.addWidget(self.necrosis_switch)
+        layout.addStretch()
