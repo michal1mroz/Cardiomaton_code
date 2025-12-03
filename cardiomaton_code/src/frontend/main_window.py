@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
 
         self.render_label = SimulationView(self.cell_data_provider, self.ui.brush_size_slider, self.cell_modificator)
         self.render_charged = True
+        self.inspection_set = True
 
         self.dark_mode = False
         self.accessibility_mode = False
@@ -63,6 +64,7 @@ class MainWindow(QMainWindow):
         self.ui.play_button.clicked.connect(self._toggle_simulation)
         self.ui.speed_dropdown.currentTextChanged.connect(self._on_speed_change)
         self.ui.toggle_render_button.clicked.connect(self._toggle_render_mode)
+        self.ui.toggle_interaction_button.clicked.connect(self._toggle_interaction_mode)
 
         self.ui.prev_button.pressed.connect(self.navigator.start_backward_hold)
         self.ui.prev_button.released.connect(self.navigator.stop_backward_hold)
@@ -109,6 +111,11 @@ class MainWindow(QMainWindow):
                 self._render_history_frame(self.navigator.current_buffer_index)
             else:
                 self._update_live_frame()
+
+    def _toggle_interaction_mode(self):
+        self.inspection_set = not self.inspection_set
+        self.render_label.set_interaction_mode(self.inspection_set)
+        self.ui.toggle_interaction_button.setText("⌕" if self.inspection_set else "️✐")
 
     def _update_live_frame(self):
         frame, pixmap = self.renderer.render_next_frame(self.render_label.size(), self.render_charged)
