@@ -8,7 +8,7 @@ RESOURCES_DIR = Path("resources/db")
 
 RESOURCES_DIR.mkdir(parents=True, exist_ok=True)
 
-engine = create_engine(DATABASE_URL, echo=False, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, echo=True, connect_args={"check_same_thread": False})
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
