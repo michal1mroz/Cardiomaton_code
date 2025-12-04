@@ -1,0 +1,167 @@
+{
+    "HIS_LEFT": {
+        "id": 2,
+        "cell_data": {
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.001,
+            "t12": 0.005,
+            "t23": 0.230,
+            "t34": 0.400,
+            "t40": 2.900
+        },
+        "period": 2.900,
+        "range": 3680,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": true,
+        "charge_function": "PURKINJE",
+        "name": "Left bundle branch"
+    },
+    "HIS_RIGHT": {
+        "id": 3,
+        "cell_data": {
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.001,
+            "t12": 0.005,
+            "t23": 0.230,
+            "t34": 0.400,
+            "t40": 2.900
+        },
+        "period": 2.900,
+        "range": 3680,
+        "propagation_time": 1,
+        "propagation_time_max": 5,
+        "self_polarization": true,
+        "charge_function": "PURKINJE",
+        "name": "Right bundle branch"
+    },
+    "INTERNODAL_POST": {
+        "id": 5,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.239
+        },
+        "period": 0.239,
+        "range": 400,
+        "propagation_time": 2,
+        "propagation_time_max": 5,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Posterior internodal tract"
+    },
+    "INTERNODAL_ANT": {
+        "id": 6,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.239
+        },
+        "period": 0.239,
+        "range": 400,
+        "propagation_time": 3,
+        "propagation_time_max": 5,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Anterior internodal tract"
+    },
+    "INTERNODAL_MID": {
+        "id": 7,
+        "cell_data": {
+            "V_rest": -85.0,
+            "V_peak": 20.0,
+            "V12": 5.0,
+            "V23": -15.0,
+            "t01": 0.004,
+            "t12": 0.008,
+            "t23": 0.158,
+            "t34": 0.238,
+            "t40": 0.239
+        },
+        "period": 0.239,
+        "range": 400,
+        "propagation_time": 4,
+        "propagation_time_max": 5,
+        "self_polarization": false,
+        "charge_function": "ATRIAL",
+        "name": "Middle internodal tract"
+    },
+    "HIS_BUNDLE": {
+        "id": 8,
+        "cell_data": {
+            "V_rest": -90.0,
+            "V40": -75,
+            "V_peak": 30.0,
+            "V12": 0.0,
+            "V23": -20.0,
+            "t01": 0.001,
+            "t12": 0.005,
+            "t23": 0.230,
+            "t34": 0.400,
+            "t40": 2.900
+        },
+        "period": 2.900,
+        "range": 3600,
+        "propagation_time": 2,
+        "propagation_time_max": 5,
+        "self_polarization": true,
+        "charge_function": "PURKINJE",
+        "name": "Bundle of His"
+    },
+    "SA_NODE": {
+        "id": 9,
+        "cell_data": {
+            "V_rest": -60,
+            "V_thresh": -40,
+            "V_peak": 10,
+            "t40": 0.700,
+            "t03": 0.710,
+            "t34": 0.810
+        },
+        "period": 0.810,
+        "range": 1760,
+        "propagation_time": 1,
+        "propagation_time_max": 12,
+        "self_polarization": true,
+        "charge_function": "PACEMAKER",
+        "name": "Sinoatrial node"
+    },
+    "AV_NODE": {
+        "id": 10,
+        "cell_data": {
+            "V_rest": -65,
+            "V_thresh": -45,
+            "V_peak": 5,
+            "t40": 1.500,
+            "t03": 1.510,
+            "t34": 1.650
+        },
+        "period": 1.650,
+        "range": 2200,
+        "propagation_time": 2,
+        "propagation_time_max": 20,
+        "self_polarization": true,
+        "charge_function": "PACEMAKER",
+        "name": "Atrioventricular node"
+    }
+}
