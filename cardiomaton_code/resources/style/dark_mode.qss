@@ -30,6 +30,10 @@ QScrollArea {
     border-radius: 20px;
 }
 
+#parameters_scroll {
+    background-color: transparent;
+}
+
 QWidget#Logo {
     background-color: #5E83F2;
     border-radius: 25px;

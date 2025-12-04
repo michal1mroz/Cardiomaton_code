@@ -27,7 +27,6 @@ class ParameterPanel(QtWidgets.QWidget):
         self._sliders: Dict[str, Dict[str, ParameterSlider]] = {}
 
         main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.setObjectName("Layout")
 
         scroll = QtWidgets.QScrollArea()
         scroll.setWidgetResizable(True)
@@ -40,7 +39,6 @@ class ParameterPanel(QtWidgets.QWidget):
             scroll_layout.addWidget(self._create_section_header(cell_type))
 
             section_widget = QtWidgets.QWidget()
-            section_widget.setObjectName("Layout")
             section_layout = QtWidgets.QVBoxLayout(section_widget)
             section_layout.setContentsMargins(10, 0, 10, 0)
             section_layout.setSpacing(10)
@@ -141,7 +139,8 @@ class ParameterPanel(QtWidgets.QWidget):
         slider_low.valueChanged.connect(enforce_constraint_low)
         slider_high.valueChanged.connect(enforce_constraint_high)
 
-    def _create_section_header(self, title: str) -> QtWidgets.QWidget:
+    @staticmethod
+    def _create_section_header(title: str) -> QtWidgets.QWidget:
         container = QtWidgets.QWidget()
         container.setObjectName("Layout")
         layout = QtWidgets.QHBoxLayout(container)

@@ -1,6 +1,5 @@
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QScrollArea, QListView
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore
 
 from src.frontend.parameter_panel.parameter_panel import ParameterPanel
 from src.frontend.ui_components.modification_panel import ModificationPanel
@@ -82,8 +81,7 @@ class UiMainWindow(object):
 
         self.parameters_scroll = QScrollArea()
         self.parameters_scroll.setWidgetResizable(True)
-        self.parameters_scroll.setObjectName("Layout")
-        UIFactory.add_shadow(self.parameters_scroll)
+        self.parameters_scroll.setObjectName("parameters_scroll")
 
         self.parameters_inner_container = QWidget()
         self.parameters_inner_layout = QVBoxLayout(self.parameters_inner_container)
