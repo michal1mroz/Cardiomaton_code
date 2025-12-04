@@ -29,6 +29,7 @@ class MainWindow(QMainWindow):
         self.cell_modificator = CellModificator()
 
         self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
+        self.runner.set_speed_level("2x", self.sim)
         self.navigator = PlaybackNavigator()
         self.inspector_manager = CellInspectorManager(self.ui)
         self.generator = ActionPotentialGenerator()

@@ -112,7 +112,7 @@ class UiMainWindow(object):
 
     @staticmethod
     def _configure_player_controls(widget: PlayerControlsWidget):
-        widget.speed_dropdown.setCurrentText("1x")
+        widget.speed_dropdown.setCurrentText("2x")
         view = QListView()
         widget.speed_dropdown.setView(view)
 
