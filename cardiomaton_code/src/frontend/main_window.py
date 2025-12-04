@@ -13,14 +13,14 @@ from src.frontend.simulation_display.simulation_view import SimulationView
 from src.backend.services.simulation_loop import SimulationRunner
 from src.frontend.ui_main_window import UiMainWindow
 from src.models.cell import CellDict
-
+from src.frontend.simulation_display.scaled_view import ScaledView
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = UiMainWindow(self)
 
-        automaton_size = (507, 695)
+        automaton_size = (292, 400)
         self.base_frame_time = 0.05
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
 
@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
 
     def _init_ui_layout(self):
         self.ui.simulation_layout.addWidget(self.render_label)
+
 
     def _connect_signals(self):
         self.runner.frame_tick.connect(self._update_live_frame)
