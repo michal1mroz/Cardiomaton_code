@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
 
     def _display_frame(self, frame_num, pixmap):
         self.render_label.setPixmap(pixmap)
-        self.ui.frame_counter_label.setText(f"Time {frame_num}")
+        self.ui.frame_counter_label.setText(f"Time in ms: {frame_num // 2}")
 
     def _on_cell_clicked(self, cell_data: CellDict):
         self.inspector_manager.show_inspector(
