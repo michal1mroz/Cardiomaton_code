@@ -33,10 +33,7 @@ QScrollArea {
 }
 
 QWidget#Logo {
-    background-color: #6D98F4;
-    border-radius: 25px;
-    color: white;
-    font-size: 24px;
+    border-image: url(./resources/style/logo.png) 0 0 0 0 stretch stretch;
 }
 
 QToolTip {
@@ -74,6 +71,10 @@ QLabel#ProjectName {
 #ParametersLine {
     background-color: #798BA3;
     max-height: 1px;
+    border: none;
+}
+
+#ParameterPanel {
     border: none;
 }
 

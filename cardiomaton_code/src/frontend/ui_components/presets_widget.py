@@ -14,6 +14,8 @@ class PresetsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.setFixedHeight(60)
+
         self.main_layout = QHBoxLayout(self)
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)

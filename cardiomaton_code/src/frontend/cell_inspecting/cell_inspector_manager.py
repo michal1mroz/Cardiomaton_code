@@ -1,12 +1,18 @@
+from PyQt6.QtWidgets import QVBoxLayout
+
 from src.frontend.cell_inspecting.cell_inspector import CellInspector
-from src.frontend.ui_main_window import UiMainWindow
+from src.frontend.ui_simulation_window import UiSimulationWindow
 from src.models.cell import CellDict
 
 
 class CellInspectorManager:
-    def __init__(self, ui: UiMainWindow):
+    def __init__(self, ui: UiSimulationWindow):
         self.ui = ui
         self._current_inspector: CellInspector | None = None
+
+        if not self.ui.cell_inspector_container.layout():
+            self.ui.cell_inspector_layout = QVBoxLayout(self.ui.cell_inspector_container)
+            self.ui.cell_inspector_layout.setContentsMargins(0, 0, 0, 0)
 
     def show_inspector(self, cell_data: CellDict, on_close_callback, is_running: bool):
         self.hide_inspector()
@@ -17,20 +23,25 @@ class CellInspectorManager:
             running=is_running
         )
 
-        self.ui.cell_inspector_layout.addWidget(self._current_inspector)
-        self.ui.parameters_scroll.setVisible(False)
+        self.ui.cell_inspector_container.layout().addWidget(self._current_inspector)
+        self.ui.cell_inspector_container.show()
+        self.ui.tools_container.setVisible(False)
         self.ui.presets_layout.setVisible(False)
 
-        self.ui.cell_inspector_container.setParent(self.ui.settings_layout)
-        self.ui.verticalLayout_2.insertWidget(0, self.ui.cell_inspector_container, 7)
+        settings_layout = self.ui.settings_container.layout()
+
+        settings_layout.insertWidget(0, self.ui.cell_inspector_container, stretch=1)
 
     def hide_inspector(self):
         if self._current_inspector:
-            self.ui.cell_inspector_container.setParent(None)
+            settings_layout = self.ui.settings_container.layout()
+            settings_layout.removeWidget(self.ui.cell_inspector_container)
+            self.ui.cell_inspector_container.hide()
 
-            self.ui.parameters_scroll.setVisible(True)
+            self.ui.tools_container.setVisible(True)
             self.ui.presets_layout.setVisible(True)
 
+            self._current_inspector.setParent(None)
             self._current_inspector.deleteLater()
             self._current_inspector = None
 

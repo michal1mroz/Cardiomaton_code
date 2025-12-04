@@ -142,7 +142,6 @@ class ParameterPanel(QtWidgets.QWidget):
     @staticmethod
     def _create_section_header(title: str) -> QtWidgets.QWidget:
         container = QtWidgets.QWidget()
-        container.setObjectName("Layout")
         layout = QtWidgets.QHBoxLayout(container)
         layout.setContentsMargins(0, 10, 0, 10)
         layout.setSpacing(10)

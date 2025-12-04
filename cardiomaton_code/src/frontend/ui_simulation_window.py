@@ -9,31 +9,17 @@ from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
 
 
-class UiMainWindow(object):
-    def __init__(self, main_window: QMainWindow):
-        UIFactory.load_fonts()
-        self._setup_main_window_properties(main_window)
+class UiSimulationWindow(object):
+    def __init__(self, parent_widget: QWidget):
+        self.layout = QVBoxLayout(parent_widget)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(10)
 
-        self.central_widget = UIFactory.create_widget(main_window)
-
-        self.simulation_background = UIFactory.create_widget(self.central_widget)
-        self.simulation_background.setGeometry(450, 28, 700, 600)
+        self.simulation_background = UIFactory.create_widget(parent_widget)
+        self.simulation_background.setGeometry(450, -40, 700, 600)
         self.simulation_background.setObjectName("simulation_background_widget")
 
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.central_widget)
-        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_4.setSpacing(0)
-
-        self.layout = UIFactory.create_widget(self.central_widget)
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.layout)
-
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setSpacing(10)
-
-        self.topbar = TopBarWidget()
-        self.verticalLayout.addWidget(self.topbar)
-
-        self.bottom_container = UIFactory.create_widget(self.layout)
+        self.bottom_container = UIFactory.create_widget(parent_widget)
         self.bottom_layout = QtWidgets.QHBoxLayout(self.bottom_container)
         self.bottom_layout.setSpacing(30)
 
@@ -47,27 +33,9 @@ class UiMainWindow(object):
         self.bottom_layout.addWidget(self.simulation_outer, stretch=13)
         self.bottom_layout.addWidget(self.empty_right_padding, stretch=0)
 
-        self.verticalLayout.addWidget(self.bottom_container)
-        self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 7)
-
-        self.horizontalLayout_4.addWidget(self.layout)
-        main_window.setCentralWidget(self.central_widget)
+        self.layout.addWidget(self.bottom_container)
 
         self._map_shortcuts()
-
-    @staticmethod
-    def _setup_main_window_properties(window):
-        window.resize(1100, 600)
-        window.setWindowTitle("Cardiomaton")
-        size_policy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Expanding
-        )
-        window.setMinimumSize(QtCore.QSize(1100, 600))
-        window.setMaximumSize(QtCore.QSize(1100, 600))
-        window.setAutoFillBackground(False)
-        window.setSizePolicy(size_policy)
 
     def _init_settings_panel(self):
         self.settings_container = QWidget()
@@ -79,22 +47,27 @@ class UiMainWindow(object):
         self.presets_layout.setObjectName("Layout")
         UIFactory.add_shadow(self.presets_layout)
 
-        self.parameters_scroll = QScrollArea()
-        self.parameters_scroll.setWidgetResizable(True)
-        self.parameters_scroll.setObjectName("parameters_scroll")
+        layout.addWidget(self.presets_layout, stretch=0)
 
-        self.parameters_inner_container = QWidget()
-        self.parameters_inner_layout = QVBoxLayout(self.parameters_inner_container)
-        self.parameters_inner_container.setObjectName("Layout")
+        self.tools_container = QWidget()
+        self.tools_container.setObjectName("Layout")
+
+        tools_layout = QVBoxLayout(self.tools_container)
+        tools_layout.setContentsMargins(0, 10, 0, 10)
+        tools_layout.setSpacing(10)
 
         self.modification_panel = ModificationPanel()
-        self.parameters_inner_layout.addWidget(self.modification_panel)
+        tools_layout.addWidget(self.modification_panel, stretch=0)
 
-        self.parameter_panel = ParameterPanel(self.parameters_inner_container)
-        self.parameters_inner_layout.addWidget(self.parameter_panel)
-        self.parameters_inner_layout.addStretch()
+        self.parameters_scroll = QScrollArea()
+        self.parameters_scroll.setWidgetResizable(True)
+        self.parameters_scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.parameter_panel = ParameterPanel()
+        self.parameter_panel.setObjectName("ParameterPanel")
+        self.parameters_scroll.setWidget(self.parameter_panel)
 
-        self.parameters_scroll.setWidget(self.parameters_inner_container)
+        tools_layout.addWidget(self.parameters_scroll, stretch=1)
+        layout.addWidget(self.tools_container, stretch=1)
 
         self.player_controls = PlayerControlsWidget()
 
@@ -102,17 +75,11 @@ class UiMainWindow(object):
 
         UIFactory.add_shadow(self.player_controls)
 
+        layout.addWidget(self.player_controls, stretch=0)
+
         self.cell_inspector_container = QWidget()
         self.cell_inspector_container.setObjectName("CellInspectorContainer")
-        self.cell_inspector_layout = QVBoxLayout(self.cell_inspector_container)
-
-        layout.addWidget(self.presets_layout)
-        layout.addWidget(self.parameters_scroll)
-        layout.addWidget(self.player_controls)
-
-        layout.setStretch(0, 1)
-        layout.setStretch(1, 6)
-        layout.setStretch(2, 1)
+        layout.addWidget(self.cell_inspector_container)
 
         self.settings_layout = self.settings_container
         self.verticalLayout_2 = layout
@@ -129,7 +96,7 @@ class UiMainWindow(object):
     def _init_simulation_area(self):
         self.simulation_outer = QWidget()
         self.simulation_outer_layout = QVBoxLayout(self.simulation_outer)
-        self.simulation_outer_layout.setContentsMargins(10, 80, 0, 0)
+        self.simulation_outer_layout.setContentsMargins(10, 110, 0, 0)
         self.simulation_outer_layout.setSpacing(0)
 
         self.simulation_widget = QWidget()
@@ -144,8 +111,6 @@ class UiMainWindow(object):
         self.simulation_outer_layout.addWidget(self.simulation_widget)
 
     def _map_shortcuts(self):
-        self.project_name = self.topbar.project_name
-
         self.restart_button = self.player_controls.restart_button
         self.play_button = self.player_controls.play_button
         self.prev_button = self.player_controls.prev_button

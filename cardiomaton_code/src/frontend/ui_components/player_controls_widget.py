@@ -6,6 +6,8 @@ class PlayerControlsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.setFixedHeight(60)
+
         self.main_layout = QHBoxLayout(self)
 
         self.main_layout.setSpacing(8)
