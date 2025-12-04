@@ -32,7 +32,7 @@ class Cell:
         if cell_type in [CellType.INTERNODAL_ANT, CellType.INTERNODAL_MID, CellType.INTERNODAL_POST]:
             self.timer = 0
         else: # cells with self-depolarization have shifted initial timer so that the user does not wait too long for the first action potential
-            self.timer = 2200
+            self.timer = 1300
         # self.timer = 0
         self.neighbors = []
         self.period = self.config["period"]
