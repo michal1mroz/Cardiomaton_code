@@ -10,7 +10,6 @@
    Text Dark:           #233348
    Text Light/White:    #FFFFFF
 
-   White transparent background:      rgba(255, 255, 255, 230)
    ======================================================= */
 
 
@@ -27,10 +26,6 @@ PlayerControlsWidget,
 QScrollArea {
     background-color: #FFFFFF;
     border-radius: 20px;
-}
-
-#TopBar {
-    background-color: rgba(242, 247, 255, 200);
 }
 
 QWidget#Logo {
@@ -403,7 +398,6 @@ GraphWidget {
     background-color: #FFFFFF;
     color: #233348;
     selection-color: #6D98F4;
-
     border: 1px solid #DBE3F1;
 }
 
@@ -411,4 +405,12 @@ GraphWidget {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
+}
+
+/* --- SIMULATION ---*/
+#simulation_background_widget {
+    background-image: url(./resources/style/light_heart.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
 }

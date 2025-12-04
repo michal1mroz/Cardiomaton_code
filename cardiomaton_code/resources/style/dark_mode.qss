@@ -12,7 +12,6 @@
 
    Background Dark:     #181C23
    Background Lighter:  #303742
-   TopBar Background:   rgba(51, 59, 70, 70)
    ======================================================= */
 
 
@@ -29,10 +28,6 @@ PlayerControlsWidget,
 QScrollArea {
     background-color: #181C23;
     border-radius: 20px;
-}
-
-#TopBar {
-    background-color: rgba(51, 59, 70, 70);
 }
 
 QWidget#Logo {
@@ -406,4 +401,12 @@ GraphWidget {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
+}
+
+/* --- SIMULATION ---*/
+#simulation_background_widget {
+    background-image: url(./resources/style/dark_heart.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
 }

@@ -13,10 +13,6 @@ QScrollArea {
     border-radius: 20px;
 }
 
-#TopBar {
-    background-color: rgba(242, 247, 255, 240);
-}
-
 QWidget#Logo {
     background-color: #6D98F4;
     border-radius: 25px;
@@ -409,4 +405,12 @@ GraphWidget {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
+}
+
+/* --- SIMULATION ---*/
+#simulation_background_widget {
+    background-image: url(./resources/style/access_heart.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
 }

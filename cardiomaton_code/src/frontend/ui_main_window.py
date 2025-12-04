@@ -1,3 +1,4 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QScrollArea, QListView
 from PyQt6 import QtWidgets, QtCore, QtGui
 
@@ -14,13 +15,17 @@ class UiMainWindow(object):
         UIFactory.load_fonts()
         self._setup_main_window_properties(main_window)
 
-        self.centralwidget = UIFactory.create_widget(main_window)
+        self.central_widget = UIFactory.create_widget(main_window)
 
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
+        self.simulation_background = UIFactory.create_widget(self.central_widget)
+        self.simulation_background.setGeometry(450, 28, 700, 600)
+        self.simulation_background.setObjectName("simulation_background_widget")
+
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.central_widget)
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_4.setSpacing(0)
 
-        self.layout = UIFactory.create_widget(self.centralwidget)
+        self.layout = UIFactory.create_widget(self.central_widget)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.layout)
 
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -31,27 +36,29 @@ class UiMainWindow(object):
 
         self.bottom_container = UIFactory.create_widget(self.layout)
         self.bottom_layout = QtWidgets.QHBoxLayout(self.bottom_container)
-        self.bottom_layout.setSpacing(40)
+        self.bottom_layout.setSpacing(30)
 
         self._init_settings_panel()
         self._init_simulation_area()
 
-        self.bottom_layout.addWidget(self.settings_container, stretch=11)
-        self.bottom_layout.addWidget(self.simulation_widget, stretch=13)
+        self.empty_right_padding = QWidget()
+        self.empty_right_padding.setFixedWidth(1)
+
+        self.bottom_layout.addWidget(self.settings_container, stretch=12)
+        self.bottom_layout.addWidget(self.simulation_outer, stretch=13)
+        self.bottom_layout.addWidget(self.empty_right_padding, stretch=0)
 
         self.verticalLayout.addWidget(self.bottom_container)
         self.verticalLayout.setStretch(0, 1)
         self.verticalLayout.setStretch(1, 7)
 
         self.horizontalLayout_4.addWidget(self.layout)
-        main_window.setCentralWidget(self.centralwidget)
+        main_window.setCentralWidget(self.central_widget)
 
         self._map_shortcuts()
 
-        QtCore.QMetaObject.connectSlotsByName(main_window)
-        QtCore.QTimer.singleShot(0, self._resize_layouts)
-
-    def _setup_main_window_properties(self, window):
+    @staticmethod
+    def _setup_main_window_properties(window):
         window.resize(1100, 600)
         window.setWindowTitle("Cardiomaton")
         size_policy = QtWidgets.QSizePolicy(
@@ -122,12 +129,21 @@ class UiMainWindow(object):
         UIFactory.add_shadow(widget.play_button)
 
     def _init_simulation_area(self):
+        self.simulation_outer = QWidget()
+        self.simulation_outer_layout = QVBoxLayout(self.simulation_outer)
+        self.simulation_outer_layout.setContentsMargins(10, 80, 0, 0)
+        self.simulation_outer_layout.setSpacing(0)
+
         self.simulation_widget = QWidget()
         self.simulation_layout = QVBoxLayout(self.simulation_widget)
 
-        self.frame_counter_label = UIFactory.create_label(self.simulation_widget, "Time 0", font_size=14, bold=True)
-        self.frame_counter_label.setGeometry(40, 400, 150, 40)
+        self.frame_counter_label = UIFactory.create_label(
+            self.bottom_container, "Time 0", font_size=15, bold=True
+        )
+        self.frame_counter_label.setGeometry(520, 450, 150, 40)
         self.frame_counter_label.setObjectName("frame_counter_label")
+
+        self.simulation_outer_layout.addWidget(self.simulation_widget)
 
     def _map_shortcuts(self):
         self.project_name = self.topbar.project_name
@@ -144,10 +160,3 @@ class UiMainWindow(object):
         self.undo_button = self.modification_panel.undo_button
         self.brush_size_slider = self.modification_panel.brush_slider
         self.necrosis_switch = self.modification_panel.necrosis_switch
-
-    def _resize_layouts(self):
-        height = self.settings_layout.height() // 8
-        self.presets_layout.setMinimumHeight(height)
-        self.presets_layout.setMaximumHeight(height)
-        self.player_controls.setMinimumHeight(height)
-        self.player_controls.setMaximumHeight(height)
