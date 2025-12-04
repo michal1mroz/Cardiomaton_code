@@ -13,7 +13,6 @@ from src.frontend.simulation_display.simulation_view import SimulationView
 from src.backend.services.simulation_loop import SimulationRunner
 from src.frontend.ui_main_window import UiMainWindow
 from src.models.cell import CellDict
-from src.frontend.simulation_display.scaled_view import ScaledView
 
 class MainWindow(QMainWindow):
     def __init__(self):
