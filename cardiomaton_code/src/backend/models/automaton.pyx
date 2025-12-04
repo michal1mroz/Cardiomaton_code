@@ -466,6 +466,8 @@ cdef class Automaton:
                             True if cell_a.self_polarization == 1 else 0,
                             int(cell_a.timer),
                             float(cell_a.charge))
+            temp_cell.propagation_time = int(cell_a.propagation_time)
+            temp_cell.propagation_count = int(cell_a.propagation_count)
             res[pos] = temp_cell
         
         for pos, wrapper in self.cell_data.items():

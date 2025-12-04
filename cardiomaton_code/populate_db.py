@@ -13,3 +13,4 @@ if __name__ == '__main__':
     init_db()
     db = SessionLocal()
     res = create_or_overwrite_entry(db, "default", cell_map.values(), graph.shape[0], graph.shape[1], 0)
+    res = create_or_overwrite_entry(db, "default2", cell_map.values(), graph.shape[0], graph.shape[1], 10000)

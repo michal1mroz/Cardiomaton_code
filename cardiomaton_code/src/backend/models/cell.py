@@ -33,6 +33,8 @@ class Cell:
         self.neighbors = []
         self.period = self.config["period"]
         self.n_range = self.config["range"]
+        self.propagation_time = self.config.get('propagation_time')
+        self.propagation_count = 0
         self.charges, self.max_charge, self.ref_threshold = ChargeUpdate.get_func(self.config)
 
     def __repr__(self) -> str:
