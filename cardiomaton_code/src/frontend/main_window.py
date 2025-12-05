@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = UiMainWindow(self)
 
-        automaton_size = (507, 695)
+        automaton_size = (292, 400)
         self.base_frame_time = 0.05
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
         self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
@@ -31,6 +31,7 @@ class MainWindow(QMainWindow):
         self.cell_modificator = CellModificator()
 
         self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
+        self.runner.set_speed_level("2x", self.sim)
         self.navigator = PlaybackNavigator()
         self.inspector_manager = CellInspectorManager(self.ui)
         self.generator = ActionPotentialGenerator()
@@ -54,6 +55,7 @@ class MainWindow(QMainWindow):
 
     def _init_ui_layout(self):
         self.ui.simulation_layout.addWidget(self.render_label)
+
 
     def _connect_signals(self):
         self.runner.frame_tick.connect(self._update_live_frame)
@@ -132,7 +134,7 @@ class MainWindow(QMainWindow):
 
     def _display_frame(self, frame_num, pixmap):
         self.render_label.setPixmap(pixmap)
-        self.ui.frame_counter_label.setText(f"Time {frame_num}")
+        self.ui.frame_counter_label.setText(f"Time in ms: {frame_num // 2}")
 
     def _on_cell_clicked(self, cell_data: CellDict):
         self.inspector_manager.show_inspector(
