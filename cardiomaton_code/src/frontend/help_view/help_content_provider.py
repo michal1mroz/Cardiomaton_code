@@ -36,8 +36,8 @@ class HelpContentProvider:
 
         steps.append(TutorialStep(
             widget=simulation_window.presets_layout.button,
-            title="Create Custom Preset",
-            description="Saves your current modifications as a new preset in the database, making it available for future playback."
+            title="Save Preset Mode",
+            description="Enters or exits the preset saving mode. Open this interface to name and store the current simulation state. Click again to close the input field and return to the default view."
         ))
 
         steps.append(TutorialStep(
@@ -116,6 +116,12 @@ class HelpContentProvider:
             widget=simulation_window.toggle_interaction_button,
             title="Interaction Mode",
             description="Toggles between modification and inspection modes. In modification mode, paint over the heart and adjust parameters. In inspection mode, hover or click on the conduction system to view detailed cell properties."
+        ))
+
+        steps.append(TutorialStep(
+            widget=simulation_window.presets_layout.text_input,
+            title="Save Your Preset",
+            description="Type a name for your preset and press Enter to confirm. This saves the current state of the simulation under that name, allowing you to restore this exact configuration later."
         ))
 
         overlay_graph = self.app.simulation_window.overlay_graph

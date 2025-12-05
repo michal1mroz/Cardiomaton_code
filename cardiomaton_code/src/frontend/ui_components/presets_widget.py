@@ -118,7 +118,8 @@ class PresetsWidget(QWidget):
         self.text_input.setVisible(True)
         self.text_input.clear()
         self.text_input.setFocus()
-        
+
+        self.label.setText("Save Preset")
         self.dropdown.hide()
 
     def hide_input_field(self):
@@ -128,7 +129,8 @@ class PresetsWidget(QWidget):
         self.button.setText("+")
         
         self.text_input.setVisible(False)
-        
+
+        self.label.setText("Select Preset")
         self.dropdown.show()
 
     def cancel_input(self):
