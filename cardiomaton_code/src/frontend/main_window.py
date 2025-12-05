@@ -4,8 +4,9 @@ from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QLabel
 from PyQt6.QtGui import QIcon
 
-from src.frontend.help_window import HelpWindow
+from src.frontend.help_view.help_content_provider import HelpContentProvider
 from src.frontend.simulation_window import SimulationWindow
+from src.frontend.help_view.help_overlay import HelpOverlay
 from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
 
@@ -38,6 +39,10 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         self.main_layout.addWidget(self.stack)
 
+        self.help_overlay = HelpOverlay(self)
+        self.help_provider = HelpContentProvider(self)
+        self.help_overlay.hide()
+
         self._init_views()
         self._connect_topbar()
         self._apply_style()
@@ -45,9 +50,6 @@ class MainWindow(QMainWindow):
     def _init_views(self):
         self.simulation_window = SimulationWindow()
         self.stack.addWidget(self.simulation_window)
-
-        self.help_view = HelpWindow()
-        self.stack.addWidget(self.help_view)
 
         self.about_view = QWidget()
         lbl_about = QLabel("O nas", self.about_view)
@@ -58,8 +60,8 @@ class MainWindow(QMainWindow):
 
     def _connect_topbar(self):
         self.topbar.btn_app.clicked.connect(lambda: self.stack.setCurrentIndex(0))
-        self.topbar.btn_help.clicked.connect(lambda: self.stack.setCurrentIndex(1))
-        self.topbar.btn_about.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        self.topbar.btn_help.clicked.connect(self.start_interactive_help)
+        self.topbar.btn_about.clicked.connect(lambda: self.stack.setCurrentIndex(1))
 
         self.topbar.btn_theme.clicked.connect(self._toggle_theme)
         self.topbar.btn_access.clicked.connect(self._toggle_accessibility_mode)
@@ -97,3 +99,11 @@ class MainWindow(QMainWindow):
 
         self.topbar.btn_theme.setText(icon_text)
         self.topbar.btn_access.setText(access_text)
+
+    def start_interactive_help(self):
+        self.stack.setCurrentIndex(0)
+        self.simulation_window._pause_simulation()
+
+        steps = self.help_provider.get_steps()
+        self.help_overlay.set_steps(steps)
+        self.help_overlay.show_tutorial()

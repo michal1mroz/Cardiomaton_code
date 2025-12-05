@@ -237,7 +237,7 @@ QPushButton#BtnAbout:hover {
 
 #speedComboBox QAbstractItemView {
     font-family: 'Mulish';
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     background-color: #FFFFFF;
     color: #E1605D;
@@ -318,7 +318,7 @@ QSlider::add-page:horizontal {
 }
 
 QSlider::handle:horizontal {
-    background: white;
+    background: #5c5c5c;
     border: 1px solid #5c5c5c;
     width: 14px;
     margin: -6px 0;
@@ -326,7 +326,7 @@ QSlider::handle:horizontal {
 }
 
 QSlider::handle:horizontal:hover {
-    background: #e0e0e0;
+    background: black;
 }
 
 
@@ -373,7 +373,7 @@ GraphWidget {
     /* Custom Properties dla PyQtGraph */
     qproperty-plotBackground: white;
     qproperty-traceColor: #CD4B48;
-    qproperty-axisColor: #6c7c91;
+    qproperty-axisColor: #233348;
     qproperty-titleColor: #233348;
 }
 
@@ -419,4 +419,22 @@ GraphWidget {
     background-repeat: no-repeat;
     background-position: center;
     border: none;
+}
+
+/* --- HELP --- */
+
+#tooltip_widget {
+    background-color: #FFFFFF;
+    color: #233348;
+    border: 1px solid #E1605D;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Mulish';
+    font-size: 14px;
+}
+
+/* --- CELL INSPECTOR --*/
+#cell_label {
+    font-family: "Mulish";
+    font-size: 15px;
 }

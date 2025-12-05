@@ -28,8 +28,8 @@ class ParameterPanel(QtWidgets.QWidget):
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
-        scroll = QtWidgets.QScrollArea()
-        scroll.setWidgetResizable(True)
+        self.scroll = QtWidgets.QScrollArea()
+        self.scroll.setWidgetResizable(True)
 
         container = QtWidgets.QWidget()
         container.setObjectName("Layout")
@@ -79,13 +79,14 @@ class ParameterPanel(QtWidgets.QWidget):
                 binding = ParameterSlider(definition=definition, slider=slider, value_edit=value_edit)
                 self._sliders[cell_type][name] = binding
 
-                binding.parameterChanged.connect(lambda ct=cell_type: self.sigParametersChanged.emit(ct))
+                if name != "propagation_time":
+                    binding.parameterChanged.connect(lambda ct=cell_type: self.sigParametersChanged.emit(ct))
 
             scroll_layout.addWidget(section_widget)
 
         scroll_layout.addStretch()
-        scroll.setWidget(container)
-        main_layout.addWidget(scroll)
+        self.scroll.setWidget(container)
+        main_layout.addWidget(self.scroll)
 
         self._link_parameters("PACEMAKER", "V_rest", "V_thresh")
         self._link_parameters("ATRIAL", "V12", "V_peak")

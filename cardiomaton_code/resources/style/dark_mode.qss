@@ -416,3 +416,21 @@ GraphWidget {
     background-position: center;
     border: none;
 }
+
+/* --- HELP --- */
+
+#tooltip_widget {
+    background-color: #303742;
+    color: #E6EAF0;
+    border: 1px solid #E1605D;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Mulish';
+    font-size: 14px;
+}
+
+/* --- CELL INSPECTOR --*/
+#cell_label {
+    font-family: "Mulish";
+    font-size: 14px;
+}

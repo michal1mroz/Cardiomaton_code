@@ -56,7 +56,7 @@ class SimulationWindow(QWidget):
     def _connect_signals(self):
         self.runner.frame_tick.connect(self._update_live_frame)
 
-        self.navigator.interaction_started.connect(self._pause_simulation_for_history)
+        self.navigator.interaction_started.connect(self._pause_simulation)
         self.navigator.request_render_buffer.connect(self._render_history_frame)
 
         self.ui.play_button.clicked.connect(self._toggle_simulation)
@@ -87,7 +87,7 @@ class SimulationWindow(QWidget):
         is_running = self.runner.toggle()
         self._update_ui_state(is_running)
 
-    def _pause_simulation_for_history(self):
+    def _pause_simulation(self):
         if self.runner.running:
             self.runner.stop()
             self._update_ui_state(False)
