@@ -82,3 +82,8 @@ class CellModificator:
 
     def get_highlights(self):
         return self.selected_cells
+
+    def reset(self) -> None:
+        self.selected_cells.clear()
+        self.current_modification = 0
+        self.committed_modifications.clear()

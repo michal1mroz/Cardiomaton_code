@@ -115,8 +115,9 @@ class MainWindow(QMainWindow):
 
     def _restart_automaton(self):
         self.sim.restart_automaton()
-
+        self.cell_modificator.reset()
         self._update_live_frame()
+
 
     def _toggle_interaction_mode(self):
         self.inspection_set = not self.inspection_set
