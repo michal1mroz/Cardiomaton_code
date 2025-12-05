@@ -2,6 +2,7 @@ from typing import Optional, Dict
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import pyqtSignal
+from PyQt6 import QtGui
 
 from src.frontend.parameter_panel.parameter_definition import ParameterDefinition, CELL_PARAMETER_DEFINITIONS, \
     CELL_PARAMETER_LABELS
@@ -67,18 +68,17 @@ class ParameterPanel(QtWidgets.QWidget):
                 slider.setSingleStep(1)
                 slider.setObjectName(f"{cell_type}_{name}")
 
-                value_label = QtWidgets.QLabel(definition.format_default_text())
-                value_label.setObjectName("ParameterValueLabel")
-                value_label.setFixedWidth(60)
-                value_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+                value_edit = QtWidgets.QLineEdit(definition.format_default_text())
+                value_edit.setFixedWidth(60)
+                value_edit.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
                 bottom_layout.addWidget(slider)
-                bottom_layout.addWidget(value_label)
+                bottom_layout.addWidget(value_edit)
 
                 row_layout.addWidget(bottom_row)
                 section_layout.addWidget(row)
 
-                binding = ParameterSlider(definition=definition, slider=slider, value_label=value_label)
+                binding = ParameterSlider(definition=definition, slider=slider, value_edit=value_edit)
                 self._sliders[cell_type][name] = binding
 
                 binding.parameterChanged.connect(lambda ct=cell_type: self.sigParametersChanged.emit(ct))
@@ -127,7 +127,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 slider_high.blockSignals(True)
                 slider_high.setValue(value)
                 slider_high.blockSignals(False)
-                binding_high._update_label(value)
+
                 binding_high.parameterChanged.emit()
 
         def enforce_constraint_high(value):
@@ -135,7 +135,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 slider_low.blockSignals(True)
                 slider_low.setValue(value)
                 slider_low.blockSignals(False)
-                binding_low._update_label(value)
+
                 binding_low.parameterChanged.emit()
 
         slider_low.valueChanged.connect(enforce_constraint_low)

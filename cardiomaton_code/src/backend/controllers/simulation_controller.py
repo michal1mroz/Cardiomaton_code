@@ -41,6 +41,9 @@ class SimulationController:
     def undo_modification(self):
         self.service.undo_modification()
 
+    def restart_automaton(self):
+        self.service.restart_automaton()
+
     @property
     def frame_time(self) -> float:
         """
