@@ -17,7 +17,6 @@ dependencies = [
     "pyqtgraph (>=0.13.7,<0.14.0)",
     "sqlalchemy (>=2.0.43,<3.0.0)",
     "pydantic (>=2.11.7,<3.0.0)",
-    "numba (>=0.61.2,<0.62.0)",
     "cython (>=3.1.4,<4.0.0)"
 ]
 
@@ -38,3 +37,4 @@ alembic = "^1.16.5"
 [tool.poetry.scripts]
 build = "cardiomaton_code.build_tools.dev_tasks:build"
 clean = "cardiomaton_code.build_tools.dev_tasks:clean"
+cardiomaton = "cardiomaton_code.main_with_front.py:main"
