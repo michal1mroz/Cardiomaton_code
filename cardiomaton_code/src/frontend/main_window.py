@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
         self.render_label.cellClicked.connect(self._on_cell_clicked)
         self.ui.commit_button.clicked.connect(self._modify_cells)
         self.ui.undo_button.clicked.connect(self._undo_cell_modification)
+        self.ui.restart_button.clicked.connect(self._restart_automaton)
 
         self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
         self.ui.topbar.btn_theme.clicked.connect(self._toggle_theme)
@@ -111,6 +112,11 @@ class MainWindow(QMainWindow):
                 self._render_history_frame(self.navigator.current_buffer_index)
             else:
                 self._update_live_frame()
+
+    def _restart_automaton(self):
+        self.sim.restart_automaton()
+
+        self._update_live_frame()
 
     def _toggle_interaction_mode(self):
         self.inspection_set = not self.inspection_set
