@@ -79,7 +79,8 @@ class MainWindow(QMainWindow):
         self.ui.topbar.btn_access.clicked.connect(self._toggle_accessibility_mode)
 
         # Presets
-        self.ui.presets_layout.preset_selected.connect(self.on_preset_selected)
+        self.ui.presets_layout.preset_selected.connect(self._on_preset_selected)
+        self.ui.presets_layout.save_preset_request.connect(self._save_preset)
 
     def _toggle_simulation(self):
         if not self.runner.running and self.navigator.current_buffer_index != -1:
@@ -214,7 +215,8 @@ class MainWindow(QMainWindow):
 
         self.overlay_graph.raise_()
 
-    def on_preset_selected(self, entry):
+    def _on_preset_selected(self, entry):
+        self._pause_simulation_for_history()
         db = SessionLocal()
         try:
             dto = get_automaton(db, entry)
@@ -228,3 +230,8 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             print(f'Error retrieving entry: {entry}')
+
+    def _save_preset(self, entry):
+        self._pause_simulation_for_history()
+        self.sim.save_automaton(entry)
+        self.ui.presets_layout._refresh_entries()

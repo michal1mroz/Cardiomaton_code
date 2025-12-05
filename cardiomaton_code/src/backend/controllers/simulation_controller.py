@@ -36,6 +36,9 @@ class SimulationController:
     def update_automaton(self, automaton: AutomatonDto, image: QImage):
         self.service.update_automaton(automaton, image)
 
+    def save_automaton(self, entry: str) -> bool:
+        return self.service.save_automaton(entry)
+
     def render_frame(self, idx, if_charged, drop_newer) -> int:
         return self.service.render_frame(idx, if_charged, drop_newer)
 

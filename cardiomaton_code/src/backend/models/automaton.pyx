@@ -439,6 +439,9 @@ cdef class Automaton:
         self.frame_recorder.remove_newer(idx)
         self.frame_counter += idx
 
+    cpdef int get_frame_counter(self):
+        return self.frame_counter
+
     cpdef dict get_cell_data(self, tuple position):
         data = self.cell_data.get(position, None)
         if data is not None:

@@ -42,6 +42,8 @@ cdef class Automaton:
     cpdef dict serialize_automaton(self)
 
     cdef dict _serialize_automaton(self)
+    cpdef int get_frame_counter(self)
+
 
     # Cell modification functions
     cpdef void modify_cell_state(self, set coords, object new_state)

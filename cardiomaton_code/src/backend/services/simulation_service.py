@@ -7,7 +7,7 @@ from src.backend.enums.cell_state import CellState
 from PyQt6.QtGui import QImage
 
 from src.database.db import init_db, SessionLocal
-from src.database.crud.automaton_crud import get_automaton
+from src.database.crud.automaton_crud import get_automaton, create_or_overwrite_entry
 from src.database.dto.automaton_dto import AutomatonDto
 
 class SimulationService:
@@ -40,6 +40,20 @@ class SimulationService:
         if hasattr(ptr, "setsize"):
             ptr.setsize(image.bytesPerLine() * image.height())
         self.automaton = Automaton(automaton.shape, automaton.cell_map, img_ptr=int(ptr), img_bytes=image.bytesPerLine(), frame=automaton.frame)
+
+    def save_automaton(self, entry: str) -> bool:
+        automaton = self.automaton.serialize_automaton()
+        shape = self.automaton.get_shape()
+        frame = self.automaton.get_frame_counter()
+
+        try:
+            db = SessionLocal()
+            res = create_or_overwrite_entry(db, entry, automaton.values(), shape[0], shape[1], frame)
+            return True
+        except Exception as e:
+            print(f"Failed to save the entry: {e}")
+            return False
+
 
     def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
