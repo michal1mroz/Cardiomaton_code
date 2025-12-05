@@ -106,6 +106,18 @@ class HelpContentProvider:
             description="Displays detailed information about the cell you selected and presents a real-time graph of its electrical potential."
         ))
 
+        steps.append(TutorialStep(
+            widget=simulation_window.restart_button,
+            title="Reset Simulation",
+            description="Restores the simulation to its initial state. All your unsaved modifications will be lost."
+        ))
+
+        steps.append(TutorialStep(
+            widget=simulation_window.toggle_interaction_button,
+            title="Interaction Mode",
+            description="Toggles between modification and inspection modes. In modification mode, paint over the heart and adjust parameters. In inspection mode, hover or click on the conduction system to view detailed cell properties."
+        ))
+
         overlay_graph = self.app.simulation_window.overlay_graph
 
         if overlay_graph.isVisible():

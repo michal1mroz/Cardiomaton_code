@@ -102,9 +102,9 @@ class UiSimulationWindow(object):
         self.simulation_layout = QVBoxLayout(self.simulation_widget)
 
         self.frame_counter_label = UIFactory.create_label(
-            self.bottom_container, "Time 0", font_size=15, bold=True
+            self.bottom_container, "Time: 0 ms", font_size=13, bold=True
         )
-        self.frame_counter_label.setGeometry(520, 450, 150, 40)
+        self.frame_counter_label.setGeometry(520, 450, 170, 40)
         self.frame_counter_label.setObjectName("frame_counter_label")
 
         self.simulation_outer_layout.addWidget(self.simulation_widget)

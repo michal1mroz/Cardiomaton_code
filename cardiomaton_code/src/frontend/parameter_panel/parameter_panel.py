@@ -69,6 +69,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 value_edit = QtWidgets.QLineEdit(definition.format_default_text())
                 value_edit.setFixedWidth(60)
                 value_edit.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+                value_edit.setObjectName("ValueEdit")
 
                 bottom_layout.addWidget(slider)
                 bottom_layout.addWidget(value_edit)

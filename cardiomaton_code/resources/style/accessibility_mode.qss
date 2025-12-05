@@ -51,6 +51,13 @@ QLabel#ProjectName {
     font-size: 16px;
 }
 
+#ValueEdit {
+    font-family: 'Mulish';
+    font-size: 16px;
+    color: #233348;
+    background: transparent;
+}
+
 #ParameterTitle {
     color: #233348;
     font-family: 'Mulish ExtraBold';
@@ -72,6 +79,7 @@ QLabel#ProjectName {
     background-color: #FFFFFF;
     border-radius: 10px;
     padding: 6px 5px;
+    font-size: 18px;
 }
 
 
@@ -379,7 +387,8 @@ GraphWidget {
 
 /* --- PRESETS ---*/
 
-#presetComboBox {
+#presetComboBox,
+#presetNameInput {
     font-family: Mulish;
     font-size: 18px;
     color: #233348;
@@ -387,7 +396,7 @@ GraphWidget {
     border: 1px solid #DBE3F1;
     border-radius: 16px;
     padding: 5px 25px 5px 25px;
-    width: 100px;
+    width: 150px;
 }
 
 #presetComboBox::drop-down {
@@ -411,6 +420,11 @@ GraphWidget {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
+}
+
+
+#presetNameInput {
+    width: 170px;
 }
 
 /* --- SIMULATION ---*/

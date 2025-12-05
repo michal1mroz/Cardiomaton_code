@@ -129,7 +129,7 @@ class SimulationWindow(QWidget):
 
     def _display_frame(self, frame_num, pixmap):
         self.render_label.setPixmap(pixmap)
-        self.ui.frame_counter_label.setText(f"Time in ms: {frame_num // 2}")
+        self.ui.frame_counter_label.setText(f"Time: {frame_num // 2} ms")
 
     def _on_cell_clicked(self, cell_data: CellDict):
         self.inspector_manager.show_inspector(
@@ -187,7 +187,7 @@ class SimulationWindow(QWidget):
         self.ui.toggle_interaction_button.setText("⌕" if self.inspection_set else "️✐")
 
     def _on_preset_selected(self, entry):
-        self._pause_simulation_for_history()
+        self._pause_simulation()
         db = SessionLocal()
         try:
             dto = get_automaton(db, entry)
@@ -203,6 +203,6 @@ class SimulationWindow(QWidget):
             print(f'Error retrieving entry: {entry}')
 
     def _save_preset(self, entry):
-        self._pause_simulation_for_history()
+        self._pause_simulation()
         self.sim.save_automaton(entry)
         self.ui.presets_layout.silent_refresh()
