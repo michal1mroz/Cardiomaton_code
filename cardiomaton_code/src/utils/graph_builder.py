@@ -52,8 +52,8 @@ def extract_conduction_pixels(path = "./resources/img_ccs/",nr_of_nodes = 1500,t
         return components
 
     # Binarize images
-    bin_main = binarize_image(path + "CCS.png", THRESHOLD_MAIN_IMAGE)
-    bin_parts = binarize_image(path + "CCS_parts.png", THRESHOLD_PARTS_IMAGE)
+    bin_main = binarize_image(path + "ccs_reduced.png", THRESHOLD_MAIN_IMAGE)
+    bin_parts = binarize_image(path + "ccs_parts_reduced.png", THRESHOLD_PARTS_IMAGE)
 
     # Get main graph components (full system) and parts (regions)
     region_components = get_connected_components(bin_parts)

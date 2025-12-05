@@ -18,7 +18,8 @@ def sigmoid(t, V_lo, V_hi, t0, k):
 
     can the exp ever explode here??? @mm
     """
-    return V_lo + (V_hi - V_lo) / (1 + np.exp(-(t - t0)/k))
+    return V_lo + (V_hi - V_lo) * expit((t-t0)/k)
+# / (1 + np.exp(-(t - t0)/k))
 
 def pacemaker_AP(t,
                  V_rest, V_thresh, V_peak, 

@@ -14,22 +14,24 @@ from src.backend.services.simulation_loop import SimulationRunner
 from src.frontend.ui_main_window import UiMainWindow
 from src.models.cell import CellDict
 
+from src.database.db import SessionLocal
+from src.database.crud.automaton_crud import get_automaton
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = UiMainWindow(self)
 
-        automaton_size = (507, 695)
+        automaton_size = (292, 400)
         self.base_frame_time = 0.05
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
-
         self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
         self.renderer = FrameRenderer(self.sim, self.image)
         self.cell_data_provider = CellDataProvider(self.sim)
         self.cell_modificator = CellModificator()
 
         self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
+        self.runner.set_speed_level("2x", self.sim)
         self.navigator = PlaybackNavigator()
         self.inspector_manager = CellInspectorManager(self.ui)
         self.generator = ActionPotentialGenerator()
@@ -55,6 +57,7 @@ class MainWindow(QMainWindow):
     def _init_ui_layout(self):
         self.ui.simulation_layout.addWidget(self.render_label)
 
+
     def _connect_signals(self):
         self.runner.frame_tick.connect(self._update_live_frame)
 
@@ -79,6 +82,10 @@ class MainWindow(QMainWindow):
         self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
         self.ui.topbar.btn_theme.clicked.connect(self._toggle_theme)
         self.ui.topbar.btn_access.clicked.connect(self._toggle_accessibility_mode)
+
+        # Presets
+        self.ui.presets_layout.preset_selected.connect(self._on_preset_selected)
+        self.ui.presets_layout.save_preset_request.connect(self._save_preset)
 
     def _toggle_simulation(self):
         if not self.runner.running and self.navigator.current_buffer_index != -1:
@@ -141,7 +148,7 @@ class MainWindow(QMainWindow):
 
     def _display_frame(self, frame_num, pixmap):
         self.render_label.setPixmap(pixmap)
-        self.ui.frame_counter_label.setText(f"Time {frame_num}")
+        self.ui.frame_counter_label.setText(f"Time in ms: {frame_num // 2}")
 
     def _on_cell_clicked(self, cell_data: CellDict):
         self.inspector_manager.show_inspector(
@@ -223,3 +230,24 @@ class MainWindow(QMainWindow):
         self.overlay_graph.move(x, y)
 
         self.overlay_graph.raise_()
+
+    def _on_preset_selected(self, entry):
+        self._pause_simulation_for_history()
+        db = SessionLocal()
+        try:
+            dto = get_automaton(db, entry)
+            size = dto.shape
+            self.image = QImage(size[1], size[0], QImage.Format.Format_RGBA8888)
+
+            self.sim.update_automaton(dto, self.image)
+            self.renderer = FrameRenderer(self.sim, self.image)
+
+            self._update_live_frame()
+
+        except Exception as e:
+            print(f'Error retrieving entry: {entry}')
+
+    def _save_preset(self, entry):
+        self._pause_simulation_for_history()
+        self.sim.save_automaton(entry)
+        self.ui.presets_layout.silent_refresh()

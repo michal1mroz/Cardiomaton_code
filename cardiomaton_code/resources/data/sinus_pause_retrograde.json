@@ -14,7 +14,7 @@
             "t40": 2.900
         },
         "period": 2.900,
-        "range": 3280,
+        "range": 3000,
         "propagation_time": 1,
         "propagation_time_max": 5,
         "self_polarization": true,
@@ -36,7 +36,7 @@
             "t40": 2.900
         },
         "period": 2.900,
-        "range": 3280,
+        "range": 3000,
         "propagation_time": 1,
         "propagation_time_max": 5,
         "self_polarization": true,
@@ -121,7 +121,7 @@
             "t40": 2.900
         },
         "period": 2.900,
-        "range": 3000,
+        "range": 2600,
         "propagation_time": 2,
         "propagation_time_max": 5,
         "self_polarization": true,
@@ -139,7 +139,7 @@
             "t34": 0.810
         },
         "period": 0.810,
-        "range": 1660,
+        "range": 4000,
         "propagation_time": 1,
         "propagation_time_max": 12,
         "self_polarization": true,
@@ -157,7 +157,7 @@
             "t34": 1.150
         },
         "period": 1.150,
-        "range": 2060,
+        "range": 1800,
         "propagation_time": 2,
         "propagation_time_max": 20,
         "self_polarization": true,

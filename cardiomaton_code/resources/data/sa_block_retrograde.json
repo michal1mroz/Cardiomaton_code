@@ -140,8 +140,8 @@
         },
         "period": 0.810,
         "range": 1660,
-        "propagation_time": 1,
-        "propagation_time_max": 12,
+        "propagation_time": 2,
+        "propagation_time_max": 1,
         "self_polarization": true,
         "charge_function": "PACEMAKER",
         "name": "Sinoatrial node"

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Dict, Tuple, List, TypedDict
 
-from cardiomaton_code.src.backend.enums.cell_type import CellType
-from cardiomaton_code.src.backend.enums.cell_state import CellState
+from src.backend.enums.cell_type import CellType
+from src.backend.enums.cell_state import CellState
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
 class CellDict(TypedDict):
@@ -28,12 +28,24 @@ class Cell:
         self.cell_data = self.config["cell_data"]
         self.self_polarization = self_polarization if self_polarization is not None else self.config.get("self_polarization", False)
         self.state = init_state
-        self.timer = self_polarization_timer
-        self.charge = charge
+# MM version
+        # self.timer = self_polarization_timer
+        # self.charge = charge
+# MS version
+        # cells withot self-depolarization can have the timer set to 0
+        if cell_type in [CellType.INTERNODAL_ANT, CellType.INTERNODAL_MID, CellType.INTERNODAL_POST]:
+            self.timer = 0
+        else: # cells with self-depolarization have shifted initial timer so that the user does not wait too long for the first action potential
+            self.timer = 1100
+        # self.timer = 0
+
         self.neighbors = []
         self.period = self.config["period"]
         self.n_range = self.config["range"]
+        self.propagation_time = self.config.get('propagation_time')
+        self.propagation_count = 0
         self.charges, self.max_charge, self.ref_threshold = ChargeUpdate.get_func(self.config)
+        self.charge = self.charges[self.timer]
 
     def __repr__(self) -> str:
         return f"<Cell>: position: ({self.pos_x}, {self.pos_y}), charge: {self.charge}, state: {self.state}, self_polar: {self.self_polarization}, type: {self.cell_type}"

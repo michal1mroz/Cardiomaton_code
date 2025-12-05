@@ -19,15 +19,15 @@ if __name__ == '__main__':
     init_db()
     db = SessionLocal()
     print("test")
-    res = create_or_overwrite_entry(db, "default", cell_map.values(), graph.shape[0], graph.shape[1], 10)
+    # res = create_or_overwrite_entry(db, "default", cell_map.values(), graph.shape[0], graph.shape[1], 10)
     # print(res)
     # res = create_or_overwrite_entry(db, "default2", cell_map.values(), graph.shape[0], graph.shape[1], 10)
     # res = create_or_overwrite_entry(db, "default3", cell_map.values(), graph.shape[0], graph.shape[1], 10)
    
    
-    aut = get_automaton(db, "default")
+    # aut = get_automaton(db, "default")
     # print(aut)
 
-    print(list_entries(db))
-    print(delete_entry(db, "default"))
+    # print(list_entries(db))
+    # print(delete_entry(db, "default"))
     print(list_entries(db))

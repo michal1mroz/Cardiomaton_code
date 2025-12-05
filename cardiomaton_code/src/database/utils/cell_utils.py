@@ -110,6 +110,8 @@ cell_dtype = np.dtype([
     ("n_neighbors", np.uint8),
     ("arg_id", np.int32),
     ("timer", np.uint16),
+    ("propagation_time", np.uint16),
+    ("propagation_count", np.uint16),
 ])
 
 def encode_cell(cell: Cell, arg_id: np.int32) -> np.void:
@@ -130,7 +132,9 @@ def encode_cell(cell: Cell, arg_id: np.int32) -> np.void:
             pack_neighbors(cell.neighbors_to_tuple_list()),
             np.uint8(len(cell.neighbors)),
             np.int32(arg_id),
-            np.uint16(cell.timer)),
+            np.uint16(cell.timer),
+            np.uint16(cell.propagation_time),
+            np.uint16(cell.propagation_count)),
         dtype=cell_dtype)[()]
 
 def decode_cell(blob: np.void, cell_args) -> Tuple[Cell, List[Tuple[int, int]]]:
@@ -152,6 +156,8 @@ def decode_cell(blob: np.void, cell_args) -> Tuple[Cell, List[Tuple[int, int]]]:
     cell = Cell(position = position, cell_type=cell_type, cell_config=cell_args[arg_id], init_state=state, self_polarization=self_polar)
     cell.charge = float(blob["charge"])
     cell.timer = int(blob["timer"])
+    cell.propagation_time = int(blob["propagation_time"])
+    cell.propagation_count = int(blob["propagation_count"])
     return cell, neighbors
 
 def __serialize_cells(cells: List[Cell], arg_dict: Dict) -> bytes:
