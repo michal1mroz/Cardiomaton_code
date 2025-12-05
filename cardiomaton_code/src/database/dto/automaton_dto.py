@@ -9,3 +9,4 @@ class AutomatonDto():
     cell_map: Dict[Tuple[int, int], Cell]
     shape: Tuple[int, int]
     frame: int
+    name: str

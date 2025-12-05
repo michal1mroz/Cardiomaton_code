@@ -25,21 +25,26 @@ class SimulationService:
         # graph, A, B = extract_conduction_pixels()
         # space = Space(graph)
         # _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
+        self.ft = frame_time
+        self.image = image
         ptr = image.bits()
         if hasattr(ptr, "setsize"):
             ptr.setsize(image.bytesPerLine() * image.height())
         init_db()
         db = SessionLocal()
+        self.current_automaton_preset = "PHYSIOLOGICAL"
         dto = get_automaton(db, "PHYSIOLOGICAL")
 
-        self.automaton = Automaton(dto.shape, dto.cell_map, img_ptr = int(ptr), img_bytes=image.bytesPerLine(), frame=dto.frame, frame_time=frame_time)
-        # self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
+
+        self.automaton = Automaton(dto.shape, dto.cell_map, img_ptr = int(ptr), img_bytes=image.bytesPerLine(), frame=dto.frame, frame_time=self.ft)
+        # self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=self.frame_time)
 
     def update_automaton(self, automaton: AutomatonDto, image: QImage):
         ptr = image.bits()
         if hasattr(ptr, "setsize"):
             ptr.setsize(image.bytesPerLine() * image.height())
         self.automaton = Automaton(automaton.shape, automaton.cell_map, img_ptr=int(ptr), img_bytes=image.bytesPerLine(), frame=automaton.frame)
+        self.current_automaton_preset = automaton.name
 
     def save_automaton(self, entry: str) -> bool:
         automaton = self.automaton.serialize_automaton()
@@ -93,11 +98,26 @@ class SimulationService:
         # self.automaton.modify_cells(modification)
 
     def undo_modification(self):
-        """
-        TODO: undo of last cell modification of the automaton
-        """
         self.automaton.undo_modification()
 
+    def restart_automaton(self):
+        init_db()
+        db = SessionLocal()
+
+        dto = get_automaton(db, self.current_automaton_preset)
+
+        ptr = self.image.bits()
+        if hasattr(ptr, "setsize"):
+            ptr.setsize(self.image.bytesPerLine() * self.image.height())
+
+        self.automaton = Automaton(
+            dto.shape,
+            dto.cell_map,
+            img_ptr=int(ptr),
+            img_bytes=self.image.bytesPerLine(),
+            frame=dto.frame,
+            frame_time=self.ft
+        )
     @property
     def frame_time(self) -> float:
         """

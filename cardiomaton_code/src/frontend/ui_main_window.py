@@ -132,11 +132,13 @@ class UiMainWindow(object):
     def _map_shortcuts(self):
         self.project_name = self.topbar.project_name
 
+        self.restart_button = self.player_controls.restart_button
         self.play_button = self.player_controls.play_button
         self.prev_button = self.player_controls.prev_button
         self.next_button = self.player_controls.next_button
         self.speed_dropdown = self.player_controls.speed_dropdown
         self.toggle_render_button = self.player_controls.toggle_render_button
+        self.toggle_interaction_button = self.player_controls.toggle_interaction_button
 
         self.commit_button = self.modification_panel.commit_button
         self.undo_button = self.modification_panel.undo_button

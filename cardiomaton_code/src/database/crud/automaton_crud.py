@@ -227,7 +227,8 @@ def get_automaton(db: Session, name: str) -> AutomatonDto:
     return AutomatonDto(
         cell_map = cells,
         shape = (dictionary['width'], dictionary['height']),
-        frame = dictionary['frames']
+        frame = dictionary['frames'],
+        name = name
     )
 
 def delete_entry(db: Session, name: str) -> bool:

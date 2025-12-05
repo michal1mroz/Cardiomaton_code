@@ -16,6 +16,7 @@ class SimulationView(QLabel):
 
         self.cell_data_provider = cell_data_provider
         self.running = False
+        self.inspection_set = True
 
         self._cell_modificator = cell_modificator
         self._brush_size_slider = brush_size_slider
@@ -42,6 +43,9 @@ class SimulationView(QLabel):
     def set_running(self, state: bool) -> None:
         self.running = state
 
+    def set_interaction_mode(self, state: bool) -> None:
+        self.inspection_set = state
+
     def paintEvent(self, event) -> None:
         super().paintEvent(event)
         if self.pixmap() is None:
@@ -53,7 +57,7 @@ class SimulationView(QLabel):
         painter.end()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        if self.running:
+        if self.inspection_set:
             if self.pixmap() is None:
                 return
 
@@ -75,7 +79,7 @@ class SimulationView(QLabel):
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         pos = self._coordinate_mapper.map_event_to_cell(self, event)
 
-        if self.running or self.pixmap() is None:
+        if self.inspection_set or self.pixmap() is None:
             if self.pixmap() is not None:
                 self._tooltip.handle_mouse_move(self, pos, event)
             return

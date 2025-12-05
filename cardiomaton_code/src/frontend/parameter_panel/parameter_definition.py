@@ -27,6 +27,14 @@ class ParameterDefinition:
     def to_real_value(self, slider_value: int) -> float:
         return slider_value / 1000.0 if self.use_thousand_scale else float(slider_value)
 
+    def to_slider_value(self, real_value: int) -> float:
+        return int(real_value * 1000.0) if self.use_thousand_scale else int(real_value)
+
+    def format_value(self, slider_value: int) -> str:
+        if self.use_thousand_scale:
+            return f"{slider_value:.3f}"
+        return str(int(slider_value))
+
     def format_default_text(self) -> str:
         if self.use_thousand_scale:
             return f"{self.default:.3f}"
