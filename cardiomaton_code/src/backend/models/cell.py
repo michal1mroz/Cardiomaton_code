@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Dict, Tuple, List, TypedDict
 
-from cardiomaton_code.src.backend.enums.cell_type import CellType
-from cardiomaton_code.src.backend.enums.cell_state import CellState
+from src.backend.enums.cell_type import CellType
+from src.backend.enums.cell_state import CellState
 from src.update_strategies.charge_approx.charge_update import ChargeUpdate
 
 class CellDict(TypedDict):
@@ -28,7 +28,10 @@ class Cell:
         self.cell_data = self.config["cell_data"]
         self.self_polarization = self_polarization if self_polarization is not None else self.config.get("self_polarization", False)
         self.state = init_state
-
+# MM version
+        # self.timer = self_polarization_timer
+        # self.charge = charge
+# MS version
         # cells withot self-depolarization can have the timer set to 0
         if cell_type in [CellType.INTERNODAL_ANT, CellType.INTERNODAL_MID, CellType.INTERNODAL_POST]:
             self.timer = 0

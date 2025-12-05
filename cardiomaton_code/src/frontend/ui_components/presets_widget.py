@@ -8,7 +8,6 @@ from src.database.crud.automaton_crud import list_entries
 
 class PresetsWidget(QWidget):
     preset_selected = pyqtSignal(object)  
-    # custom_preset_selected = pyqtSignal()
     preset_changed = pyqtSignal(str)  
     save_preset_request = pyqtSignal(str)
 
@@ -24,18 +23,11 @@ class PresetsWidget(QWidget):
         self.main_layout.addStretch(1)
 
         self.dropdown = QComboBox()
-        # self.dropdown.addItem("Preset 1")
-        # self.dropdown.addItem("Preset 2")
         self.dropdown.setObjectName("presetComboBox")
         self.main_layout.addWidget(self.dropdown)
         self.main_layout.addStretch(1)
 
         self._load_database_entries()
-
-        # self.button = UIFactory.create_pushbutton(self, font_size=15)
-        # self.button.setText("+")
-        # self.main_layout.addWidget(self.button)
-        # self.button.setObjectName("presetBtn")
 
         self.text_input = QLineEdit()
         self.text_input.setObjectName("presetNameInput")
@@ -123,7 +115,6 @@ class PresetsWidget(QWidget):
         self.text_input.setFocus()
         
         self.dropdown.setEnabled(False)
-        
         self.dropdown.setCurrentText("Custom")
 
     def hide_input_field(self):
