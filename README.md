@@ -1,6 +1,25 @@
 # Cardiomaton - project repository
 
-## Setup information
+## Starting application
+This section explains the requirements of the Cardiomaton application as well as a method to start it.
+
+### Requirements
+Cardiomaton app requires following dependencies:
+* Python - version 3.11 or higher
+* Poetry - version 2.0.0 or higher
+* C compiler - GNU compiler for Linux, Visual Studio build tools for C++ for Windows
+
+### Starting application
+Application can be started by running correct scripts - `cardiomaton.bat` for windows, or `cardiomaton.sh` for linux or macOS.
+Alternatively, to manually build and start the project run the following commands from the root of the project:
+```shell
+eval $(poetry env activate)
+poetry run build
+cd cardiomaton_code
+python main_with_front.py
+```
+
+## Setup information for development
 
 ### Poetry installation:
 Dependencies should be added to poetry with
