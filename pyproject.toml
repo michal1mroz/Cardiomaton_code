@@ -38,3 +38,4 @@ alembic = "^1.16.5"
 [tool.poetry.scripts]
 build = "cardiomaton_code.build_tools.dev_tasks:build"
 clean = "cardiomaton_code.build_tools.dev_tasks:clean"
+cardiomaton = "cardiomaton_code.main_with_front.py:main"
