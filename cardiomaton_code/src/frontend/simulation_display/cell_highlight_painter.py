@@ -42,8 +42,14 @@ class CellHighlightPainter:
             painter.drawRect(QRectF(x, y, cell_width, cell_height))
 
     @staticmethod
-    def _get_color(index, total=10):
-        hue = int((index % total) * 360 / total)
-        color = QColor.fromHsv(hue, 255, 255, 128)
-        color.setAlpha(55)
+    def _get_color(index):
+        fixed_colors = [
+            QColor.fromHsv(0, 255, 180),
+            QColor.fromHsv(108, 255, 180),
+            QColor.fromHsv(180, 255, 180),
+            QColor.fromHsv(252, 255, 180),
+            QColor.fromHsv(324, 255, 180),
+        ]
+
+        color = fixed_colors[index % len(fixed_colors)]
         return color
