@@ -2,7 +2,6 @@ from typing import Dict, Tuple, List
 import numpy as np
 from functools import lru_cache
 
-from src.update_strategies.charge_approx.ms_final import pacemaker_AP_full
 from src.update_strategies.charge_approx.pacemakers import pacemaker_AP 
 from src.update_strategies.charge_approx.atrial import atrial_AP
 from src.update_strategies.charge_approx.purkinje import purkinje_AP
@@ -85,7 +84,7 @@ class ChargeUpdate():
                 Dict[int, float] - map of time in frames (modulo range) -> charge values
                 int - time % range for the greatest argument
         """
-        fun = CHARGE_FUNCTIONS.get(config["charge_function"], pacemaker_AP_full) 
+        fun = CHARGE_FUNCTIONS.get(config["charge_function"], pacemaker_AP) 
         key = frozenset(config["cell_data"].items())
         res = ChargeUpdate._get_func(key, config["period"], config["range"], fun)
         return res
