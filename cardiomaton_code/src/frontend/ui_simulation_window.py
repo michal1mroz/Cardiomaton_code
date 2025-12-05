@@ -1,11 +1,10 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QScrollArea, QListView
-from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QListView
+from PyQt6 import QtWidgets
 
 from src.frontend.parameter_panel.parameter_panel import ParameterPanel
 from src.frontend.ui_components.modification_panel import ModificationPanel
 from src.frontend.ui_components.player_controls_widget import PlayerControlsWidget
 from src.frontend.ui_components.presets_widget import PresetsWidget
-from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
 
 

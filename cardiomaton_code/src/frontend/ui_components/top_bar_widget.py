@@ -24,7 +24,7 @@ class TopBarWidget(QWidget):
         self.project_name = QLabel("Cardiomaton")
         self.project_name.setObjectName("ProjectName")
 
-        self.btn_app = UIFactory.create_pushbutton(self, font_family="Mulish ExtraBold")
+        self.btn_app = UIFactory.create_pushbutton(self)
         self.btn_app.setText("App")
         self.btn_app.setObjectName("BtnApp")
 

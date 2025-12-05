@@ -1,9 +1,10 @@
 import os
 
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
-                             QHBoxLayout, QPushButton, QStackedWidget, QLabel)
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QLabel
+from PyQt6.QtGui import QIcon
 
+from src.frontend.help_window import HelpWindow
 from src.frontend.simulation_window import SimulationWindow
 from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
@@ -17,6 +18,7 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(QSize(1100, 600))
         self.setMaximumSize(QSize(1100, 600))
         self.setWindowTitle("Cardiomaton")
+        self.setWindowIcon(QIcon("./resources/style/logo.png"))
 
         UIFactory.load_fonts()
 
@@ -44,12 +46,7 @@ class MainWindow(QMainWindow):
         self.simulation_window = SimulationWindow()
         self.stack.addWidget(self.simulation_window)
 
-        self.help_view = QWidget()
-        lbl_help = QLabel("Tutaj będzie pomoc", self.help_view)
-        lbl_help.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        lbl_help.setStyleSheet("font-size: 20px; color: gray;")
-        help_layout = QVBoxLayout(self.help_view)
-        help_layout.addWidget(lbl_help)
+        self.help_view = HelpWindow()
         self.stack.addWidget(self.help_view)
 
         self.about_view = QWidget()

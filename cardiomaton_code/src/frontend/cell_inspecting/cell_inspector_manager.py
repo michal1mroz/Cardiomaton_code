@@ -12,7 +12,7 @@ class CellInspectorManager:
 
         if not self.ui.cell_inspector_container.layout():
             self.ui.cell_inspector_layout = QVBoxLayout(self.ui.cell_inspector_container)
-            self.ui.cell_inspector_layout.setContentsMargins(0, 0, 0, 0)
+            self.ui.cell_inspector_layout.setContentsMargins(40, 0, 15, 0)
 
     def show_inspector(self, cell_data: CellDict, on_close_callback, is_running: bool):
         self.hide_inspector()

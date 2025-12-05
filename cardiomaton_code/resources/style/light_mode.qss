@@ -201,10 +201,10 @@ QPushButton#BtnAbout {
 }
 
 #BtnTheme:hover,
-#BtnAccess:hover
-QPushButton#BtnApp:hover,
-QPushButton#BtnHelp:hover,
-QPushButton#BtnAbout:hover {
+#BtnAccess:hover,
+#BtnApp:hover,
+#BtnHelp:hover,
+#BtnAbout:hover {
     color: #496BD3;
     background: transparent;
 }

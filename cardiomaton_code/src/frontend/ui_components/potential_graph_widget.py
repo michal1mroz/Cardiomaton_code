@@ -1,14 +1,13 @@
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtGui import QFont, QResizeEvent, QColor
+from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import pyqtProperty, Qt
 import pyqtgraph as pg
-import pyqtgraph as pq
 
 
 class GraphWidget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("GraphContainer")
+        self.setObjectName("Layout")
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
@@ -22,7 +21,7 @@ class GraphWidget(QtWidgets.QFrame):
         layout.setContentsMargins(5, 5, 5, 5)
 
         self.plot_widget = pg.PlotWidget()
-        self.plot_widget.setBackground('w')
+        self.plot_widget.setBackground(None)
         self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
         self.plot_widget.getPlotItem().getViewBox().setBorder(None)
 
@@ -38,15 +37,6 @@ class GraphWidget(QtWidgets.QFrame):
         self.close_btn.setFixedSize(24, 24)
         self.close_btn.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         self.close_btn.clicked.connect(self.hide)
-
-    def resizeEvent(self, event: QResizeEvent):
-        super().resizeEvent(event)
-        padding_x = 10
-        padding_y = 10
-        x = self.width() - self.close_btn.width() - padding_x
-        y = padding_y
-        self.close_btn.move(x, y)
-        self.close_btn.raise_()
 
     def update_data(self, t, v, title="Preview"):
         self._current_title_text = title

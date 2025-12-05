@@ -39,7 +39,6 @@ class SimulationWindow(QWidget):
         self.plot_windows = {}
 
         self.overlay_graph = GraphWidget(parent=self)
-        self.overlay_graph.resize(585, 250)
         self.overlay_graph.hide()
 
         self.render_label = SimulationView(self.cell_data_provider, self.ui.brush_size_slider, self.cell_modificator)
@@ -173,11 +172,7 @@ class SimulationWindow(QWidget):
         self.overlay_graph.update_data(t, v, title=f"Preview {cell_type}")
 
     def _reposition_overlay_graph(self):
-        padding = 20
-        x = self.width() - self.overlay_graph.width() - padding
-        y = self.height() - self.overlay_graph.height() - padding
-
-        self.overlay_graph.move(x, y)
+        self.overlay_graph.setGeometry(500, 230, 585, 250)
 
         self.overlay_graph.raise_()
 
