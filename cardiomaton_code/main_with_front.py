@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QApplication
 from src.frontend.main_window import MainWindow
 # from src.models.cell_type import ConfigLoader
 from cardiomaton_code.src.backend.enums.cell_type import ConfigLoader
+from src.database.db import init_db
 
 def main():
     """
@@ -12,6 +13,7 @@ def main():
     when the application is closed.
     """
     ConfigLoader.loadConfig() 
+    init_db()
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()

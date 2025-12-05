@@ -35,6 +35,12 @@ class SimulationService:
         self.automaton = Automaton(dto.shape, dto.cell_map, img_ptr = int(ptr), img_bytes=image.bytesPerLine(), frame=dto.frame, frame_time=frame_time)
         # self.automaton = Automaton(graph.shape, cell_map, int(ptr), image.bytesPerLine(), frame_time=frame_time)
 
+    def update_automaton(self, automaton: AutomatonDto, image: QImage):
+        ptr = image.bits()
+        if hasattr(ptr, "setsize"):
+            ptr.setsize(image.bytesPerLine() * image.height())
+        self.automaton = Automaton(automaton.shape, automaton.cell_map, img_ptr=int(ptr), img_bytes=image.bytesPerLine(), frame=automaton.frame)
+
     def step(self, if_charged: bool) -> int:#Tuple[int, Dict[Tuple[int, int], CellDict]]:
         """
         Advances the simulation by one frame.

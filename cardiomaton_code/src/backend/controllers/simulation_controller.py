@@ -1,4 +1,5 @@
 from typing import Optional, Tuple, Dict
+from src.database.dto.automaton_dto import AutomatonDto
 from src.models.cell import CellDict
 from src.backend.services.simulation_service import SimulationService
 from PyQt6.QtGui import QImage
@@ -31,6 +32,9 @@ class SimulationController:
             updated_data (CellDict): A new data for the specific cell.
         """
         self.service.update_cell(data)
+
+    def update_automaton(self, automaton: AutomatonDto, image: QImage):
+        self.service.update_automaton(automaton, image)
 
     def render_frame(self, idx, if_charged, drop_newer) -> int:
         return self.service.render_frame(idx, if_charged, drop_newer)

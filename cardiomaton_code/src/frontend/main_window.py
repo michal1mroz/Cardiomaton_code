@@ -14,6 +14,8 @@ from src.backend.services.simulation_loop import SimulationRunner
 from src.frontend.ui_main_window import UiMainWindow
 from src.models.cell import CellDict
 
+from src.database.db import SessionLocal
+from src.database.crud.automaton_crud import get_automaton
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -23,7 +25,6 @@ class MainWindow(QMainWindow):
         automaton_size = (507, 695)
         self.base_frame_time = 0.05
         self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
-
         self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
         self.renderer = FrameRenderer(self.sim, self.image)
         self.cell_data_provider = CellDataProvider(self.sim)
@@ -76,6 +77,9 @@ class MainWindow(QMainWindow):
         self.ui.parameter_panel.sigParametersChanged.connect(self._on_parameter_slider_moved)
         self.ui.topbar.btn_theme.clicked.connect(self._toggle_theme)
         self.ui.topbar.btn_access.clicked.connect(self._toggle_accessibility_mode)
+
+        # Presets
+        self.ui.presets_layout.preset_selected.connect(self.on_preset_selected)
 
     def _toggle_simulation(self):
         if not self.runner.running and self.navigator.current_buffer_index != -1:
@@ -209,3 +213,18 @@ class MainWindow(QMainWindow):
         self.overlay_graph.move(x, y)
 
         self.overlay_graph.raise_()
+
+    def on_preset_selected(self, entry):
+        db = SessionLocal()
+        try:
+            dto = get_automaton(db, entry)
+            size = dto.shape
+            self.image = QImage(size[1], size[0], QImage.Format.Format_RGBA8888)
+
+            self.sim.update_automaton(dto, self.image)
+            self.renderer = FrameRenderer(self.sim, self.image)
+
+            self._update_live_frame()
+
+        except Exception as e:
+            print(f'Error retrieving entry: {entry}')
