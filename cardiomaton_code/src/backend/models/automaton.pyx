@@ -231,6 +231,10 @@ cdef class Automaton:
             snapshot[i].c_state = cell_b.c_state
             snapshot[i].charge = cell_b.charge
             snapshot[i].timer = cell_b.timer
+            snapshot[i].can_propagate = cell_b.can_propagate
+            snapshot[i].propagation_time = cell_b.propagation_time
+            snapshot[i].propagation_count = cell_b.propagation_count
+
         self.grid_a = self.grid_b
         self.grid_b = tmp
 
@@ -260,7 +264,18 @@ cdef class Automaton:
             cell.c_state = snapshots[i].c_state
             cell.charge = snapshots[i].charge
             cell.timer = snapshots[i].timer 
+            cell.can_propagate = snapshots[i].can_propagate
+            cell.propagation_time = snapshots[i].propagation_time
+            cell.propagation_count = snapshots[i].propagation_count
             func(self.img_buffer, self.bytes_per_line, cell)
+            # Fix idea by Albert
+            cell = self.grid_b[i]
+            cell.c_state = snapshots[i].c_state
+            cell.charge = snapshots[i].charge
+            cell.timer = snapshots[i].timer 
+            cell.can_propagate = snapshots[i].can_propagate
+            cell.propagation_count = snapshots[i].propagation_count
+            cell.propagation_time = snapshots[i].propagation_time
 
         if drop_newer:
             self.frame_recorder.remove_newer(idx)

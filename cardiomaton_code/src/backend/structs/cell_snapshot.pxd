@@ -10,3 +10,6 @@ cdef struct CellSnapshot:
     CellStateC c_state
     float charge
     int timer
+    int can_propagate
+    int propagation_count
+    int propagation_time

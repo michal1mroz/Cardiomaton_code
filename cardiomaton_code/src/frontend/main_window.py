@@ -236,4 +236,4 @@ class MainWindow(QMainWindow):
     def _save_preset(self, entry):
         self._pause_simulation_for_history()
         self.sim.save_automaton(entry)
-        self.ui.presets_layout._refresh_entries()
+        self.ui.presets_layout.silent_refresh()

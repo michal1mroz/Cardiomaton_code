@@ -149,8 +149,35 @@ class PresetsWidget(QWidget):
         
         return True, name
 
+    def silent_refresh(self, entry: str = None):
+        current_text = self.current_entry if hasattr(self, 'current_entry') else self.dropdown.currentText()
+        was_blocked = self.dropdown.signalsBlocked()
+
+        try:
+            self.dropdown.blockSignals(True)
+            self._load_database_entries()
+
+            if entry:
+                index = self.dropdown.findText(entry)
+                if index >= 0:
+                    self.dropdown.setCurrentIndex(index)
+                    self.current_entry = entry
+            else:
+                if current_text:
+                    index = self.dropdown.findText(current_text)
+                    if index >= 0:
+                        self.dropdown.setCurrentIndex(index)
+                        self.current_entry = current_text
+        except Exception as e:
+            print(f'Error silently refreshing automaton preset list: {e}')
+            self.dropdown.clear()
+        finally:
+            self.dropdown.blockSignals(was_blocked)
+        self.current_entry = self._get_selected_entry() 
+
     def on_input_return_pressed(self):
         self.save_preset_from_input()
+
 
     def save_preset_from_input(self):
         name = self.text_input.text()
