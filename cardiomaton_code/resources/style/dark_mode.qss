@@ -12,7 +12,6 @@
 
    Background Dark:     #181C23
    Background Lighter:  #303742
-   TopBar Background:   rgba(51, 59, 70, 70)
    ======================================================= */
 
 
@@ -31,15 +30,12 @@ QScrollArea {
     border-radius: 20px;
 }
 
-#TopBar {
-    background-color: rgba(51, 59, 70, 70);
+#parameters_scroll {
+    background-color: transparent;
 }
 
 QWidget#Logo {
-    background-color: #5E83F2;
-    border-radius: 25px;
-    color: white;
-    font-size: 24px;
+    border-image: url(./resources/style/logo.png) 0 0 0 0 stretch stretch;
 }
 
 QToolTip {
@@ -68,6 +64,13 @@ QLabel#ProjectName {
     font-size: 13px;
 }
 
+#ValueEdit {
+    font-family: 'Mulish';
+    font-size: 13px;
+    color: #E6EAF0;
+    background: transparent;
+}
+
 #ParameterTitle {
     color: #E6EAF0;
     font-family: 'Mulish ExtraBold';
@@ -80,6 +83,9 @@ QLabel#ProjectName {
         border: none;
 }
 
+#ParameterPanel {
+    border: none;
+}
 
 /* --- BUTTONS --- */
 
@@ -375,15 +381,16 @@ GraphWidget {
 
 /* --- PRESETS ---*/
 
-#presetComboBox {
+#presetComboBox,
+#presetNameInput {
     font-family: Mulish;
-    font-size: 18px;
+    font-size: 15px;
     color: #E6EAF0;
     background-color: #303742;
     border: 1px solid #303742;
     border-radius: 16px;
     padding: 5px 25px 5px 25px;
-    width: 100px;
+    width: 140px;
 }
 
 #presetComboBox::drop-down {
@@ -406,4 +413,36 @@ GraphWidget {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
+}
+
+
+#presetNameInput {
+    width: 155px;
+}
+
+
+/* --- SIMULATION ---*/
+#simulation_background_widget {
+    background-image: url(./resources/style/dark_heart.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+}
+
+/* --- HELP --- */
+
+#tooltip_widget {
+    background-color: #303742;
+    color: #E6EAF0;
+    border: 1px solid #E1605D;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Mulish';
+    font-size: 14px;
+}
+
+/* --- CELL INSPECTOR --*/
+#cell_label {
+    font-family: "Mulish";
+    font-size: 14px;
 }

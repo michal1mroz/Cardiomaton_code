@@ -1,9 +1,11 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from src.frontend.main_window import MainWindow
 # from src.models.cell_type import ConfigLoader
 from src.backend.enums.cell_type import ConfigLoader
 from src.database.db import init_db
+
+from src.frontend.main_window import MainWindow
+
 
 def main():
     """

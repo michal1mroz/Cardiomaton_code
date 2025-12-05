@@ -13,15 +13,12 @@ QScrollArea {
     border-radius: 20px;
 }
 
-#TopBar {
-    background-color: rgba(242, 247, 255, 240);
+#parameters_scroll {
+    background-color: transparent;
 }
 
 QWidget#Logo {
-    background-color: #6D98F4;
-    border-radius: 25px;
-    color: white;
-    font-size: 24px;
+    border-image: url(./resources/style/logo.png) 0 0 0 0 stretch stretch;
 }
 
 QToolTip {
@@ -54,6 +51,13 @@ QLabel#ProjectName {
     font-size: 16px;
 }
 
+#ValueEdit {
+    font-family: 'Mulish';
+    font-size: 16px;
+    color: #233348;
+    background: transparent;
+}
+
 #ParameterTitle {
     color: #233348;
     font-family: 'Mulish ExtraBold';
@@ -66,10 +70,16 @@ QLabel#ProjectName {
     border: none;
 }
 
+#ParameterPanel {
+    border: none;
+}
+
+
 #frame_counter_label {
     background-color: #FFFFFF;
     border-radius: 10px;
     padding: 6px 5px;
+    font-size: 18px;
 }
 
 
@@ -235,7 +245,7 @@ QPushButton#BtnAbout:hover {
 
 #speedComboBox QAbstractItemView {
     font-family: 'Mulish';
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     background-color: #FFFFFF;
     color: #E1605D;
@@ -316,7 +326,7 @@ QSlider::add-page:horizontal {
 }
 
 QSlider::handle:horizontal {
-    background: white;
+    background: #5c5c5c;
     border: 1px solid #5c5c5c;
     width: 14px;
     margin: -6px 0;
@@ -324,7 +334,7 @@ QSlider::handle:horizontal {
 }
 
 QSlider::handle:horizontal:hover {
-    background: #e0e0e0;
+    background: black;
 }
 
 
@@ -371,13 +381,14 @@ GraphWidget {
     /* Custom Properties dla PyQtGraph */
     qproperty-plotBackground: white;
     qproperty-traceColor: #CD4B48;
-    qproperty-axisColor: #6c7c91;
+    qproperty-axisColor: #233348;
     qproperty-titleColor: #233348;
 }
 
 /* --- PRESETS ---*/
 
-#presetComboBox {
+#presetComboBox,
+#presetNameInput {
     font-family: Mulish;
     font-size: 18px;
     color: #233348;
@@ -385,7 +396,7 @@ GraphWidget {
     border: 1px solid #DBE3F1;
     border-radius: 16px;
     padding: 5px 25px 5px 25px;
-    width: 100px;
+    width: 150px;
 }
 
 #presetComboBox::drop-down {
@@ -409,4 +420,35 @@ GraphWidget {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 10px;
+}
+
+
+#presetNameInput {
+    width: 170px;
+}
+
+/* --- SIMULATION ---*/
+#simulation_background_widget {
+    background-image: url(./resources/style/access_heart.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+}
+
+/* --- HELP --- */
+
+#tooltip_widget {
+    background-color: #FFFFFF;
+    color: #233348;
+    border: 1px solid #E1605D;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Mulish';
+    font-size: 14px;
+}
+
+/* --- CELL INSPECTOR --*/
+#cell_label {
+    font-family: "Mulish";
+    font-size: 15px;
 }

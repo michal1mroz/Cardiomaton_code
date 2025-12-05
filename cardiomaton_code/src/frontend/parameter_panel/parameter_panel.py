@@ -27,10 +27,9 @@ class ParameterPanel(QtWidgets.QWidget):
         self._sliders: Dict[str, Dict[str, ParameterSlider]] = {}
 
         main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.setObjectName("Layout")
 
-        scroll = QtWidgets.QScrollArea()
-        scroll.setWidgetResizable(True)
+        self.scroll = QtWidgets.QScrollArea()
+        self.scroll.setWidgetResizable(True)
 
         container = QtWidgets.QWidget()
         container.setObjectName("Layout")
@@ -40,7 +39,6 @@ class ParameterPanel(QtWidgets.QWidget):
             scroll_layout.addWidget(self._create_section_header(cell_type))
 
             section_widget = QtWidgets.QWidget()
-            section_widget.setObjectName("Layout")
             section_layout = QtWidgets.QVBoxLayout(section_widget)
             section_layout.setContentsMargins(10, 0, 10, 0)
             section_layout.setSpacing(10)
@@ -71,6 +69,7 @@ class ParameterPanel(QtWidgets.QWidget):
                 value_edit = QtWidgets.QLineEdit(definition.format_default_text())
                 value_edit.setFixedWidth(60)
                 value_edit.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+                value_edit.setObjectName("ValueEdit")
 
                 bottom_layout.addWidget(slider)
                 bottom_layout.addWidget(value_edit)
@@ -81,13 +80,14 @@ class ParameterPanel(QtWidgets.QWidget):
                 binding = ParameterSlider(definition=definition, slider=slider, value_edit=value_edit)
                 self._sliders[cell_type][name] = binding
 
-                binding.parameterChanged.connect(lambda ct=cell_type: self.sigParametersChanged.emit(ct))
+                if name != "propagation_time":
+                    binding.parameterChanged.connect(lambda ct=cell_type: self.sigParametersChanged.emit(ct))
 
             scroll_layout.addWidget(section_widget)
 
         scroll_layout.addStretch()
-        scroll.setWidget(container)
-        main_layout.addWidget(scroll)
+        self.scroll.setWidget(container)
+        main_layout.addWidget(self.scroll)
 
         self._link_parameters("PACEMAKER", "V_rest", "V_thresh")
         self._link_parameters("ATRIAL", "V12", "V_peak")
@@ -141,9 +141,9 @@ class ParameterPanel(QtWidgets.QWidget):
         slider_low.valueChanged.connect(enforce_constraint_low)
         slider_high.valueChanged.connect(enforce_constraint_high)
 
-    def _create_section_header(self, title: str) -> QtWidgets.QWidget:
+    @staticmethod
+    def _create_section_header(title: str) -> QtWidgets.QWidget:
         container = QtWidgets.QWidget()
-        container.setObjectName("Layout")
         layout = QtWidgets.QHBoxLayout(container)
         layout.setContentsMargins(0, 10, 0, 10)
         layout.setSpacing(10)

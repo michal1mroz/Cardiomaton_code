@@ -1,5 +1,6 @@
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QListView
 
 from src.frontend.ui_components.ui_factory import UIFactory
 
@@ -14,34 +15,38 @@ class PresetsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.setFixedHeight(60)
+
         self.main_layout = QHBoxLayout(self)
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
-        self.label = UIFactory.create_label(self, "Select Preset", font_size=14)
+        self.label = UIFactory.create_label(self, "Select Preset", font_size=13)
         self.main_layout.addWidget(self.label)
         self.main_layout.addStretch(1)
 
         self.dropdown = QComboBox()
         self.dropdown.setObjectName("presetComboBox")
+        view = QListView()
+        view.setFont(QFont("Mulish", 10))
+        self.dropdown.setView(view)
         self.main_layout.addWidget(self.dropdown)
-        self.main_layout.addStretch(1)
 
         self._load_database_entries()
 
         self.text_input = QLineEdit()
         self.text_input.setObjectName("presetNameInput")
         self.text_input.setPlaceholderText("Enter preset name...")
-        self.text_input.setMaximumWidth(150)  # Limit width
-        self.text_input.setVisible(False)  # Hidden by default
+        self.text_input.setVisible(False)
         self.text_input.returnPressed.connect(self.on_input_return_pressed)
         self.main_layout.addWidget(self.text_input)
 
-        # Button
+        self.main_layout.addStretch(1)
+
         self.button = UIFactory.create_pushbutton(self, font_size=15)
         self.button.setText("+")
         self.button.setObjectName("presetBtn")
-        self.button.setFixedSize(30, 30)  # Make it square
+        self.button.setFixedSize(30, 30)
         self.main_layout.addWidget(self.button)
 
         self.main_layout.setContentsMargins(30, 5, 30, 5)
@@ -113,9 +118,9 @@ class PresetsWidget(QWidget):
         self.text_input.setVisible(True)
         self.text_input.clear()
         self.text_input.setFocus()
-        
-        self.dropdown.setEnabled(False)
-        self.dropdown.setCurrentText("Custom")
+
+        self.label.setText("Save Preset")
+        self.dropdown.hide()
 
     def hide_input_field(self):
         """Hide the text input field."""
@@ -124,8 +129,9 @@ class PresetsWidget(QWidget):
         self.button.setText("+")
         
         self.text_input.setVisible(False)
-        
-        self.dropdown.setEnabled(True)
+
+        self.label.setText("Select Preset")
+        self.dropdown.show()
 
     def cancel_input(self):
         """Cancel the input operation."""

@@ -177,10 +177,12 @@ class CellDetails(QWidget):
             h = QHBoxLayout()
 
             label_key = QLabel(f"{display_name}:", self)
+            label_key.setObjectName("cell_label")
             label_key.setFixedWidth(150)
             h.addWidget(label_key)
 
             value_label = QLabel(self._format_value(self._data[key]), self)
+            value_label.setObjectName("cell_label")
             self._labels[key] = value_label
             h.addWidget(value_label)
 

@@ -7,21 +7,24 @@ from src.frontend.ui_components.ui_factory import UIFactory
 class TopBarWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.setFixedHeight(80)
+
         self.setObjectName("TopBar")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(29, 0, 29, 0)
+        layout.setContentsMargins(29, 20, 29, 20)
         layout.setSpacing(20)
 
         self.logo = QWidget()
-        self.logo.setFixedSize(50, 50)
+        self.logo.setFixedSize(40, 40)
         self.logo.setObjectName("Logo")
 
         self.project_name = QLabel("Cardiomaton")
         self.project_name.setObjectName("ProjectName")
 
-        self.btn_app = UIFactory.create_pushbutton(self, font_family="Mulish ExtraBold")
+        self.btn_app = UIFactory.create_pushbutton(self)
         self.btn_app.setText("App")
         self.btn_app.setObjectName("BtnApp")
 

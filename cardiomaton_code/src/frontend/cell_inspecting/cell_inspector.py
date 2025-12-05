@@ -25,8 +25,6 @@ class CellInspector(QWidget):
         self._plot = SeriesPlot(title="Charge over time", y_label="Charge", x_label="Time [Frames]", maxlen=500,
                                 parent=self)
 
-        self.setFont(QFont("Mulish", 10))
-
         self._init_ui()
 
         self._details.set_running(self._running)
