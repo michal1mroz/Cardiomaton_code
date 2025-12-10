@@ -17,7 +17,7 @@ dependencies = [
     "pyqtgraph (>=0.13.7,<0.14.0)",
     "sqlalchemy (>=2.0.43,<3.0.0)",
     "pydantic (>=2.11.7,<3.0.0)",
-    "cython (>=3.1.4,<4.0.0)"
+    "cython (>=3.1.4,<4.0.0)",
 ]
 
 [build-system]
@@ -33,6 +33,7 @@ build-backend = "setuptools.build_meta"
 jupyter = "^1.1.1"
 ipykernel = "^6.29.5"
 alembic = "^1.16.5"
+pyinstaller = { version = "^6.17.0", markers = "python_version < '3.15'" }
 
 [tool.poetry.scripts]
 build = "cardiomaton_code.build_tools.dev_tasks:build"
