@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtCore import QSize, Qt, QThread
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QLabel
 from PyQt6.QtGui import QIcon
 
@@ -9,8 +9,9 @@ from src.frontend.simulation_window import SimulationWindow
 from src.frontend.help_view.help_overlay import HelpOverlay
 from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
+from src.frontend.workers.backend_init_worker import BackendInitWorker
 
-
+from time import sleep
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow):
         self.resize(1100, 600)
         self.setMinimumSize(QSize(1100, 600))
         self.setMaximumSize(QSize(1100, 600))
-        self.setWindowTitle("Cardiomaton")
+        self.setWindowTitle("Cardiomaton loading...")
         self.setWindowIcon(QIcon("./resources/style/logo.png"))
 
         UIFactory.load_fonts()
@@ -43,12 +44,33 @@ class MainWindow(QMainWindow):
         self.help_provider = HelpContentProvider(self)
         self.help_overlay.hide()
 
-        self._init_views()
-        self._connect_topbar()
+
         self._apply_style()
 
-    def _init_views(self):
-        self.simulation_window = SimulationWindow()
+        #backend initialization
+        self.base_frame_time = 0.05
+
+        self.thread = QThread()
+        self.worker = BackendInitWorker(self.base_frame_time)
+        self.worker.moveToThread(self.thread)
+
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self._finish_init_async)
+
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        self.thread.start()
+
+    def _finish_init_async(self, sim, renderer, image):
+        self._init_views(sim, renderer, image)
+        self._connect_topbar()
+        self.setWindowTitle("Cardiomaton")
+
+        self.thread.quit()
+
+    def _init_views(self, sim, renderer, image):
+        self.simulation_window = SimulationWindow(sim, renderer, image, self.base_frame_time)
         self.stack.addWidget(self.simulation_window)
 
         self.about_view = QWidget()

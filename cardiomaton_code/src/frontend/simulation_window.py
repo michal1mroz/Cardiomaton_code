@@ -1,7 +1,6 @@
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget
 
-from src.backend.controllers.simulation_controller import SimulationController
 from src.backend.services.action_potential_generator import ActionPotentialGenerator
 from src.database.crud.automaton_crud import get_automaton
 from src.database.db import SessionLocal
@@ -18,20 +17,18 @@ from src.models.cell import CellDict
 
 
 class SimulationWindow(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self,sim, renderer, image, base_frame_time, parent=None):
         super().__init__(parent)
         self.ui = UiSimulationWindow(self)
 
-        automaton_size = (292, 400)
-        self.base_frame_time = 0.05
-        self.image = QImage(automaton_size[1], automaton_size[0], QImage.Format.Format_RGBA8888)
+        self.sim = sim
+        self.renderer = renderer
+        self.image = image
 
-        self.sim = SimulationController(frame_time=self.base_frame_time, image=self.image)
-        self.renderer = FrameRenderer(self.sim, self.image)
         self.cell_data_provider = CellDataProvider(self.sim)
         self.cell_modificator = CellModificator()
 
-        self.runner = SimulationRunner(base_frame_time=self.base_frame_time)
+        self.runner = SimulationRunner(base_frame_time=base_frame_time)
         self.runner.set_speed_level("2x", self.sim)
         self.navigator = PlaybackNavigator()
         self.inspector_manager = CellInspectorManager(self.ui)
