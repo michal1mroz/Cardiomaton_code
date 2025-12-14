@@ -39,7 +39,6 @@ class SimulationView(QLabel):
                 padding: 12px;
             }
         """)
-
     def set_running(self, state: bool) -> None:
         self.running = state
 

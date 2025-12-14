@@ -201,7 +201,7 @@ cdef class Automaton:
             cell = self.grid_a[i]
             # draw_from_state(self.img_buffer, self.bytes_per_line, cell)
             draw_from_charge(self.img_buffer, self.bytes_per_line, cell)
-    
+
     cdef void _clear_img(self):
         cdef size_t total_bytes = self.bytes_per_line * <int>self.size[0]
         memset(self.img_buffer, 0, total_bytes)

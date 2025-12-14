@@ -20,7 +20,7 @@ COLOR_TABLE[5][:] = [  0,  0,   0,   255] # Necrosis #000000FF
 
 cdef void draw_from_state(unsigned char* img, int bytes_per_line, CCell* cell):
     """
-        Helper function that uses color mapping for states to mark the 
+        Helper function that uses color mapping for states to mark the
         corresponding cells on the image.
 
         Args:
@@ -71,7 +71,7 @@ cdef void draw_from_charge(unsigned char* img, int bytes_per_line, CCell* cell):
         h += 360.0
     while h >= 360.0:
         h -= 360.0
-    
+
     c = v * s
     hi = int(h / 60.0) % 6
     f = (h / 60.0) - int(h / 60.0)
@@ -90,7 +90,7 @@ cdef void draw_from_charge(unsigned char* img, int bytes_per_line, CCell* cell):
         r_f, g_f, b_f = x, 0, c
     else:
         r_f, g_f, b_f = c, 0, x
-    
+
     r = <int>((r_f + m) * 255.0)
     g = <int>((g_f + m) * 255.0)
     b = <int>((b_f + m) * 255.0)
