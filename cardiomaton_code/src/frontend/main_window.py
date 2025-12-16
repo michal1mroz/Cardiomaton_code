@@ -10,9 +10,13 @@ from src.frontend.help_view.help_overlay import HelpOverlay
 from src.frontend.ui_components.top_bar_widget import TopBarWidget
 from src.frontend.ui_components.ui_factory import UIFactory
 
+from PyQt6.QtGui import QImage
+from src.backend.controllers.simulation_controller import SimulationController
+from src.frontend.frame_rendering.frame_renderer import FrameRenderer
+
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, simulationController: SimulationController, frameRenderer: FrameRenderer, image: QImage):
         super().__init__()
 
         self.resize(1100, 600)
@@ -43,12 +47,12 @@ class MainWindow(QMainWindow):
         self.help_provider = HelpContentProvider(self)
         self.help_overlay.hide()
 
-        self._init_views()
+        self._init_views(simulationController, frameRenderer, image)
         self._connect_topbar()
         self._apply_style()
 
-    def _init_views(self):
-        self.simulation_window = SimulationWindow()
+    def _init_views(self,  simulationController: SimulationController, frameRenderer: FrameRenderer, image: QImage):
+        self.simulation_window = SimulationWindow(simulationController, frameRenderer, image)
         self.stack.addWidget(self.simulation_window)
 
         self.about_view = QWidget()
