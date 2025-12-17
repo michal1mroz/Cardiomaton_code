@@ -20,9 +20,9 @@ def main():
     loading.show()
 
     # --- Backend initialization thread setup ---
-
+    K = 5
     backend_thread = QThread()
-    backend_worker = BackendInitWorker(base_frame_time=0.05, size = (292, 400))
+    backend_worker = BackendInitWorker(base_frame_time=0.05, size = (292 * K, 400 * K))
 
     backend_worker.moveToThread(backend_thread)
 

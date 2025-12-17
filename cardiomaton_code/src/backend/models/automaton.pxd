@@ -37,7 +37,7 @@ cdef class Automaton:
     cpdef dict get_cell_data(self, tuple)
 
     cpdef int get_buffer_size(self)
-    cpdef int render_frame(self, int idx, object if_charged, object drop_newer)
+    cpdef int render_frame(self, int idx, bint if_charged, bint drop_newer)
     cpdef void set_frame_counter(self, int)
     cpdef dict serialize_automaton(self)
 
