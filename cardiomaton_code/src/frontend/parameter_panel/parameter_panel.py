@@ -124,16 +124,20 @@ class ParameterPanel(QtWidgets.QWidget):
 
         def enforce_constraint_low(value):
             if value > slider_high.value():
+                # print(f"constraint low - type: {cell_type}, low: {param_low}, high: {param_high}, value: {value}, {slider_high.value()}, {slider_low.value()}")
                 slider_high.blockSignals(True)
-                slider_high.setValue(value)
+                # slider_high.setValue(value)
+                binding_high.set_slider_value(value)
                 slider_high.blockSignals(False)
 
                 binding_high.parameterChanged.emit()
 
         def enforce_constraint_high(value):
             if value < slider_low.value():
+                # print(f"constraint high - type: {cell_type}, low: {param_low}, high: {param_high}, value: {value}, {slider_high.value()}, {slider_low.value()}")
                 slider_low.blockSignals(True)
-                slider_low.setValue(value)
+                # slider_low.setValue(value)
+                binding_low.set_slider_value(value)
                 slider_low.blockSignals(False)
 
                 binding_low.parameterChanged.emit()
