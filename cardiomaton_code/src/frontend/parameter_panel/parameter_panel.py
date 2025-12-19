@@ -17,14 +17,12 @@ class ParameterPanel(QtWidgets.QWidget):
                  definitions: Optional[Dict[str, Dict[str, ParameterDefinition]]] = None) -> None:
         super().__init__(parent)
 
-
-
         self._definitions: Dict[str, Dict[str, ParameterDefinition]] = (
             definitions if definitions is not None else CELL_PARAMETER_DEFINITIONS
         )
 
-
         self._sliders: Dict[str, Dict[str, ParameterSlider]] = {}
+        self._constraint_labels: Dict[str, Dict[str, QtWidgets.QLabel]] = {}
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
@@ -44,6 +42,7 @@ class ParameterPanel(QtWidgets.QWidget):
             section_layout.setSpacing(10)
 
             self._sliders[cell_type] = {}
+            self._constraint_labels[cell_type] = {}
 
             for name, definition in parameters.items():
                 row = QtWidgets.QWidget()
@@ -75,6 +74,20 @@ class ParameterPanel(QtWidgets.QWidget):
                 bottom_layout.addWidget(value_edit)
 
                 row_layout.addWidget(bottom_row)
+
+                constraint_label = QtWidgets.QLabel("")
+                constraint_label.setObjectName("ConstraintLabel")
+                constraint_label.setStyleSheet("""
+                    QLabel {
+                        color: #e74c3c;
+                        font-size: 10px;
+                        font-style: italic;
+                    }
+                """)
+                constraint_label.setVisible(False)
+                row_layout.addWidget(constraint_label)
+                self._constraint_labels[cell_type][name] = constraint_label
+
                 section_layout.addWidget(row)
 
                 binding = ParameterSlider(definition=definition, slider=slider, value_edit=value_edit)
@@ -118,29 +131,43 @@ class ParameterPanel(QtWidgets.QWidget):
     def _link_parameters(self, cell_type: str, param_low: str, param_high: str) -> None:
         binding_low = self._sliders[cell_type][param_low]
         binding_high = self._sliders[cell_type][param_high]
-
+        
+        constraint_label_low = self._constraint_labels[cell_type][param_low]
+        constraint_label_high = self._constraint_labels[cell_type][param_high]
+        
         slider_low = binding_low.get_slider_widget()
         slider_high = binding_high.get_slider_widget()
 
+        # Assuming that the unit uses the last 5 chars in the CELL_PARAMETER_LABELS...
         def enforce_constraint_low(value):
             if value > slider_high.value():
-                # print(f"constraint low - type: {cell_type}, low: {param_low}, high: {param_high}, value: {value}, {slider_high.value()}, {slider_low.value()}")
+                constraint_label_low.setText(f"Value of '{CELL_PARAMETER_LABELS[cell_type][param_high][:-5]}' changed to {value} due to the constraints.")
+                constraint_label_low.setVisible(True)
+                
+                QtCore.QTimer.singleShot(2000, lambda: constraint_label_low.setVisible(False)) 
+                
                 slider_high.blockSignals(True)
-                # slider_high.setValue(value)
                 binding_high.set_slider_value(value)
                 slider_high.blockSignals(False)
 
                 binding_high.parameterChanged.emit()
+            else:
+                constraint_label_low.setVisible(False)
 
         def enforce_constraint_high(value):
             if value < slider_low.value():
-                # print(f"constraint high - type: {cell_type}, low: {param_low}, high: {param_high}, value: {value}, {slider_high.value()}, {slider_low.value()}")
+                constraint_label_high.setText(f"Value of '{CELL_PARAMETER_LABELS[cell_type][param_low][:-5]}' changed to {value} due to the constraints.")
+                constraint_label_high.setVisible(True)
+                
+                QtCore.QTimer.singleShot(2000, lambda: constraint_label_high.setVisible(False)) 
+                
                 slider_low.blockSignals(True)
-                # slider_low.setValue(value)
                 binding_low.set_slider_value(value)
                 slider_low.blockSignals(False)
 
                 binding_low.parameterChanged.emit()
+            else:
+                constraint_label_high.setVisible(False)
 
         slider_low.valueChanged.connect(enforce_constraint_low)
         slider_high.valueChanged.connect(enforce_constraint_high)
