@@ -5,6 +5,8 @@ from libc.math cimport sqrtf
 
 from src.backend.enums.cell_state cimport CellStateC
 from src.backend.structs.c_cell cimport CCell
+from src.backend.structs.c_triangle cimport CTriangle, TriangleOrientation
+
 
 """
     Mapping CellStateC -> color in 8-bit RGBA, where first index
@@ -128,27 +130,16 @@ cdef void draw_from_charge(unsigned char* img, int bytes_per_line, CCell* cell) 
         255
     )
 
-cdef inline void draw_cell_soft(unsigned char* img, int bytes_per_line, int cx, int cy, uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept nogil:
+cdef void draw_cell_soft(unsigned char* img, int bytes_per_line, int cx, int cy, uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept nogil:
     cdef int px, py, idx
-    cdef float dx, dy, d2
-    cdef float radius = 0.6 * K
-    cdef float radius2 = radius * radius
+    cdef int half = K // 2
 
-    for py in range(cy - <int>radius - 1, cy + <int>radius + 1):
+    for py in range(cy - half, cy - half + K):
         if py < 0 or py >= img_height:
             continue
 
-        dy = <float>(py - cy)
-        dy *= dy
-
-        for px in range(cx - <int>radius - 1, cx + <int>radius + 1):
+        for px in range(cx - half, cx - half + K):
             if px < 0 or px >= img_width:
-                continue
-
-            dx = <float>(px - cx)
-            d2 = dx * dx + dy
-
-            if d2 > radius2:
                 continue
 
             idx = py * bytes_per_line + px * 4
@@ -156,4 +147,66 @@ cdef inline void draw_cell_soft(unsigned char* img, int bytes_per_line, int cx, 
             img[idx + 0] = r
             img[idx + 1] = g
             img[idx + 2] = b
-            img[idx + 3] = 255
+            img[idx + 3] = a
+
+cdef void draw_triangle_soft(unsigned char* img, int bytes_per_line, CTriangle tri) noexcept nogil:
+    cdef int px, py, idx
+    cdef int half = K // 2
+    cdef float fx, fy
+    cdef float A = K * 0.9
+    cdef float B = K * 0.9
+
+    cdef int cy = tri.x * K + half
+    cdef int cx = tri.y * K + half
+
+    cdef int base_y = cy - half
+    cdef int base_x = cx - half
+
+    cdef int sample_x, sample_y, sample_idx
+    cdef uint8_t r, g, b, a
+
+    if tri.orient == TriangleOrientation.TRI_NW or tri.orient == TriangleOrientation.TRI_SW:
+        sample_x = base_x + K
+        sample_y = cy
+    else:  # TRI_NE, TRI_SE
+        sample_x = base_x - 1
+        sample_y = cy
+
+    if sample_x < 0 or sample_x >= img_width or sample_y < 0 or sample_y >= img_height:
+        return
+
+    sample_idx = sample_y * bytes_per_line + sample_x * 4
+    r = img[sample_idx + 0]
+    g = img[sample_idx + 1]
+    b = img[sample_idx + 2]
+    a = img[sample_idx + 3]
+    # r = 0
+    # g = 255
+    # b = 0
+    # a = 255
+
+    for py in range(K):
+        for px in range(K):
+
+            if tri.orient == TriangleOrientation.TRI_NE:
+                if px + py >= K:
+                    continue
+            elif tri.orient == TriangleOrientation.TRI_NW:
+                if (K - px - 1) + py >= K:
+                    continue
+            elif tri.orient == TriangleOrientation.TRI_SE:
+                if px + (K - py - 1) >= K:
+                    continue
+            else:  # TRI_SW
+                if (K - px - 1) + (K - py - 1) >= K:
+                    continue
+
+            idx = (base_y + py) * bytes_per_line + (base_x + px) * 4
+
+            if idx < 0:
+                continue
+
+            img[idx + 0] = r
+            img[idx + 1] = g
+            img[idx + 2] = b
+            img[idx + 3] = a
