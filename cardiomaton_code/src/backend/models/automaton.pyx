@@ -238,32 +238,29 @@ cdef class Automaton:
         cdef CellSnapshot* snapshot = self.frame_recorder.get_next_buffer()
         self.frame_counter += 1
 
-        cdef CCell** grid
         cdef CCell* cell
         cdef unsigned char* img_buffer = self.img_buffer
         cdef int bytes_per_line = self.bytes_per_line
         cdef int n_nodes = self.n_nodes
 
-        for i in range(self.n_nodes):
-            cell_a = self.grid_a[i]
-            cell_b = self.grid_b[i]
-            update_charge(cell_a, cell_b)
-            # draw_function(self.img_buffer, self.bytes_per_line, cell_b)
-
-            # Inline write to the buffer
-            snapshot[i].pos_x = cell_b.pos_x
-            snapshot[i].pos_y = cell_b.pos_y
-            snapshot[i].c_state = cell_b.c_state
-            snapshot[i].charge = cell_b.charge
-            snapshot[i].timer = cell_b.timer
-            snapshot[i].can_propagate = cell_b.can_propagate
-            snapshot[i].propagation_time = cell_b.propagation_time
-            snapshot[i].propagation_count = cell_b.propagation_count
-        grid = self.grid_b
         with nogil:
             for i in prange(n_nodes, schedule='static'):
-                cell = grid[i]
-                draw_function(img_buffer, bytes_per_line, cell)
+                cell_a = self.grid_a[i]
+                cell_b = self.grid_b[i]
+                update_charge(cell_a, cell_b)
+
+                draw_function(img_buffer, bytes_per_line, cell_b)
+
+                # Inline write to the buffer
+                snapshot[i].pos_x = cell_b.pos_x
+                snapshot[i].pos_y = cell_b.pos_y
+                snapshot[i].c_state = cell_b.c_state
+                snapshot[i].charge = cell_b.charge
+                snapshot[i].timer = cell_b.timer
+                snapshot[i].can_propagate = cell_b.can_propagate
+                snapshot[i].propagation_time = cell_b.propagation_time
+                snapshot[i].propagation_count = cell_b.propagation_count
+
             for i in prange(self.n_triangles, schedule='static'):
                 triangle = self.smoothing_triangles[i]
                 draw_triangle_soft(self.img_buffer, self.bytes_per_line, triangle)
