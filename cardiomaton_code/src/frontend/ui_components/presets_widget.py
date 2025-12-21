@@ -60,7 +60,13 @@ class PresetsWidget(QWidget):
 
     def _init_connections(self):
         self.dropdown.currentTextChanged.connect(self.on_preset_changed)
-        self.button.clicked.connect(self.toggle_input_field)
+        self.button.clicked.connect(self.handle_button_click)
+
+    def handle_button_click(self):
+        if self.is_adding_preset:
+            self.on_input_return_pressed()
+        else:
+            self.toggle_input_field()
     
     def on_preset_changed(self, text):
         """Handler for when combobox selection changes."""

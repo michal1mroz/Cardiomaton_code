@@ -37,7 +37,7 @@ class HelpContentProvider:
         steps.append(TutorialStep(
             widget=simulation_window.presets_layout.button,
             title="Save Preset Mode",
-            description="Enters or exits the preset saving mode. Open this interface to name and store the current simulation state. Click again to close the input field and return to the default view."
+            description="Enters or exits the preset saving mode. Open this interface to name and store the current simulation state. Click again to save your preset, exit the input field and return to the default view."
         ))
 
         steps.append(TutorialStep(
@@ -121,7 +121,7 @@ class HelpContentProvider:
         steps.append(TutorialStep(
             widget=simulation_window.presets_layout.text_input,
             title="Save Your Preset",
-            description="Type a name for your preset and press Enter to confirm. This saves the current state of the simulation under that name, allowing you to restore this exact configuration later."
+            description="Type a name for your preset and press the '✔' button to confirm. This saves the current state of the simulation under that name, allowing you to restore this exact configuration later."
         ))
 
         overlay_graph = self.app.simulation_window.overlay_graph
