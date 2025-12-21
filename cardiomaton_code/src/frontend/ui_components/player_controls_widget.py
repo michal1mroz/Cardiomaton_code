@@ -16,7 +16,7 @@ class PlayerControlsWidget(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
         self.speed_dropdown = QComboBox()
-        self.speed_dropdown.addItems(["1x", "2x", "3x"])
+        self.speed_dropdown.addItems(["1x", "2x", "5x"])
         self.speed_dropdown.setObjectName("speedComboBox")
 
         self.restart_button = QPushButton()
