@@ -148,21 +148,81 @@ QPushButton#GraphCloseBtn {
     font-size: 12px;
 }
 
-#ToggleBtn,
-#ControlBtn {
+#RestartBtn {
     background-color: transparent;
-    border: none;
-    font-weight: bold;
-    color: #E1605D;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/reload.png") 0 0 0 0 stretch stretch;
 }
 
-#ToggleBtn:hover,
-#ControlBtn:hover {
-    color: #CD4B48;
+#RestartBtn:hover {
+        border-image: url("./resources/style/icons/reload_hover.png") 0 0 0 0 stretch stretch;
+
 }
 
-#ToggleBtn { font-size: 40px; }
-#ControlBtn { font-size: 30px; }
+#PrevBtn {
+    background-color: transparent;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/left_arrow.png") 0 0 0 0 stretch stretch;
+}
+
+#PrevBtn:hover {
+        border-image: url("./resources/style/icons/left_arrow_hover.png") 0 0 0 0 stretch stretch;
+
+}
+
+#NextBtn {
+    background-color: transparent;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/right_arrow.png") 0 0 0 0 stretch stretch;
+}
+
+#NextBtn:hover {
+        border-image: url("./resources/style/icons/right_arrow_hover.png") 0 0 0 0 stretch stretch;
+
+}
+
+#InvestigateBtn {
+    background-color: transparent;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/investigate.png") 0 0 0 0 stretch stretch;
+}
+
+#InvestigateBtn:hover {
+        border-image: url("./resources/style/icons/investigate_hover.png") 0 0 0 0 stretch stretch;
+
+}
+
+#ModificationBtn {
+    background-color: transparent;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/modification.png") 0 0 0 0 stretch stretch;
+}
+
+#ModificationBtn:hover {
+        border-image: url("./resources/style/icons/modification_hover.png") 0 0 0 0 stretch stretch;
+
+}
+
+#PotentialBtn {
+    background-color: transparent;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/lightning.png") 0 0 0 0 stretch stretch;
+}
+
+#PotentialBtn:hover {
+        border-image: url("./resources/style/icons/lightning_hover.png") 0 0 0 0 stretch stretch;
+
+}
+
+#StateBtn {
+    background-color: transparent;
+    border-radius: 0px;
+    border-image: url("./resources/style/icons/state.png") 0 0 0 0 stretch stretch;
+}
+
+#StateBtn:hover {
+    border-image: url("./resources/style/icons/state_hover.png") 0 0 0 0 stretch stretch;
+}
 
 #presetBtn {
     font-family: 'Mulish ExtraBold';

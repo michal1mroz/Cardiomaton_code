@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QImage
+from PyQt6.QtGui import QImage, QIcon
 from PyQt6.QtWidgets import QWidget
 
 from src.backend.controllers.simulation_controller import SimulationController
@@ -95,7 +95,10 @@ class SimulationWindow(QWidget):
         self.navigator.set_buffer_size(self.sim.get_buffer_size())
 
     def _update_ui_state(self, is_running: bool):
-        self.ui.play_button.setText("▪" if is_running else "▶")
+        if is_running:
+            self.ui.play_button.setIcon(QIcon("./resources/style/icons/stop.png"))
+        else:
+            self.ui.play_button.setIcon(QIcon("./resources/style/icons/play.png"))
         self.render_label.set_running(is_running)
         self.inspector_manager.set_running_state(is_running)
 
@@ -104,7 +107,14 @@ class SimulationWindow(QWidget):
 
     def _toggle_render_mode(self):
         self.render_charged = not self.render_charged
-        self.ui.toggle_render_button.setText("↯" if self.render_charged else "️⏣")
+        if self.render_charged:
+            self.ui.toggle_render_button.setObjectName("PotentialBtn")
+        else:
+            self.ui.toggle_render_button.setObjectName("StateBtn")
+
+        self.ui.toggle_render_button.style().unpolish(self.ui.toggle_render_button)
+        self.ui.toggle_render_button.style().polish(self.ui.toggle_render_button)
+        self.ui.toggle_render_button.update()
 
         if not self.runner.running:
             if self.navigator.current_buffer_index != -1:
@@ -184,7 +194,14 @@ class SimulationWindow(QWidget):
     def _toggle_interaction_mode(self):
         self.inspection_set = not self.inspection_set
         self.render_label.set_interaction_mode(self.inspection_set)
-        self.ui.toggle_interaction_button.setText("⌕" if self.inspection_set else "️✐")
+        if self.inspection_set:
+            self.ui.toggle_interaction_button.setObjectName("InvestigateBtn")
+        else:
+            self.ui.toggle_interaction_button.setObjectName("ModificationBtn")
+
+        self.ui.toggle_interaction_button.style().unpolish(self.ui.toggle_interaction_button)
+        self.ui.toggle_interaction_button.style().polish(self.ui.toggle_interaction_button)
+        self.ui.toggle_interaction_button.update()
 
     def _on_preset_selected(self, entry):
         self._pause_simulation()

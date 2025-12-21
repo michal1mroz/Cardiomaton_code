@@ -1,5 +1,5 @@
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer
-from PyQt6.QtGui import QFont
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QSize
+from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QListView
 
 from src.frontend.ui_components.ui_factory import UIFactory
@@ -43,10 +43,11 @@ class PresetsWidget(QWidget):
 
         self.main_layout.addStretch(1)
 
-        self.button = UIFactory.create_pushbutton(self, font_size=15)
-        self.button.setText("+")
+        self.button = UIFactory.create_pushbutton(self)
         self.button.setObjectName("presetBtn")
         self.button.setFixedSize(30, 30)
+        self.button.setIcon(QIcon("./resources/style/icons/plus.png"))
+        self.button.setIconSize(QSize(14, 14))
         self.main_layout.addWidget(self.button)
 
         self.main_layout.setContentsMargins(30, 5, 30, 5)
@@ -113,7 +114,7 @@ class PresetsWidget(QWidget):
         """Show the text input field for entering a new preset name."""
         self.is_adding_preset = True
         
-        self.button.setText("✓")
+        self.button.setIcon(QIcon("./resources/style/icons/okay.png"))
         
         self.text_input.setVisible(True)
         self.text_input.clear()
@@ -125,9 +126,9 @@ class PresetsWidget(QWidget):
     def hide_input_field(self):
         """Hide the text input field."""
         self.is_adding_preset = False
-        
-        self.button.setText("+")
-        
+
+        self.button.setIcon(QIcon("./resources/style/icons/plus.png"))
+
         self.text_input.setVisible(False)
 
         self.label.setText("Select Preset")
