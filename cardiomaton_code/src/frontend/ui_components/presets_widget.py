@@ -48,6 +48,8 @@ class PresetsWidget(QWidget):
         self.button.setIcon(QIcon("./resources/style/icons/plus.png"))
         self.button.setIconSize(QSize(14, 14))
         self.main_layout.addWidget(self.button)
+        UIFactory.add_shadow(self.button)
+
 
         self.exit_button = UIFactory.create_pushbutton(self)
         self.exit_button.setObjectName("exitBtn")
@@ -56,6 +58,7 @@ class PresetsWidget(QWidget):
         self.exit_button.setIconSize(QSize(14, 14))
         self.main_layout.addWidget(self.exit_button)
         self.exit_button.hide()
+        UIFactory.add_shadow(self.exit_button)
 
         self.main_layout.setContentsMargins(30, 5, 30, 5)
 

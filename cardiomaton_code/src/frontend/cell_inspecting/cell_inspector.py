@@ -53,7 +53,7 @@ class CellInspector(QWidget):
         self._root.setContentsMargins(0, 0, 0, 0)
 
         top = QHBoxLayout()
-        top.setContentsMargins(0, 15, 0, 0)
+        top.setContentsMargins(0, 15, 7, 0)
         top.addStretch()
 
         close_btn = UIFactory.create_pushbutton(self)
@@ -62,6 +62,7 @@ class CellInspector(QWidget):
         close_btn.setIcon(QIcon("./resources/style/icons/cancel.png"))
         close_btn.setIconSize(QSize(14, 14))
         close_btn.clicked.connect(self.close_inspector)
+        UIFactory.add_shadow(close_btn)
         top.addWidget(close_btn)
         self._root.addLayout(top)
         self._root.addWidget(self._details)

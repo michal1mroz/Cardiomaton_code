@@ -14,16 +14,14 @@ class UIFactory:
                     QFontDatabase.addApplicationFont(os.path.join(fonts_dir, filename))
 
     @staticmethod
-    def add_shadow(widget: QWidget, blur: int = 30, offset_x: int = 2, offset_y: int = 2,
-                   color: QColor = QColor(150, 150, 150, 100)) -> None:
-        '''
-        TODO: Customize shadows between dark and light modes
+    def add_shadow(widget: QWidget, blur: int = 15, offset_x: int = 3, offset_y: int = 3,
+                   color: QColor = QColor(53, 66, 79, 90)) -> None:
+
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(blur)
         shadow.setOffset(offset_x, offset_y)
         shadow.setColor(color)
         widget.setGraphicsEffect(shadow)
-        '''
 
     @staticmethod
     def create_label(parent: QWidget, text: str = "", font_family: str = "Mulish",

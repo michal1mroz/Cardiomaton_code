@@ -8,10 +8,10 @@ class ModificationPanel(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(20, 10, 0, 0)
         layout.setSpacing(15)
-        layout.setObjectName("Layout")
 
         self.commit_button = QPushButton("Commit")
         self.commit_button.setObjectName("BlueBtn")
+
         self.undo_button = QPushButton("Undo")
         self.undo_button.setObjectName("UndoBtn")
 
@@ -29,7 +29,6 @@ class ModificationPanel(QWidget):
         self.brush_layout.addWidget(self.brush_slider)
         self.brush_layout.addWidget(self.brush_value_label)
         self.brush_container.setLayout(self.brush_layout)
-        self.brush_layout.setObjectName("Layout")
 
         self.necrosis_switch = QCheckBox("Necrosis")
         self.necrosis_switch.setObjectName("NecrosisSwitch")

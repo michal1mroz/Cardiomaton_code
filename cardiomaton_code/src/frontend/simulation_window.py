@@ -13,6 +13,7 @@ from src.frontend.simulation_display.cell_data_provider import CellDataProvider
 from src.frontend.simulation_display.cell_modificator import CellModificator, CellModification
 from src.frontend.simulation_display.simulation_view import SimulationView
 from src.backend.services.simulation_loop import SimulationRunner
+from src.frontend.ui_components.ui_factory import UIFactory
 from src.frontend.ui_simulation_window import UiSimulationWindow
 from src.models.cell import CellDict
 
@@ -52,6 +53,7 @@ class SimulationWindow(QWidget):
 
     def _init_ui_layout(self):
         self.ui.simulation_layout.addWidget(self.render_label)
+        UIFactory.add_shadow(self.overlay_graph)
 
     def _connect_signals(self):
         self.runner.frame_tick.connect(self._update_live_frame)

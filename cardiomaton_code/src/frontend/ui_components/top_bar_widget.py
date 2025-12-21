@@ -20,6 +20,7 @@ class TopBarWidget(QWidget):
         self.logo = QWidget()
         self.logo.setFixedSize(40, 40)
         self.logo.setObjectName("Logo")
+        UIFactory.add_shadow(self.logo)
 
         self.project_name = QLabel("Cardiomaton")
         self.project_name.setObjectName("ProjectName")

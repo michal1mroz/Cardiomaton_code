@@ -13,7 +13,7 @@ QScrollArea {
     border-radius: 20px;
 }
 
-#parameters_scroll {
+#parametersScroll {
     background-color: transparent;
 }
 
@@ -378,36 +378,32 @@ QCheckBox::indicator:checked {
 
 
 QSlider::groove:horizontal {
-    border: 1px solid #bbb;
     background: #c0c0c0;
-    height: 4px;
-    border-radius: 4px;
+    height: 6px;
+    border-radius: 3px;
 }
 
 QSlider::sub-page:horizontal {
-    background: #0078D7;
-    border: 1px solid #777;
-    height: 4px;
-    border-radius: 4px;
+    background: #5E83F2;
+    height: 6px;
+    border-radius: 3px;
 }
 
 QSlider::add-page:horizontal {
     background: #c0c0c0;
-    border: 0px solid #777;
-    height: 4px;
-    border-radius: 4px;
+    height: 6px;
+    border-radius: 3px;
 }
 
 QSlider::handle:horizontal {
-    background: #5c5c5c;
-    border: 1px solid #5c5c5c;
-    width: 14px;
+    background: #5E83F2;
+    width: 10px;
     margin: -6px 0;
-    border-radius: 7px;
+    border-radius: 5px;
 }
 
 QSlider::handle:horizontal:hover {
-    background: black;
+    background: #496BD3;
 }
 
 

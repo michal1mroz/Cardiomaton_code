@@ -41,6 +41,7 @@ class GraphWidget(QtWidgets.QFrame):
         self.close_btn.setIconSize(QSize(10, 10))
         self.close_btn.clicked.connect(self.hide)
         self.close_btn.move(550, 10)
+        UIFactory.add_shadow(self.close_btn)
 
     def update_data(self, t, v, title="Preview"):
         self._current_title_text = title
