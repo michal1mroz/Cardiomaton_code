@@ -505,3 +505,28 @@ GraphWidget {
     font-family: "Mulish";
     font-size: 14px;
 }
+
+/*--- ABOUT US ---*/
+#AboutTitle,
+#AuthorsLabel {
+    qproperty-alignment: 'AlignCenter';
+}
+
+#Subtitle {
+    qproperty-alignment: 'AlignCenter';
+    color: #F9FBFF;
+}
+
+#AboutDescription {
+    background-color: transparent;
+    border: none;
+    font-size: 15px;
+    color: #E6EAF0;
+    max-height: 140px;
+}
+
+#GithubLink {
+    qproperty-alignment: 'AlignCenter';
+    font-size: 14px;
+    font-weight: bold;
+}

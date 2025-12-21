@@ -4,6 +4,7 @@ from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QLabel
 from PyQt6.QtGui import QIcon
 
+from src.frontend.about_view.about_view import AboutView
 from src.frontend.help_view.help_content_provider import HelpContentProvider
 from src.frontend.simulation_window import SimulationWindow
 from src.frontend.help_view.help_overlay import HelpOverlay
@@ -51,11 +52,7 @@ class MainWindow(QMainWindow):
         self.simulation_window = SimulationWindow()
         self.stack.addWidget(self.simulation_window)
 
-        self.about_view = QWidget()
-        lbl_about = QLabel("O nas", self.about_view)
-        lbl_about.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        about_layout = QVBoxLayout(self.about_view)
-        about_layout.addWidget(lbl_about)
+        self.about_view = AboutView()
         self.stack.addWidget(self.about_view)
 
     def _connect_topbar(self):

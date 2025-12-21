@@ -500,8 +500,33 @@ GraphWidget {
     font-size: 14px;
 }
 
-/* --- CELL INSPECTOR --*/
+/* --- CELL INSPECTOR ---*/
 #cell_label {
     font-family: "Mulish";
     font-size: 14px;
+}
+
+/*--- ABOUT US ---*/
+#AboutTitle,
+#AuthorsLabel {
+    qproperty-alignment: 'AlignCenter';
+}
+
+#Subtitle {
+    qproperty-alignment: 'AlignCenter';
+    color: #7f8c8d;
+}
+
+#AboutDescription {
+    background-color: transparent;
+    border: none;
+    font-size: 15px;
+    color: #233348;
+    max-height: 140px;
+}
+
+#GithubLink {
+    qproperty-alignment: 'AlignCenter';
+    font-size: 14px;
+    font-weight: bold;
 }
