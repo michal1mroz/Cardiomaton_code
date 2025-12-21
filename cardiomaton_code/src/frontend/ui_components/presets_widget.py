@@ -12,6 +12,19 @@ class PresetsWidget(QWidget):
     preset_changed = pyqtSignal(str)  
     save_preset_request = pyqtSignal(str)
 
+    display_mapping = {
+        "PHYSIOLOGICAL" : "Physiological Rhythm",
+        "SINUS_BRADYCARDIA" : "Sinus Bradycardia",
+        "SINUS_TACHYCARDIA": "Sinus Tachycardia",
+        "AV_BLOCK_I": "First Degree Atrioventricular Block",
+        "SINUS_PAUSE_RETROGRADE": "Sinus Pause with Retrograde",
+        "SA_BLOCK_RETROGRADE": "Sinoatrial Block with Retrograde",
+    }
+
+    backward_display_mapping = {
+        v: k for k, v in display_mapping.items()
+    }
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -57,6 +70,12 @@ class PresetsWidget(QWidget):
 
         self.setLayout(self.main_layout)
 
+    def get_display_name(self, internal_name):
+        return self.display_mapping.get(internal_name, internal_name)
+    
+    def get_internal_name(self, display_name):
+        return self.backward_display_mapping.get(display_name, display_name)
+
     def _init_connections(self):
         self.dropdown.currentTextChanged.connect(self.on_preset_changed)
         self.button.clicked.connect(self.toggle_input_field)
@@ -80,7 +99,15 @@ class PresetsWidget(QWidget):
 
             if entries:
                 for entry in entries:
-                    self.dropdown.addItem(entry['name'])
+                    display_name = self.get_display_name(entry['name'])
+                    self.dropdown.addItem(display_name)
+                    index = self.dropdown.count() - 1
+                    self.dropdown.setItemData(
+                        index,
+                        display_name,
+                        Qt.ItemDataRole.ToolTipRole
+                    )
+
             else:
                 self.dropdown.addItem("No presets available")
         except Exception as e:
@@ -100,7 +127,7 @@ class PresetsWidget(QWidget):
         """Get the currently selected entry from database based on combobox selection."""
         current_text = self.dropdown.currentText()
         self.dropdown.hidePopup()
-        return current_text
+        return self.get_internal_name(current_text)
     
     def toggle_input_field(self):
         """Toggle the text input field visibility."""
