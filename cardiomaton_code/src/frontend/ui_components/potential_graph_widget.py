@@ -1,7 +1,9 @@
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtGui import QFont, QColor
-from PyQt6.QtCore import pyqtProperty, Qt
+from PyQt6.QtGui import QFont, QColor, QIcon
+from PyQt6.QtCore import pyqtProperty, Qt, QSize
 import pyqtgraph as pg
+
+from src.frontend.ui_components.ui_factory import UIFactory
 
 
 class GraphWidget(QtWidgets.QFrame):
@@ -32,10 +34,11 @@ class GraphWidget(QtWidgets.QFrame):
         self.curve = self.plot_widget.plot(pen=pg.mkPen(color=self._trace_color, width=2))
         layout.addWidget(self.plot_widget)
 
-        self.close_btn = QtWidgets.QPushButton("X", self)
+        self.close_btn = UIFactory.create_pushbutton(self)
         self.close_btn.setObjectName("GraphCloseBtn")
         self.close_btn.setFixedSize(24, 24)
-        self.close_btn.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.close_btn.setIcon(QIcon("./resources/style/icons/cancel.png"))
+        self.close_btn.setIconSize(QSize(10, 10))
         self.close_btn.clicked.connect(self.hide)
         self.close_btn.move(550, 10)
 

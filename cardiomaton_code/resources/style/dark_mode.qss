@@ -275,6 +275,18 @@ QPushButton#BtnAbout:hover {
     color: #FFFFFF;
 }
 
+#exitBtn {
+    background-color: #5E83F2;
+    border: none;
+    width: 30px;
+    height: 30px;
+    padding: 7px;
+    border-radius: 15px;
+}
+
+#exitBtn:hover {
+    background-color: #496BD3;
+}
 
 /* --- COMBOBOX --- */
 

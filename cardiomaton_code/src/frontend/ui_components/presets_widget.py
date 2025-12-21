@@ -38,7 +38,6 @@ class PresetsWidget(QWidget):
         self.text_input.setObjectName("presetNameInput")
         self.text_input.setPlaceholderText("Enter preset name...")
         self.text_input.setVisible(False)
-        self.text_input.returnPressed.connect(self.on_input_return_pressed)
         self.main_layout.addWidget(self.text_input)
 
         self.main_layout.addStretch(1)
@@ -49,6 +48,14 @@ class PresetsWidget(QWidget):
         self.button.setIcon(QIcon("./resources/style/icons/plus.png"))
         self.button.setIconSize(QSize(14, 14))
         self.main_layout.addWidget(self.button)
+
+        self.exit_button = UIFactory.create_pushbutton(self)
+        self.exit_button.setObjectName("exitBtn")
+        self.exit_button.setFixedSize(30, 30)
+        self.exit_button.setIcon(QIcon("./resources/style/icons/cancel.png"))
+        self.exit_button.setIconSize(QSize(14, 14))
+        self.main_layout.addWidget(self.exit_button)
+        self.exit_button.hide()
 
         self.main_layout.setContentsMargins(30, 5, 30, 5)
 
@@ -61,12 +68,13 @@ class PresetsWidget(QWidget):
     def _init_connections(self):
         self.dropdown.currentTextChanged.connect(self.on_preset_changed)
         self.button.clicked.connect(self.handle_button_click)
+        self.exit_button.clicked.connect(self.hide_input_field)
 
     def handle_button_click(self):
         if self.is_adding_preset:
-            self.on_input_return_pressed()
+            self.save_preset_from_input()
         else:
-            self.toggle_input_field()
+            self.show_input_field()
     
     def on_preset_changed(self, text):
         """Handler for when combobox selection changes."""
@@ -108,19 +116,13 @@ class PresetsWidget(QWidget):
         current_text = self.dropdown.currentText()
         self.dropdown.hidePopup()
         return current_text
-    
-    def toggle_input_field(self):
-        """Toggle the text input field visibility."""
-        if self.is_adding_preset:
-            self.cancel_input()
-        else:
-            self.show_input_field()
 
     def show_input_field(self):
         """Show the text input field for entering a new preset name."""
         self.is_adding_preset = True
         
         self.button.setIcon(QIcon("./resources/style/icons/okay.png"))
+        self.exit_button.show()
         
         self.text_input.setVisible(True)
         self.text_input.clear()
@@ -134,30 +136,27 @@ class PresetsWidget(QWidget):
         self.is_adding_preset = False
 
         self.button.setIcon(QIcon("./resources/style/icons/plus.png"))
+        self.exit_button.hide()
 
         self.text_input.setVisible(False)
 
         self.label.setText("Select Preset")
         self.dropdown.show()
-
-    def cancel_input(self):
-        """Cancel the input operation."""
-        self.hide_input_field()
         
     def validate_preset_name(self, name):
         """Validate the preset name."""
         name = name.strip()
         
         if not name:
-            return False, "Preset name cannot be empty"
+            return False, "Name cannot be empty"
         
         if len(name) > 50:
-            return False, "Preset name too long (max 50 characters)"
+            return False, "Name too long (max 50 characters)"
         
         invalid_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
         for char in invalid_chars:
             if char in name:
-                return False, f"Preset name cannot contain '{char}'"
+                return False, f"Name cannot contain '{char}'"
         
         
         return True, name
@@ -186,11 +185,7 @@ class PresetsWidget(QWidget):
             self.dropdown.clear()
         finally:
             self.dropdown.blockSignals(was_blocked)
-        self.current_entry = self._get_selected_entry() 
-
-    def on_input_return_pressed(self):
-        self.save_preset_from_input()
-
+        self.current_entry = self._get_selected_entry()
 
     def save_preset_from_input(self):
         name = self.text_input.text()

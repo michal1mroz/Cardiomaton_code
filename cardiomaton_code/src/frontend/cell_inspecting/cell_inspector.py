@@ -1,10 +1,12 @@
 from typing import Optional, Iterable
 
-from PyQt6.QtGui import QFont
+from PyQt6.QtCore import QSize
+from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy
 
 from src.frontend.cell_inspecting.cell_details import CellDetails
 from src.frontend.cell_inspecting.series_plot import SeriesPlot
+from src.frontend.ui_components.ui_factory import UIFactory
 from src.models.cell import CellDict
 
 class CellInspector(QWidget):
@@ -54,13 +56,11 @@ class CellInspector(QWidget):
         top.setContentsMargins(0, 15, 0, 0)
         top.addStretch()
 
-        close_btn = QPushButton("X")
+        close_btn = UIFactory.create_pushbutton(self)
         close_btn.setFixedSize(30, 30)
-        close_btn.setSizePolicy(
-            QSizePolicy.Policy.Fixed,
-            QSizePolicy.Policy.Fixed,
-        )
         close_btn.setObjectName("CloseBtn")
+        close_btn.setIcon(QIcon("./resources/style/icons/cancel.png"))
+        close_btn.setIconSize(QSize(14, 14))
         close_btn.clicked.connect(self.close_inspector)
         top.addWidget(close_btn)
         self._root.addLayout(top)

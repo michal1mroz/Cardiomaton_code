@@ -227,7 +227,6 @@ QPushButton#GraphCloseBtn {
     border-image: url("./resources/style/icons/state_hover.png") 0 0 0 0 stretch stretch;
 }
 
-
 #presetBtn {
     background-color: #E1605D;
     border: none;
@@ -241,6 +240,18 @@ QPushButton#GraphCloseBtn {
     background-color: #CD4B48;
 }
 
+#exitBtn {
+    background-color: #5E83F2;
+    border: none;
+    width: 30px;
+    height: 30px;
+    padding: 7px;
+    border-radius: 15px;
+}
+
+#exitBtn:hover {
+    background-color: #496BD3;
+}
 
 
 /* --- TOPBAR BUTTONS --- */
