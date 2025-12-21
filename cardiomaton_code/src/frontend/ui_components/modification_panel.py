@@ -15,7 +15,9 @@ class ModificationPanel(QWidget):
         self.undo_button = QPushButton("Undo")
         self.undo_button.setObjectName("UndoBtn")
 
-        brush_layout = QHBoxLayout()
+        self.brush_container = QWidget()
+        self.brush_container.setObjectName("brushContainer")
+        self.brush_layout = QHBoxLayout()
         self.brush_slider = QSlider(Qt.Orientation.Horizontal)
         self.brush_slider.setRange(1, 8)
         self.brush_slider.setFixedWidth(100)
@@ -24,15 +26,16 @@ class ModificationPanel(QWidget):
 
         self.brush_slider.valueChanged.connect(lambda v: self.brush_value_label.setText(str(v)))
 
-        brush_layout.addWidget(self.brush_slider)
-        brush_layout.addWidget(self.brush_value_label)
-        brush_layout.setObjectName("Layout")
+        self.brush_layout.addWidget(self.brush_slider)
+        self.brush_layout.addWidget(self.brush_value_label)
+        self.brush_container.setLayout(self.brush_layout)
+        self.brush_layout.setObjectName("Layout")
 
         self.necrosis_switch = QCheckBox("Necrosis")
         self.necrosis_switch.setObjectName("NecrosisSwitch")
 
         layout.addWidget(self.commit_button)
         layout.addWidget(self.undo_button)
-        layout.addLayout(brush_layout)
+        layout.addWidget(self.brush_container)
         layout.addWidget(self.necrosis_switch)
         layout.addStretch()
