@@ -68,5 +68,5 @@ cdef double update_charge(CCell*)
 cdef double depolarize(CCell*)
 
 # helper functions for the charge update function
-cdef int is_neighbor_depolarized(CCell*)
-cdef int is_relative_repolarization(CCell*)
+cdef int is_neighbor_depolarized(CCell*) noexcept nogil
+cdef int is_relative_repolarization(CCell*) noexcept nogil

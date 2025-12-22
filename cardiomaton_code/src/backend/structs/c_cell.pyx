@@ -177,7 +177,7 @@ cdef double depolarize(CCell* cell):
 
 #############################################################
 
-cdef int is_neighbor_depolarized(CCell* cell):
+cdef int is_neighbor_depolarized(CCell* cell) noexcept nogil:
     """
     Check if at least NEIGHBOR_DEPOLARIZATION_COUNT neighbors of the cell 
     are in RAPID_DEPOLARIZATION state
@@ -204,7 +204,7 @@ cdef int is_neighbor_depolarized(CCell* cell):
                 return 1
     return 0
 
-cdef int is_relative_repolarization(CCell* cell):
+cdef int is_relative_repolarization(CCell* cell) noexcept nogil:
     """
     Check if the repolarization in relative refraction is possible.
     For it to be possible at least NEIGHBOR_REFRACTION_POLAR neighbors must have

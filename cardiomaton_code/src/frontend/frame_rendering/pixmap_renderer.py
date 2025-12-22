@@ -17,5 +17,6 @@ class PixmapRenderer:
     def to_pixmap(self, target_size: QSize) -> QPixmap:
         return QPixmap.fromImage(self._image).scaled(
             target_size,
-            aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
         )

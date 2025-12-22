@@ -2,6 +2,7 @@ from libc.stdio cimport printf
 from libc.stdlib cimport malloc, realloc, free
 from libc.string cimport memset, memcpy
 from libc.stdint cimport uintptr_t
+from cython.parallel cimport prange
 
 
 from src.backend.structs.c_cell cimport CCell, create_c_cell, add_cell_charges, free_c_cell, allocate_neighbors, cell_to_dict, create_mimic_cell, recreate_cell_from_mimic
@@ -9,8 +10,9 @@ from src.backend.enums.cell_state cimport CellStateC,state_to_cenum, state_to_py
 from src.backend.enums.cell_type cimport type_to_cenum, type_to_pyenum
 from src.backend.enums.cell_type cimport CellTypeC
 from src.backend.utils.charge_update cimport update_charge
-from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc
+from src.backend.utils.draw_functions cimport draw_from_state, draw_from_charge, DrawFunc, draw_triangle_soft
 from src.backend.structs.cell_wrapper cimport CellWrapper
+from src.backend.structs.c_triangle cimport CTriangle, find_smoothing_triangles
 from src.backend.structs.cell_snapshot cimport CellSnapshot
 from src.backend.models.frame_recorder cimport FrameRecorder
 
@@ -86,6 +88,20 @@ cdef class Automaton:
 
         self.buf_size = 0
 
+        # Smoothing triangles
+
+        cdef CTriangle* smoothing_triangles
+        cdef int n_triangles
+
+        smoothing_triangles = find_smoothing_triangles(
+            self.grid_a,
+            self.n_nodes,
+            &n_triangles
+        )
+
+        self.n_triangles = n_triangles
+        self.smoothing_triangles = smoothing_triangles
+
 
     def __dealloc__(self):
         """
@@ -97,6 +113,8 @@ cdef class Automaton:
         if self.grid_b is not NULL:
             self._dealloc_grid(self.grid_b)
             self.grid_b = NULL
+        if self.smoothing_triangles != NULL:
+            free(self.smoothing_triangles)
 
     cdef void _dealloc_grid(self, CCell** grid):
         """
@@ -216,25 +234,36 @@ cdef class Automaton:
         cdef CCell* cell_a
         cdef CCell* cell_b
         cdef int i
+
         cdef CellSnapshot* snapshot = self.frame_recorder.get_next_buffer()
         self.frame_counter += 1
 
-        for i in range(self.n_nodes):
-            cell_a = self.grid_a[i]
-            cell_b = self.grid_b[i]
-            update_charge(cell_a, cell_b)
-            draw_function(self.img_buffer, self.bytes_per_line, cell_b)
+        cdef CCell* cell
+        cdef unsigned char* img_buffer = self.img_buffer
+        cdef int bytes_per_line = self.bytes_per_line
+        cdef int n_nodes = self.n_nodes
 
-            # Inline write to the buffer
-            snapshot[i].pos_x = cell_b.pos_x
-            snapshot[i].pos_y = cell_b.pos_y
-            snapshot[i].c_state = cell_b.c_state
-            snapshot[i].charge = cell_b.charge
-            snapshot[i].timer = cell_b.timer
-            snapshot[i].can_propagate = cell_b.can_propagate
-            snapshot[i].propagation_time = cell_b.propagation_time
-            snapshot[i].propagation_count = cell_b.propagation_count
+        with nogil:
+            for i in prange(n_nodes, schedule='static'):
+                cell_a = self.grid_a[i]
+                cell_b = self.grid_b[i]
+                update_charge(cell_a, cell_b)
 
+                draw_function(img_buffer, bytes_per_line, cell_b)
+
+                # Inline write to the buffer
+                snapshot[i].pos_x = cell_b.pos_x
+                snapshot[i].pos_y = cell_b.pos_y
+                snapshot[i].c_state = cell_b.c_state
+                snapshot[i].charge = cell_b.charge
+                snapshot[i].timer = cell_b.timer
+                snapshot[i].can_propagate = cell_b.can_propagate
+                snapshot[i].propagation_time = cell_b.propagation_time
+                snapshot[i].propagation_count = cell_b.propagation_count
+
+            for i in prange(self.n_triangles, schedule='static'):
+                triangle = self.smoothing_triangles[i]
+                draw_triangle_soft(self.img_buffer, self.bytes_per_line, triangle)
         self.grid_a = self.grid_b
         self.grid_b = tmp
 
@@ -249,8 +278,9 @@ cdef class Automaton:
             func = draw_from_state
         self._update_grid_nogil(func)
 
-    cpdef int render_frame(self, int idx, object if_charged, object drop_newer):
+    cpdef int render_frame(self, int idx, bint if_charged, bint drop_newer):
         cdef int i
+        cdef int n_nodes = self.n_nodes
         cdef CellSnapshot* snapshots = self.frame_recorder.get_buffer(idx)
         cdef DrawFunc func
         cdef CCell* cell
@@ -258,24 +288,30 @@ cdef class Automaton:
             func = draw_from_charge
         else:
             func = draw_from_state
-        
-        for i in range(self.n_nodes):
-            cell = self.grid_a[i]
-            cell.c_state = snapshots[i].c_state
-            cell.charge = snapshots[i].charge
-            cell.timer = snapshots[i].timer 
-            cell.can_propagate = snapshots[i].can_propagate
-            cell.propagation_time = snapshots[i].propagation_time
-            cell.propagation_count = snapshots[i].propagation_count
-            func(self.img_buffer, self.bytes_per_line, cell)
-            # Fix idea by Albert
-            cell = self.grid_b[i]
-            cell.c_state = snapshots[i].c_state
-            cell.charge = snapshots[i].charge
-            cell.timer = snapshots[i].timer 
-            cell.can_propagate = snapshots[i].can_propagate
-            cell.propagation_count = snapshots[i].propagation_count
-            cell.propagation_time = snapshots[i].propagation_time
+
+        with nogil:
+            for i in prange(self.n_nodes, schedule='static'):
+                cell = self.grid_a[i]
+                cell.c_state = snapshots[i].c_state
+                cell.charge = snapshots[i].charge
+                cell.timer = snapshots[i].timer
+                cell.can_propagate = snapshots[i].can_propagate
+                cell.propagation_time = snapshots[i].propagation_time
+                cell.propagation_count = snapshots[i].propagation_count
+
+                func(self.img_buffer, self.bytes_per_line, cell)
+
+                # Fix idea by Albert
+                cell = self.grid_b[i]
+                cell.c_state = snapshots[i].c_state
+                cell.charge = snapshots[i].charge
+                cell.timer = snapshots[i].timer
+                cell.can_propagate = snapshots[i].can_propagate
+                cell.propagation_count = snapshots[i].propagation_count
+                cell.propagation_time = snapshots[i].propagation_time
+            for i in prange(self.n_triangles, schedule='static'):
+                triangle = self.smoothing_triangles[i]
+                draw_triangle_soft(self.img_buffer, self.bytes_per_line, triangle)
 
         if drop_newer:
             self.frame_recorder.remove_newer(idx)

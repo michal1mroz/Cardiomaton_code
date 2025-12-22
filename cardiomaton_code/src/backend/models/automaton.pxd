@@ -1,5 +1,6 @@
 from src.backend.structs.c_cell cimport CCell
 from src.models.cell import Cell
+from src.backend.structs.c_triangle cimport CTriangle
 from src.backend.utils.draw_functions cimport DrawFunc
 from src.backend.models.frame_recorder cimport FrameRecorder
 
@@ -27,6 +28,11 @@ cdef class Automaton:
     cdef CCell ***modification_snapshot_grids
     cdef int buf_size
 
+    # Smoothing triangles
+
+    cdef CTriangle* smoothing_triangles
+    cdef int n_triangles
+
     # Public python API
     cpdef void update_grid(self, object show_charge)
     cpdef int to_cell_data(self)
@@ -37,7 +43,7 @@ cdef class Automaton:
     cpdef dict get_cell_data(self, tuple)
 
     cpdef int get_buffer_size(self)
-    cpdef int render_frame(self, int idx, object if_charged, object drop_newer)
+    cpdef int render_frame(self, int idx, bint if_charged, bint drop_newer)
     cpdef void set_frame_counter(self, int)
     cpdef dict serialize_automaton(self)
 
