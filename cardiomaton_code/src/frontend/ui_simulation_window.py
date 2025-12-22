@@ -49,17 +49,21 @@ class UiSimulationWindow(object):
         layout.addWidget(self.presets_layout, stretch=0)
 
         self.tools_container = QWidget()
+        UIFactory.add_shadow(self.tools_container)
         self.tools_container.setObjectName("Layout")
 
         tools_layout = QVBoxLayout(self.tools_container)
         tools_layout.setContentsMargins(0, 10, 0, 10)
 
         self.modification_panel = ModificationPanel()
+
+
         tools_layout.addWidget(self.modification_panel, stretch=1)
 
         self.parameters_scroll = QScrollArea()
         self.parameters_scroll.setWidgetResizable(True)
         self.parameters_scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.parameters_scroll.setObjectName("parametersScroll")
         self.parameter_panel = ParameterPanel()
         self.parameter_panel.setObjectName("ParameterPanel")
         self.parameters_scroll.setWidget(self.parameter_panel)
@@ -77,6 +81,7 @@ class UiSimulationWindow(object):
 
         self.cell_inspector_container = QWidget()
         self.cell_inspector_container.setObjectName("CellInspectorContainer")
+        UIFactory.add_shadow(self.cell_inspector_container)
         layout.addWidget(self.cell_inspector_container)
         self.cell_inspector_container.hide()
 

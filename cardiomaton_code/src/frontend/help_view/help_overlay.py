@@ -42,7 +42,7 @@ class HelpOverlay(QWidget):
                 global_pos = target.widget.mapToGlobal(QPoint(0, 0))
                 local_pos = self.mapFromGlobal(global_pos)
 
-                target_rect = QRect(local_pos, target.widget.size()).adjusted(-5, -5, 5, 5)
+                target_rect = QRect(local_pos, target.widget.size()).adjusted(-2, -2, 2, 2)
                 path.addRoundedRect(target_rect.x(), target_rect.y(), target_rect.width(), target_rect.height(), 10, 10)
 
         painter.setBrush(QBrush(QColor(0, 0, 0, 180)))
@@ -53,7 +53,7 @@ class HelpOverlay(QWidget):
         if self.active_target:
             global_pos = self.active_target.widget.mapToGlobal(QPoint(0, 0))
             local_pos = self.mapFromGlobal(global_pos)
-            target_rect = QRect(local_pos, self.active_target.widget.size()).adjusted(-5, -5, 5, 5)
+            target_rect = QRect(local_pos, self.active_target.widget.size()).adjusted(-2, -2, 2, 2)
 
             pen = QPen(QColor("#E1605D"))
             pen.setWidth(3)
@@ -70,7 +70,7 @@ class HelpOverlay(QWidget):
 
             global_pos = target.widget.mapToGlobal(QPoint(0, 0))
             local_pos = self.mapFromGlobal(global_pos)
-            target_rect = QRect(local_pos, target.widget.size()).adjusted(-5, -5, 5, 5)
+            target_rect = QRect(local_pos, target.widget.size()).adjusted(-2, -2, 2, 2)
 
             if target_rect.contains(event.pos()):
                 found_target = target

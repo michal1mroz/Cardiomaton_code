@@ -37,7 +37,13 @@ class HelpContentProvider:
         steps.append(TutorialStep(
             widget=simulation_window.presets_layout.button,
             title="Save Preset Mode",
-            description="Enters or exits the preset saving mode. Open this interface to name and store the current simulation state. Click again to close the input field and return to the default view."
+            description="Enters or exits the preset saving mode. Open this interface to name and store the current simulation state. Click again to save your preset, exit the input field and return to the default view."
+        ))
+
+        steps.append(TutorialStep(
+            widget=simulation_window.presets_layout.exit_button,
+            title="Exit Save Preset Mode",
+            description="Exits the preset saving mode without saving and returns to the default view."
         ))
 
         steps.append(TutorialStep(
@@ -53,7 +59,7 @@ class HelpContentProvider:
         ))
 
         steps.append(TutorialStep(
-            widget=simulation_window.modification_panel.brush_slider,
+            widget=simulation_window.modification_panel.brush_container,
             title="Brush Size",
             description="Controls the diameter of the modification brush. New parameters are applied to the areas of the heart you paint over in the modification mode. The visual highlight confirms which cells in the conduction system are going to receive the update."
         ))
@@ -121,7 +127,7 @@ class HelpContentProvider:
         steps.append(TutorialStep(
             widget=simulation_window.presets_layout.text_input,
             title="Save Your Preset",
-            description="Type a name for your preset and press Enter to confirm. This saves the current state of the simulation under that name, allowing you to restore this exact configuration later."
+            description="Type a name for your preset and press the '✔' button to confirm. This saves the current state of the simulation under that name, allowing you to restore this exact configuration later."
         ))
 
         overlay_graph = self.app.simulation_window.overlay_graph
