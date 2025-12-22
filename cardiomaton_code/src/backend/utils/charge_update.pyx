@@ -4,7 +4,7 @@ from src.backend.enums.cell_type cimport CellTypeC
 
 cdef int eps = 1
 
-cdef inline void update_cell(CCell* cell_a, CCell* cell_b):
+cdef inline void update_cell(CCell* cell_a, CCell* cell_b) noexcept nogil:
     """
     Helper function that overwrites the state of cell_b with the updated charge of cell_a.
     """
@@ -15,7 +15,7 @@ cdef inline void update_cell(CCell* cell_a, CCell* cell_b):
     cell_a.timer = timer
     cell_b.charge = cell_a.charges[timer] 
 
-cdef inline void depolarize_cell(CCell* cell_a, CCell* cell_b):
+cdef inline void depolarize_cell(CCell* cell_a, CCell* cell_b) noexcept nogil:
     """
     Helper function that depolarizes cell and overwrites the state of cell_b with it
     """
@@ -24,7 +24,7 @@ cdef inline void depolarize_cell(CCell* cell_a, CCell* cell_b):
     cell_b.charge = cell_b.charges[cell_b.charge_max]
     cell_b.c_state = CellStateC.RAPID_DEPOLARIZATION
 
-cdef void update_charge(CCell* cell_a, CCell* cell_b):
+cdef void update_charge(CCell* cell_a, CCell* cell_b) noexcept nogil:
     """
     Update method. Mirrors update_charge_ms.py, but performs changes in place.
     Cython doesn't support the switch-case syntax, so had to split it into if-elif chain :<<
