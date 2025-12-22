@@ -72,6 +72,10 @@ class ParameterSlider(QObject):
 
     def get_slider_widget(self) -> QtWidgets.QSlider:
         return self._slider
+    
+    def set_slider_value(self, val: float) -> None:
+        self._slider.setValue(val)
+        self._value_edit.setText(self._definition.format_value(val))
 
     def _to_slider_value(self, value: float) -> str:
         if self._definition.is_time:
