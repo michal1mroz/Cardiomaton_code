@@ -1,9 +1,8 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import QThread
-
 from src.frontend.ui_components.loading_window import PlaceholderWindow
-from src.workers.backend_init_worker import BackendInitWorker
+
+
 
 
 def main():
@@ -13,45 +12,42 @@ def main():
     Initializes the Qt application, shows a loading window,
     and initializes the backend asynchronously in a separate thread.
     """
+    K = 5
+    SIZE = (292 * K, 400 * K)
+    BASE_FRAME_TIME = 0.05
 
     app = QApplication(sys.argv)
 
     loading = PlaceholderWindow()
     loading.show()
 
-    # --- Backend initialization thread setup ---
-    K = 5
-    backend_thread = QThread()
-    backend_worker = BackendInitWorker(base_frame_time=0.05, size = (292 * K, 400 * K))
+    app.processEvents()
 
-    backend_worker.moveToThread(backend_thread)
+    # --- Backend classes import ---
+    from PyQt6.QtGui import QImage
+    from src.backend.controllers.simulation_controller import SimulationController
+    from src.frontend.frame_rendering.frame_renderer import FrameRenderer
+    from src.backend.enums.cell_type import ConfigLoader
+    from src.database.db import init_db
 
-    def on_backend_ready(simulation, renderer, image):
-        from src.backend.enums.cell_type import ConfigLoader
-        from src.database.db import init_db
-        from src.frontend.main_window import MainWindow
+    app.processEvents()
+    # --- Backend initialization ---
+    ConfigLoader.loadConfig()
+    init_db()
+    image = QImage(SIZE[1], SIZE[0], QImage.Format.Format_RGBA8888)
+    sim = SimulationController(frame_time=BASE_FRAME_TIME, image=image)
+    renderer = FrameRenderer(sim, image)
 
-        ConfigLoader.loadConfig()
-        init_db()
-
-        main_window = MainWindow(
-            simulationController=simulation,
-            frameRenderer=renderer,
-            image=image
-        )
-        main_window.show()
-
-        loading.close()
-
-        backend_thread.quit()
-        backend_thread.wait()
-
-    backend_thread.started.connect(backend_worker.run)
-    backend_worker.finished.connect(on_backend_ready)
-    backend_worker.finished.connect(backend_worker.deleteLater)
-    backend_thread.finished.connect(backend_thread.deleteLater)
-
-    backend_thread.start()
+    app.processEvents()
+    # --- Frontend initialization ---
+    from src.frontend.main_window import MainWindow
+    main_window = MainWindow(
+        simulationController=sim,
+        frameRenderer=renderer,
+        image=image
+    )
+    loading.close()
+    main_window.show()
 
     sys.exit(app.exec())
 

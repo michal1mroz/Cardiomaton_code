@@ -27,6 +27,8 @@ class SimulationWindow(QWidget):
         self.image = image
         self.renderer = frameRenderer
 
+        K = 5
+        self.size = (292 * K, 400 * K)
         self.base_frame_time = 0.05
 
         self.cell_data_provider = CellDataProvider(self.sim)
@@ -210,8 +212,7 @@ class SimulationWindow(QWidget):
         db = SessionLocal()
         try:
             dto = get_automaton(db, entry)
-            size = dto.shape
-            self.image = QImage(size[1], size[0], QImage.Format.Format_RGBA8888)
+            self.image = QImage(self.size[1], self.size[0], QImage.Format.Format_RGBA8888)
 
             self.sim.update_automaton(dto, self.image)
             self.renderer = FrameRenderer(self.sim, self.image)
