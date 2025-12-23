@@ -118,6 +118,7 @@ class SimulationService:
             frame=dto.frame,
             frame_time=self.ft
         )
+
     @property
     def frame_time(self) -> float:
         """
