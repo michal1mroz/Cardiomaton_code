@@ -212,7 +212,6 @@ class SimulationWindow(QWidget):
         db = SessionLocal()
         try:
             dto = get_automaton(db, entry)
-            self.image = QImage(self.size[1], self.size[0], QImage.Format.Format_RGBA8888)
 
             self.sim.update_automaton(dto, self.image)
             self.renderer = FrameRenderer(self.sim, self.image)
