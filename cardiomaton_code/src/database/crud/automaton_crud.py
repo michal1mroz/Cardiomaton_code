@@ -98,6 +98,7 @@ def create_or_overwrite_entry(
         width: int,
         height: int,
         frames: int,
+        is_preset: bool = False
 ) -> AutomatonTable:
     """
         Creates a new automaton entry. If the entry under the specified name already exists it is overwritten.
@@ -135,6 +136,7 @@ def create_or_overwrite_entry(
         width = width,
         height = height,
         frames = frames,
+        is_default = is_preset
     )
     db.add(row)
     db.flush()
@@ -174,7 +176,8 @@ def get_entry(
         "height": row.height,
         "frames": row.frames,
         "modified_at": row.modified_at,
-        "cells": deserialize_cells(row.data) if include_blob else None
+        "cells": deserialize_cells(row.data) if include_blob else None,
+        "is_default": row.is_default
     }
 
 def get_arguments_for_automaton(db: Session, automaton_id: int):
