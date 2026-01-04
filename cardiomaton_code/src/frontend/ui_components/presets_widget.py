@@ -164,10 +164,23 @@ class PresetsWidget(QWidget):
                     row_layout.addStretch()
                     
                     if not entry.get('is_default', False):
-                        del_btn = QPushButton('x')
+                        del_btn = QPushButton()
                         del_btn.setFixedSize(18, 18)
+                        del_btn.setIcon(QIcon("./resources/style/icons/cancel.png"))
+                        del_btn.setIconSize(QSize(12, 12))
                         del_btn.setToolTip(f"Delete preset {display_name}")
                         del_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+                        del_btn.setStyleSheet("""
+                            QPushButton {
+                                padding: 0px;
+                                margin: 0px;
+                                border: none;
+                            }
+                            QPushButton:hover {
+                                border-radius: 4px;
+                            }
+                        """)
 
                         def make_delete_handler(name, item_ref):
                             def on_delete():
