@@ -161,19 +161,7 @@ class PresetsWidget(QWidget):
                         del_btn.setIconSize(QSize(8, 8))
                         del_btn.setToolTip(f"Delete preset {display_name}")
                         del_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-                        del_btn.setStyleSheet("""
-                            QPushButton {
-                                padding: 0px;
-                                margin: 0px;
-                                border: none;
-                                background-color: #E1605D;
-                                border-radius: 8px;
-                            }
-                            QPushButton:hover {
-                                background-color: #CD4B48;
-                            }
-                        """)
+                        del_btn.setObjectName("delBtn")
 
                         def make_delete_handler(name, item_ref):
                             def on_delete():
