@@ -171,7 +171,7 @@ class PresetsWidget(QWidget):
                                 border-radius: 8px;
                             }
                             QPushButton:hover {
-                                border-radius: 4px;
+                                background-color: #CD4B48;
                             }
                         """)
 
