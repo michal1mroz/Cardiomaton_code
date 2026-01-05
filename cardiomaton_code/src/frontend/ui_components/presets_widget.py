@@ -167,6 +167,8 @@ class PresetsWidget(QWidget):
                                 padding: 0px;
                                 margin: 0px;
                                 border: none;
+                                background-color: #E1605D;
+                                border-radius: 8px;
                             }
                             QPushButton:hover {
                                 border-radius: 4px;
