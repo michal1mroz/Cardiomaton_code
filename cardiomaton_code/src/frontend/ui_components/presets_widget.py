@@ -46,14 +46,7 @@ class PresetsWidget(QWidget):
         self.list_widget = QListWidget()
         self.list_widget.setUniformItemSizes(True)
         self.list_widget.setSpacing(2)
-        self.list_widget.setStyleSheet("""
-            QListWidget {
-                background: palette(base);
-            }
-            QListWidget::item {
-                background: transparent;
-            }
-        """)
+
         font = QFont('Mulish')
         font.setPointSize(10)
         self.list_widget.setFont(font)
@@ -154,13 +147,11 @@ class PresetsWidget(QWidget):
                     self.list_widget.addItem(item)
                     row_widget = QWidget()
                     row_widget.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-                    row_widget.setAutoFillBackground(True)
 
                     row_layout = QHBoxLayout(row_widget)
                     row_layout.setContentsMargins(6,2,6,2)
                     label = QLabel(display_name)
                     label.setFont(QFont('Mulish', 10))
-                    row_layout.addWidget(label)
                     row_layout.addStretch()
                     
                     if not entry.get('is_default', False):
