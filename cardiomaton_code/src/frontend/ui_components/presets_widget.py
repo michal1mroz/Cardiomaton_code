@@ -156,7 +156,7 @@ class PresetsWidget(QWidget):
                     
                     if not entry.get('is_default', False):
                         del_btn = QPushButton()
-                        del_btn.setFixedSize(18, 18)
+                        del_btn.setFixedSize(16, 16)
                         del_btn.setIcon(QIcon("./resources/style/icons/cancel.png"))
                         del_btn.setIconSize(QSize(12, 12))
                         del_btn.setToolTip(f"Delete preset {display_name}")
