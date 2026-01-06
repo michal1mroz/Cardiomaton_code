@@ -23,6 +23,6 @@ if __name__ == '__main__':
         graph, A, B = extract_conduction_pixels()
         space = Space(graph)
         _, cell_map = space.build_capped_neighbours_graph_from_regions(A, B, cap=8)
-        res = create_or_overwrite_entry(db, config_name, cell_map.values(), graph.shape[0], graph.shape[1], 1100)
+        res = create_or_overwrite_entry(db, config_name, cell_map.values(), graph.shape[0], graph.shape[1], 1100, is_preset=True)
 
     

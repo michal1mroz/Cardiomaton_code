@@ -1,11 +1,13 @@
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QSize
 from PyQt6.QtGui import QFont, QIcon
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QListView
+from PyQt6.QtWidgets import (
+    QWidget, QHBoxLayout, QLabel, QComboBox, QPushButton, 
+    QLineEdit, QListWidget, QListWidgetItem, QAbstractItemView)
 
 from src.frontend.ui_components.ui_factory import UIFactory
 
 from src.database.db import SessionLocal
-from src.database.crud.automaton_crud import list_entries
+from src.database.crud.automaton_crud import list_entries, delete_entry
 
 class PresetsWidget(QWidget):
     preset_selected = pyqtSignal(object)  
@@ -40,9 +42,20 @@ class PresetsWidget(QWidget):
 
         self.dropdown = QComboBox()
         self.dropdown.setObjectName("presetComboBox")
-        view = QListView()
-        view.setFont(QFont("Mulish", 10))
-        self.dropdown.setView(view)
+
+        self.list_widget = QListWidget()
+        self.list_widget.setUniformItemSizes(True)
+        self.list_widget.setSpacing(2)
+
+        font = QFont('Mulish')
+        font.setPointSize(10)
+        self.list_widget.setFont(font)
+        self.list_widget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.list_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        self.dropdown.setModel(self.list_widget.model())
+        self.dropdown.setView(self.list_widget)
+
         self.main_layout.addWidget(self.dropdown)
 
         self._load_database_entries()
@@ -76,6 +89,7 @@ class PresetsWidget(QWidget):
         self.main_layout.setContentsMargins(30, 5, 30, 5)
 
         self._init_connections()
+
         self.current_entry = None
         self.is_adding_preset = False
 
@@ -99,7 +113,6 @@ class PresetsWidget(QWidget):
             self.show_input_field()
     
     def on_preset_changed(self, text):
-        """Handler for when combobox selection changes."""
         entry = self._get_selected_entry()
         self.current_entry = entry
 
@@ -108,7 +121,16 @@ class PresetsWidget(QWidget):
         if entry:
             self.preset_selected.emit(entry)
 
+    def _remove_entry(self, name):
+        try:
+            db = SessionLocal()
+            delete_entry(db, name)
+
+        except Exception as e:
+            print(f"Failed to remove: {name}. Error: {e}")
+
     def _load_database_entries(self):
+        self.list_widget.clear()
         self.dropdown.clear()
         
         try:
@@ -117,20 +139,67 @@ class PresetsWidget(QWidget):
 
             if entries:
                 for entry in entries:
-                    display_name = self.get_display_name(entry['name'])
-                    self.dropdown.addItem(display_name)
-                    index = self.dropdown.count() - 1
-                    self.dropdown.setItemData(
-                        index,
-                        display_name,
-                        Qt.ItemDataRole.ToolTipRole
-                    )
+                    internal_name = entry['name']
+                    display_name = self.get_display_name(internal_name)
+                    item = QListWidgetItem()
+                    item.setText(display_name)
+
+                    self.list_widget.addItem(item)
+                    row_widget = QWidget()
+                    row_widget.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+                    row_layout = QHBoxLayout(row_widget)
+                    row_layout.setContentsMargins(6,2,6,2)
+                    label = QLabel(display_name)
+                    label.setFont(QFont('Mulish', 10))
+                    row_layout.addStretch()
+                    
+                    if not entry.get('is_default', False):
+                        del_btn = QPushButton()
+                        del_btn.setFixedSize(16, 16)
+                        del_btn.setIcon(QIcon("./resources/style/icons/cancel.png"))
+                        del_btn.setIconSize(QSize(8, 8))
+                        del_btn.setToolTip(f"Delete preset {display_name}")
+                        del_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                        del_btn.setObjectName("delBtn")
+
+                        def make_delete_handler(name, item_ref):
+                            def on_delete():
+                                prev_index = self.dropdown.currentIndex()
+                                internal = self.get_internal_name(name)
+
+                                row = self.list_widget.row(item_ref)
+                                taken = self.list_widget.takeItem(row)
+
+                                self._remove_entry(internal)
+
+                                del taken
+                                if prev_index >= 0 and prev_index < self.list_widget.count():
+                                    self.dropdown.setCurrentIndex(prev_index)
+                                else:
+                                    if self.list_widget.count() > 0:
+                                        self.dropdown.setCurrentIndex(0)
+                                    else:
+                                        self.dropdown.setCurrentIndex(-1)
+                            return on_delete
+
+                        del_btn.clicked.connect(make_delete_handler(display_name, item))
+                        row_layout.addWidget(del_btn)
+                    
+                    self.list_widget.setItemWidget(item, row_widget)
+                    item.setToolTip(display_name)
 
             else:
-                self.dropdown.addItem("No presets available")
+                placeholder = QListWidgetItem("No presets available")
+                placeholder.setFlags(placeholder.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+                self.list_widget.addItem(placeholder)
+
         except Exception as e:
             print(f"Error loading database entries: {e}")
-            self.dropdown.addItem("Error loading presets")
+            placeholder = QListWidgetItem("No presets available")
+            placeholder.setFlags(placeholder.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+            self.list_widget.addItem(placeholder)
+
 
     def _refresh_entries(self):
         current_text = self.dropdown.currentText()
@@ -145,9 +214,6 @@ class PresetsWidget(QWidget):
         """Get the currently selected entry from database based on combobox selection."""
         current_text = self.dropdown.currentText()
         self.dropdown.hidePopup()
-# <<<<<<< HEAD
-        # return current_text
-# =======
         return self.get_internal_name(current_text)
     
     def toggle_input_field(self):
@@ -156,7 +222,6 @@ class PresetsWidget(QWidget):
             self.cancel_input()
         else:
             self.show_input_field()
-# >>>>>>> main
 
     def show_input_field(self):
         """Show the text input field for entering a new preset name."""
@@ -243,3 +308,11 @@ class PresetsWidget(QWidget):
         
         self.hide_input_field()
          
+    # def _on_list_item_clicked(self, item: QListWidgetItem):
+    #     row = self.list_widget.row(item)
+    #     if row >= 0:
+    #         self.dropdown.setCurrentIndex(row)
+    #         internal = self.get_internal_name(item.text())
+    #         self.current_entry = internal
+    #         self.preset_selected.emit(internal)
+    #         self.dropdown.hidePopup()
