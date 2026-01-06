@@ -19,13 +19,13 @@ from src.models.cell import CellDict
 
 
 class SimulationWindow(QWidget):
-    def __init__(self, simulationController: SimulationController, frameRenderer: FrameRenderer, image: QImage, parent=None):
+    def __init__(self, simulation_controller: SimulationController, frame_renderer: FrameRenderer, image: QImage, parent=None):
         super().__init__(parent)
         self.ui = UiSimulationWindow(self)
 
-        self.sim = simulationController
+        self.sim = simulation_controller
         self.image = image
-        self.renderer = frameRenderer
+        self.renderer = frame_renderer
 
         K = 5
         self.size = (292 * K, 400 * K)
