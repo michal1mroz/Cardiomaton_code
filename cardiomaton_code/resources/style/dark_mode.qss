@@ -121,6 +121,18 @@ QPushButton:hover,
     font-size: 14px;
 }
 
+#delBtn {
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    background-color: #E1605D;
+    border-radius: 8px;
+}
+
+#delBtn:hover {
+    background-color: #CD4B48;
+}
+
 #play_button {
     font-size: 30px;
     font-weight: bold;

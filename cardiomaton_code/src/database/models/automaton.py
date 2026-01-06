@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, LargeBinary, DateTime
+from sqlalchemy import Column, Integer, String, LargeBinary, DateTime, Boolean
 from src.database.db import Base
 
 class AutomatonTable(Base):
@@ -12,6 +12,7 @@ class AutomatonTable(Base):
     height = Column(Integer, nullable=False)
     frames = Column(Integer, nullable=False)
     modified_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    is_default = Column(Boolean)
 
     def __repr__(self) -> str:
         return f"<AutomatonTable(name={self.name!r} w={self.width} h={self.height} f={self.frames})>"
