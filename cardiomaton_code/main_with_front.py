@@ -42,8 +42,8 @@ def main():
     # --- Frontend initialization ---
     from src.frontend.main_window import MainWindow
     main_window = MainWindow(
-        simulationController=sim,
-        frameRenderer=renderer,
+        simulation_controller=sim,
+        frame_renderer=renderer,
         image=image
     )
     loading.close()

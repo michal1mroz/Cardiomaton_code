@@ -17,7 +17,7 @@ from src.frontend.frame_rendering.frame_renderer import FrameRenderer
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, simulationController: SimulationController, frameRenderer: FrameRenderer, image: QImage):
+    def __init__(self, simulation_controller: SimulationController, frame_renderer: FrameRenderer, image: QImage):
         super().__init__()
 
         self.resize(1100, 600)
@@ -48,12 +48,12 @@ class MainWindow(QMainWindow):
         self.help_provider = HelpContentProvider(self)
         self.help_overlay.hide()
 
-        self._init_views(simulationController, frameRenderer, image)
+        self._init_views(simulation_controller, frame_renderer, image)
         self._connect_topbar()
         self._apply_style()
 
-    def _init_views(self,  simulationController: SimulationController, frameRenderer: FrameRenderer, image: QImage):
-        self.simulation_window = SimulationWindow(simulationController, frameRenderer, image)
+    def _init_views(self,  simulation_controller: SimulationController, frame_renderer: FrameRenderer, image: QImage):
+        self.simulation_window = SimulationWindow(simulation_controller, frame_renderer, image)
         self.stack.addWidget(self.simulation_window)
 
         self.about_view = AboutView()
